@@ -1,0 +1,26 @@
+{% extends "popup_base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Dipendenti</title> 
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Dipendenti | Elimina Dipendente</h2>
+{% endblock %}
+
+{% block content %}
+<form action="{% url del_dipendente %}" method="POST">
+	{% csrf_token %}	
+	<span>Sei sicuro di voler eliminare i seguenti dipendenti</span>
+	<ul>
+	{% for obj in objs %}
+		<li>
+			<b>{{ obj }}</b>
+			<input type="hidden" name="id" value="{{ obj.id }}" />
+		</li>
+	{% endfor %}
+	</ul>
+	<input type="submit" value="Continua" />
+	<button onclick="window.close()">Annulla</button>
+</form>
+{% endblock %}

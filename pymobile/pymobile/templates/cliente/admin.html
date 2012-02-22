@@ -1,0 +1,56 @@
+{% extends "base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Clienti</title>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/modeltable.js"></script> 
+{{ filterform.media }} 
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Clienti</h2>
+{% endblock %}
+
+{% load tags %}
+
+{% block content %}
+<div class="navigation">
+	<a href="../">home</a> &gt;
+	<a href=".">amministrazione clienti</a>
+</div>
+<div id="modeltable_div">
+	<p class="modeltable_name"><b>Tabella dei Clienti</b></p>
+	{% load django_tables2 %}
+	{% render_table modeltable %}
+	
+	<div class="modeltable_actions_div">
+		<img src="{{ STATIC_URL }}/img/freccia_sel.png" />
+		Se selezionati: <select class="modeltable_actions">
+							<option value="delete">Elimina</option>
+						</select>
+						<button class="modeltable_actions_ok">Ok</button>
+	</div>	
+	<a class="addrow" href="{% url add_cliente %}">Aggiungi</a>
+</div>
+{% endblock %}
+
+{% block extraleft_bar %}
+<div id="filter_modeltable_div">
+	<form id="filter_modeltable_form" action=".">
+		<fieldset class="filter_modeltable_fieldset">
+		<legend>Filtro</legend>
+			<table>				
+				{% for field in filterform.visible_fields %}
+				<tbody>
+					<tr><td><b>{{ field.label_tag }}</b></td><td>{{ field }}</td></tr>
+					{% if field.help_text %}
+					<tr class="field_help"><td></td><td>{{ field.help_text }}</td></tr>
+					{% endif %}
+				</tbody>
+				{% endfor %}
+			</table>
+		</fieldset>
+		<input type="submit" id="filter_modeltable_search" value="cerca" />
+		<input type="reset" id="filter_modeltable_reset" value="reset" />
+	</form>
+</div>	
+{% endblock %}

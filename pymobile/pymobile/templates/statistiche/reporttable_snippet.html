@@ -1,0 +1,43 @@
+{% spaceless %}
+{% load django_tables2 %}
+<div class="table-container">
+<p><b>Periodo</b>: da <b>{{ period.0 }}</b> a <b>{{ period.1 }}</b></p>
+<table{% if reporttable.attrs %} {{ reporttable.attrs.as_html }}{% endif %}>
+    <thead>
+        <tr class="{% cycle "odd" "even" %}">
+        {% for column in reporttable.columns %}
+        {% if column.sortable %}
+            {% with column.order_by as ob %}
+            <th class="{% spaceless %}{% if column.sortable %}sortable {% endif %}{% if ob %}{% if ob.is_descending %}desc{% else %}asc{% endif %}{% endif %}{% endspaceless %}"><a href="{% if ob %}{% set_url_param sort=ob.opposite %}{% else %}{% set_url_param sort=column.name %}{% endif %}">{{ column.header }}</a></th>
+            {% endwith %}
+        {% else %}
+            <th>{{ column.header }}</th>
+        {% endif %}
+        {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in reporttable.page.object_list|default:reporttable.rows %} {# support pagination #}
+        <tr class="{% cycle "odd" "even" %}">
+            {% for cell in row %}
+                <td>{{ cell }}</td>
+            {% endfor %}
+        </tr>
+        {% empty %}
+        {% if reporttable.empty_text %}
+        <tr><td colspan="{{ reporttable.columns|length }}">{{ reporttable.empty_text }}</td></tr>
+        {% endif %}
+        {% endfor %}
+    </tbody>
+    <tfoot id="totals_row">
+    	<tr>
+    		<td><b>Totali</b></td>
+    		{% for tot in totals %}
+    		<td>{{ tot }}</td>
+    		{% endfor %}
+    		<td></td>
+    	</tr>
+    </tfoot>
+</table>
+</div>
+{% endspaceless %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}      
+
+{% load tags %}
+
+{% block extrahead %}
+<title>PYMOBILE | Tariffa</title>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/viewobj.js"></script>
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Tariffa | {{ object }}</h2>
+{% endblock %}
+
+{% block content %}
+<div class="navigation">
+	<a href="../../">home</a> &gt; 
+	<a href="../">amministrazione tariffe</a> &gt;
+	<a href="./">{{ object }}</a>
+</div>
+<div class="div_menu">
+	<ul id="menu_list">
+		<li><a href="{% url init_contratto %}?fpiano_tariffario=={{ object.id }}">Visualizza Contratti</a></li>
+	</ul>
+</div>
+<div class="div_detail">
+	<fieldset>
+	<legend>Dati Tariffa</legend>
+		<table class="table_detail">
+			<tr><td>Gestore</td><td>{{ object.gestore }}</td></tr>
+			<tr><td>Profilo</td><td>{{ object.profilo }}</td></tr>
+			<tr><td>Tipo</td><td>{% if object.tipo %}{{ object.tipo }}{% endif %}</td></tr>
+			<tr><td>Fascia</td><td>{% if object.fascia %}{{ object.fascia }}{% endif %}</td></tr>
+			{% if object.gestore = "edison" %}
+			<tr><td>Provvigione S.A.C.</td><td>{{ object.sac }}</td></tr>
+			<tr><td>Provvigione S.I.C.</td><td>{{ object.sic }}</td>
+			{% else %}
+			<tr><td>Servizio</td><td>{% if object.servizio %}{{ object.servizio }}{% endif %}</td></tr>
+			<tr><td>Provvigione per contratto</td><td>{{ object.sac }}</td></tr>
+			{% endif %}
+			<tr><td>Attivo</td><td>{% if object.attivo %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" />{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
+			<tr><td>Punteggio</td><td>{{ object.punteggio }}</td></tr>
+		</table>
+	</fieldset>
+	<div class="op_detail">
+		<ul id="op_list">
+			<li><a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_tariffa object.id %}">Modifica</a></li>
+			<li><a id="del_{{ object.id }}" class="deleteobj" href="{% url del_tariffa %}?id={{ object.id }}">Cancella</a></li>
+		</ul>
+	</div>
+</div>
+{% endblock %}

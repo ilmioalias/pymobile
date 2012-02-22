@@ -1,0 +1,67 @@
+{% extends "base.html" %}      
+
+{% load tags %}
+
+{% block extrahead %}
+<title>PYMOBILE | Appuntamento</title>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/viewobj.js"></script>
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Appuntamenti | {{ object }}</h2> 
+{% endblock %}
+
+{% block content %}
+<div class="navigation">
+	<a href="../../">home</a> &gt; 
+	<a href="../">amministrazione appuntamenti</a> &gt;
+	<a href="./">appuntamento: {{ object }}</a>
+</div>
+<div class="div_menu">
+	<ul id="menu_list">
+		<li>qualche azione</li>
+		<li>qualche azione</li>
+		<li>qualche azione</li>	
+	</ul>
+</div>
+<div class="div_detail">
+	<fieldset>
+	<legend>Dati Appuntamento</legend>
+		<table class="table_detail">
+			<tr><td>Data</td><td>{{ object.data }}</td></tr>
+			<tr><td>Cliente</td><td><a href="{% url view_cliente object.cliente.pk %}">{{ object.cliente }}</a></td></tr>
+			<tr>
+				<td>Referente</td>
+				<td>{% if object.referente %}<a href="{% url view_referente object.pk object.referente.pk %}">{{ object.referente }}</a>{% endif %}</td>
+			</tr>
+			{% if object.num_sim %}
+			<tr><td>Numero di SIM possedute</td><td>{{ object.num_sim }}</td></tr>
+			{% endif %}
+			{% if object.gestore_mob %}
+			<tr><td>Gestore di telefonia mobile</td><td>{{ object.gestore_mob }}</td></tr>
+			{% endif %}
+			{% if object.gestore_fisso %}
+			<tr><td>Gestore di telefonia fissa</td><td>{{ object.gestore_fisso }}</td></tr>
+			{% endif %}
+			{% if object.nota %}
+			<tr><td>Nota</td><td>{{ object.nota }}</td></tr>
+			{% endif %}
+			{% if object.agente %}
+			<tr><td>Agente assegnato all'appuntamento</td><td><a href="{% url view_dipendente object.agente.pk %}">{{ object.agente }}</a></td></tr>
+			{% else %}
+			<tr><td>Agente assegnato all'appuntamento</td><td>Nessun agente è stato ancora assegnato a questo appuntamento</td></tr>
+			{% endif %}
+			<tr><td>Da Richiamare</td><td>{% if object.richiamare %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" />{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
+			{% if object.nota_esito %}
+			<tr><td>Nota sull'esito</td><td>{{ object.nota_esito }}</td></tr>
+			{% endif %}
+		</table>
+	</fieldset>
+	<div class="op_detail">
+		<ul id="op_list">
+			<li><a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_appuntamento object.id %}">Modifica</a></li>
+			<li><a id="del_{{ object.id }}" class="deleteobj" href="{% url del_appuntamento %}?id={{ object.id }}">Cancella</a></li>
+		</ul>
+	</div>
+</div>
+{% endblock %}

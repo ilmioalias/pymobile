@@ -1,0 +1,30 @@
+<html lang="it-IT">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+
+	<script type="text/javascript" src="{{ STATIC_URL }}/js/jquery-1.7.1.min.js"></script>
+   	
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/css/custom/jquery-ui-1.8.17.custom.css" />		
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/css/base.css" />
+	
+	<title>LOGIN</title>
+</head>
+<body>
+<form id="login_form" method="post" action="{% url init_dipendente %}">
+	<fieldset>
+	<legend>Login</legend>
+		<table>
+			<tr>
+				<td><label for="login_username">Username</label></td>
+				<td><input id="login_username" type="text" name="username" /></td>
+		 	</tr>
+		 	<tr>
+				<td><label for="login_password">Password</label></td>
+				<td><input id="login_password" type="password" name="password" /></td>
+			</tr>
+		</table>
+	</fieldset>
+	<input type="submit" value="Entra" />
+</form>
+</body>
+</html>

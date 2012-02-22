@@ -1,0 +1,58 @@
+{% spaceless %}
+{% load tags %}
+<div class="table-container">
+<p><b>Periodo</b>: da <b>{{ period.0 }}</b> a <b>{{ period.1 }}</b></p>
+<table id="retribuzione">
+    <thead>
+        <tr class="{% cycle "odd" "even" %}">
+        	<th>Anno</th>
+        	<th>Mese</th>
+        	<th>Retribuzioni</th>
+        	<th>Variazioni Temporanee</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in rows %}
+        <tr class="{% cycle "odd" "even" %}">
+        	<td {% if row.anno %}class="anno"{% endif %}>
+        		{% if row.anno %}<b>{{ row.anno }}</b>{% endif %}
+    		</td>
+        	<td {% if row.mese %}class="mese"{% endif %}>
+        		{% if row.mese %}<b>{{ row.mese.0|get_month_name|capfirst }}</b>{% if row.mese.1 %}<br /><i>({{ row.mese.1 }})</i>{% endif %}{% else %}|{% endif %}
+    		</td>
+			<td {% if row.retribuzione %}rowspan="{{ row.rowspan_r }}"{% endif %} {% if row.retribuzione %}class="retribuzione"{% else %}class="libero"{% endif %}>
+				{% if row.retribuzione %}
+				Il: {{ row.retribuzione.data_fine }}{% if row.retribuzione.principale %} <b><i>(assunzione)</i></b>{% endif %}
+				<a class="visualizza" href="#"><img src="{{ STATIC_URL }}/img/destra.png" /></a>
+				<p class="info">
+				    Fisso: {{ row.retribuzione.fisso }}<br />
+				    Provvigione per contratto: {{ row.retribuzione.provvigione_contratto }}<br />
+				    Provvigione bonus: {{ row.retribuzione.provvigione_bonus }}<br />
+				    <a id="mod_id_{{ row.retribuzione.pk }}" class="modifyrow" href="{% url mod_retribuzione row.retribuzione.dipendente.pk row.retribuzione.pk %}">modifica</a>
+				    {% if not row.retribuzione.principale %}
+				    <a id="del_id_{{ row.retribuzione.pk }}" class="deleterow" href="{% url del_retribuzione row.retribuzione.dipendente.pk %}?id={{ row.retribuzione.pk }}">elimina</a>
+			    	{% endif %}  	
+			    </p>
+				{% endif %}
+			</td>
+			<td {% if row.variazione %}rowspan="{{ row.rowspan_v }}"{% endif %} {% if row.variazione %}class="variazione"{% else %}class="libero"{% endif %}>
+				{% if row.variazione %}
+				Da: {{ row.variazione.data_inizio }}
+				A: {{ row.variazione.data_fine }}
+				<a class="visualizza" href="#"><img src="{{ STATIC_URL }}/img/destra.png" /></a>
+				<p class="info">
+			    	Provvigione per contratto: {{ row.variazione.provvigione_contratto }}<br />
+				    Provvigione bonus: {{ row.variazione.provvigione_bonus }}<br />
+				    <a id="mod_id_{{ row.variazione.pk }}" class="modifyrow" href="{% url mod_vartmp row.variazione.dipendente.pk row.variazione.pk %}">modifica</a>
+				    <a id="del_id_{{ row.variazione.pk }}" class="deleterow" href="{% url del_vartmp row.variazione.dipendente.pk %}?id={{ row.variazione.pk }}">elimina</a>
+			    </p>
+				{% endif %}
+			</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">Tabella Vuota</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endspaceless %}

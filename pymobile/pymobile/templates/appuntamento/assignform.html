@@ -1,0 +1,34 @@
+{% extends "popup_base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Appuntamenti</title> 
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Appuntamenti | Assegna Appuntamento</h2>
+{% endblock %}
+
+{% block content %}
+<form action="{% url assign_appuntamento %}" method="POST">
+	{% csrf_token %}	
+	<span>Sei sicuro di voler assegnare i seguenti appuntamenti all'agente <b>{{ agente }}</b></span>
+	<ul>
+	{% for obj in objs %}
+		<li>
+			<b>{{ obj }}</b>
+			{% if obj.agente %}
+				<p class="warning">
+					<b>Attenzione:</b>
+					L'appuntamento è già assegnato all'agente <b>{{ obj.agente }}</b><br/>
+				   	L'agente verrà cambiato.
+			    </p>
+			{% endif %}
+			<input type="hidden" name="id" value="{{ obj.id }}" />
+		</li>
+	{% endfor %}
+	</ul>
+	<input type="hidden" name="agente" value="{{ agente.id }}"/>
+	<input type="submit" value="Salva" />
+	<button onclick="window.close()">Annulla</button>
+</form>
+{% endblock %}

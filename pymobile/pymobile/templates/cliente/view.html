@@ -1,0 +1,65 @@
+{% extends "base.html" %}      
+
+{% load tags %}
+
+{% block extrahead %}
+<title>PYMOBILE | Cliente</title>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/viewobj.js"></script>
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Clienti | {{ object }}</h2> 
+{% endblock %}
+
+{% block content %}
+<div class="navigation">
+	<a href="../../">home</a> &gt; 
+	<a href="../">amministrazione clienti</a> &gt;
+	<a href="./">{{ object }}</a>
+</div>
+<div class="div_menu">
+	<ul id="menu_list">
+		<li><a href="{% url init_appuntamento %}?fcliente=={{ object.id }}">Visualizza Appuntamenti</a></li>
+		<li><a href="{% url init_contratto %}?fcliente=={{ object.id }}">Visualizza Contratti</a></li>	
+	</ul>
+</div>
+<div class="div_detail">
+	<fieldset>
+	<legend>Dati Cliente</legend>
+		<table class="table_detail">
+			<tr><td>Cliente</td><td>{{ object.get_tipo_display }}</td></tr>
+			<tr><td>Denominazione</td><td>{{ object.denominazione }}</td></tr>
+			{% if object.cognome %}
+			<tr><td>Cognome</td><td>{{ object.cognome }}</td></tr>
+			{% endif %}	
+			{% if object.nome %}
+			<tr><td>Nome</td><td>{{ object.nome }}</td></tr>
+			{% endif %}	
+			{% if object.tipo == "bus" %}
+			<tr><td>Partita IVA</td><td>{{ object.partiva_codfisc }}</td></tr>
+			{% else %}
+			<tr><td>Codice Fiscale</td><td>{{ object.partiva_codfisc }}</td></tr>
+			{% endif %}	
+			<tr><td>Indirizzo </td><td>{{ object.indirizzo }}</td></tr>
+			<tr><td>Città</td><td>{{ object.residenza }}</td></tr>
+			<tr><td>EMail</td><td>{{ object.email }}</td></tr>
+			<tr><td>Telefono</td><td>{{ object.telefono }}</td></tr>
+			<tr><td>Cellulare</td><td>{{ object.cellulare }}</td></tr>
+			<tr><td>FAX</td><td>{{ object.fax }}</td></tr>
+			<tr>
+				<td>Blindato</td>
+				<td>{% if object.blindato %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" />{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td>
+			</tr>
+			{% if object.nota %}
+			<tr><td>Nota</td><td>{{ object.nota }}</td></tr>
+			{% endif %}
+		</table>
+	</fieldset>
+	<div class="op_detail">
+		<ul id="op_list">
+			<li><a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_cliente object.id %}">Modifica</a></li>
+			<li><a id="del_{{ object.id }}" class="deleteobj" href="{% url del_cliente %}?id={{ object.id }}">Cancella</a></li>
+		</ul>
+	</div>
+</div>
+{% endblock %}

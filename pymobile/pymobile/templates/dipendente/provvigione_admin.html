@@ -1,0 +1,56 @@
+{% extends "base.html" %}      
+
+{% load tags %}
+
+{% block extrahead %}
+<title>PYMOBILE | Dipendenti</title>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/modeltable.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/modeltable_retribuzione.js"></script>
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Dipendente | Provvigione di {{ dipendente }}</h2>
+{% endblock %}
+
+{% block content %}	
+<div class="navigation">
+	<a href="../">home</a> &gt; 
+	<a href="../">amministrazione dipendenti</a> &gt;
+	<a href="../">{{ dipendente }}</a> &gt;
+	<a href=".">provvigione</a>
+</div>
+<div id="modeltable_div">
+	<p class="modeltable_name"><b>Tabella delle variazioni delle provvigione</b></p>
+	<a class="addrow" href="{% url add_retribuzione dipendente.pk %}">Aggiungi Retribuzione</a><br />
+	<a class="addrow" href="{% url add_vartmp dipendente.pk %}">Aggiungi Variazione Temporanea</a>
+	{% include "dipendente/provvigione_table_snippet.html" %}
+	<br />
+	<a class="addrow" href="{% url add_retribuzione dipendente.pk %}">Aggiungi Retribuzione</a><br />
+	<a class="addrow" href="{% url add_vartmp dipendente.pk %}">Aggiungi Variazione Temporanea</a>
+</div>
+{% endblock %}
+
+{% block extraleft_bar %}
+<div id="filter_modeltable_div">
+	<form id="filter_modeltable_form" action=".">
+		<fieldset class="filter_modeltable_fieldset">
+		<legend>Filtro</legend>
+			<table id="filter_modeltable">
+				<tbody>
+					<tr>
+						<td><b>Data</b></td>
+						<td>
+						<table>
+							<tr><td>da</td><td><input id="id_data_inizio" class="date_start" type="text" name="data_inizio"></td></tr>
+							<tr><td>a</td><td><input id="id_data_fine" class="date_end" type="text" name="data_fine"></td></tr>
+						</table>
+						</td>
+					</tr>					
+				</tbody>				
+			</table>
+		</fieldset>
+		<input type="submit" id="filter_modeltable_search" value="seleziona" />
+		<input type="reset" id="filter_modeltable_reset" value="reset" />
+	</form>
+</div>	
+{% endblock %}

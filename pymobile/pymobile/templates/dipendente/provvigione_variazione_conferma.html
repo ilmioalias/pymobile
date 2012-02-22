@@ -1,0 +1,47 @@
+{% extends "popup_base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Dipendenti</title>
+{{ modelform.media }}
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Dipendenti | Conferma della variazione temporanea della retribuzione di {{ dipendente }}
+</h2>
+{% endblock %}
+
+{% block content %}
+{% if vartmp_del %}
+Verrano <b>eliminate</b> le seguenti varizioni temporanee già presenti nel DATABASE perché si sovrappongono totalmente con la nuova variazione temporanea:
+<ul>
+	{% for var in vartmp_del %}
+	<li><b>{{ var }}</b></li>
+	{% endfor %}
+</ul>
+{% endif %}
+{% if vartmp_mod_i or vartmp_mod_f %}
+<br />
+Verrano <b>modificate</b> le seguenti varizioni temporanee già presenti nel DATABASE perché si sovrappongono in parte con la nuova variazione temporanea:
+<ul>
+	{% for var in vartmp_mod_i %}
+	<li><b>{{ var }}</b></li>
+	{% endfor %}
+	{% for var in vartmp_mod_f %}
+	<li><b>{{ var }}</b></li>
+	{% endfor %}	
+</ul>
+{% endif %}
+<form action="." method="post">
+	<input id="id_dipendente" type="hidden" value="{{ dipendente.pk }}" name="dipendente">
+	<input id="id_variazione" type="hidden" value="{{ variazione }}" name="variazione">
+	<input id="id_principale" type="hidden" value="{{ principale }}" name="principale">
+	<input id="id_data_inizio" type="hidden" value="{{ data_inizio }}" name="data_inizio">
+	<input id="id_data_fine" type="hidden" value="{{ data_fine }}" name="data_fine">
+	<input id="id_provvigione_contratto" type="hidden" value="{{ provvigione_contratto }}" name="provvigione_contratto">
+	<input id="id_provvigione_bonus" type="hidden" value="{{ provvigione_bonus }}" name="provvigione_bonus">
+	<input id="id_verified" type="hidden" value="1" name="verified">
+	<input type="submit" class="modelform_save" value="continua" />
+	<button onclick="window.close()">annulla</button>
+</form>
+
+{% endblock %}

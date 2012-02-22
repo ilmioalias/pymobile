@@ -1,0 +1,48 @@
+{% extends "base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Statistiche</title>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/reporttable.js"></script> 
+{{ filterform.media }} 
+{% endblock %}
+
+{% block header %} 
+<h2>Statistiche: Classifiche</h2>
+{% endblock %}
+
+{% load tags %}
+
+{% block content %}
+<div class="navigation">
+	<a href="../">home</a> &gt;
+	<a href="../">statistiche</a> &gt;
+	<a href="../">classifiche</a> &gt;
+	<a href=".">canvas agenti: tim e telecom</a>
+</div>
+<div id="reporttable_div">
+	<p class="reporttable_name"><b>Canvas Agenti: Tim e Telecom</b></p>
+	{% include "statistiche/reporttable_snippet.html" %}
+</div>
+{% endblock %}
+
+{% block extraleft_bar %}
+<div id="filter_reporttable_div">
+	<form id="filter_reporttable_form" action=".">
+		<fieldset class="filter_reporttable_fieldset">
+		<legend>Filtro</legend>
+			<table>				
+				{% for field in filterform.visible_fields %}
+				<tbody>
+					<tr><td><b>{{ field.label_tag }}</b></td><td>{{ field }}</td></tr>
+					{% if field.help_text %}
+					<tr class="field_help"><td></td><td>{{ field.help_text }}</td></tr>
+					{% endif %}
+				</tbody>
+				{% endfor %}
+			</table>
+		</fieldset>
+		<input type="submit" id="filter_reporttable_search" value="cerca" />
+		<input type="reset" id="filter_reporttable_reset" value="reset" />
+	</form>
+</div>	
+{% endblock %}

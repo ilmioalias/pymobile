@@ -1,0 +1,147 @@
+{% extends "popup_base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Contratti</title>
+{{ modelform.media }} 
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Contratti | {{ action }} Contratto</h2>
+{% endblock %}
+
+{% block content %}
+{% load tags %}
+<div class="modelform_div">
+	<form class="modelform" action="." method="POST">
+		<div class="modelform_fieldset_div">
+			<fieldset class="modelform_fieldset">
+			<legend><b>Dati Contratto</b></legend>					
+				{% csrf_token %}
+				{{ modelformset.management_form }}
+				{% for hidden_field in modelform.hidden_fields %}
+				   {{ hidden_field }}
+				{% endfor %}						
+				<table>	
+					{% if modelform.non_field_errors %}
+					<tbody>
+						<tr class="field_error">
+							<td colspan="2">{{ field.non_field_errors|first }}</td>
+						</tr>					
+					</tbody>
+					{% endif %}					
+					{% for field in modelform.visible_fields %}
+					<tbody class="field">
+						{% if field.errors %}
+							<tr class="field_error">
+								<td></td><td>{{ field.errors|first }}</td>
+							</tr>
+						{% endif %}
+						<tr class="{% if field.errors %}field_error{% endif %}" >
+							<td>{{ field.label_tag }}</td>
+							<td>
+								{{ field }}
+							    {% if field|isfk %}
+							    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_contratto_fk field.html_name %}">
+							    		<img src="{{ STATIC_URL }}/img/add.png" />
+						    		</a>
+					    		{% endif %}
+							</td>
+						</tr>
+						{% if field.help_text %}
+							<tr class="field_help">
+								<td></td><td>{{ field.help_text }}</td>
+							</tr>
+						{% endif %}
+					</tbody>
+				  		{% if field.html_name == "agente" %}
+			  			<tbody class="field pianotariffario">
+				  			{% for pt_form in modelformset.forms %}
+				  			<tr>
+				  				<td colspan="2">
+		  							{% for hidden_field in pt_form.hidden_fields %}
+	   								{{ hidden_field }}
+									{% endfor %}
+						  			<fieldset>
+							  			<table>
+								  			{% for pt_field in pt_form.visible_fields %}
+											<tbody class="field">
+												{% if pt_field.errors %}
+												<tr class="field_error">
+													<td></td><td>{{ pt_field.errors|first }}</td>
+												</tr>
+												{% endif %}
+											<tr class="{% if pt_field.errors %}field_error{% endif %}" >
+												<td>{{ pt_field.label_tag }}</td>
+												<td>
+													{{ pt_field }}
+												    {% if pt_field|isfk %}
+												    	<a id="add_{{ pt_field.auto_id }}" class="add_subform" href="{% url add_contratto_fk "tariffa" %}">
+												    		<img src="{{ STATIC_URL }}/img/add.png" />
+											    		</a>
+										    		{% endif %}													
+												</td>
+											</tr>
+												{% if pt_field.help_text %}
+												<tr class="field_help">
+													<td></td><td>{{ pt_field.help_text }}</td>
+												</tr>
+												{% endif %}
+											</tbody>
+									  		{% endfor %}
+									  	</table>
+						  			</fieldset>
+					  			</td>
+				  			</tr>
+		  					{% endfor %}
+			  				<tr><td><button class="add_tariffa" value="add">Aggiungi</button></td></tr>
+			  				<!-- inseriamo un form vuoto usato per aggiungere dinamicamente un altro form -->
+			  				<tr style="display: none">
+				  				<td colspan="2">
+		  							{% for hidden_field in modelformset.empty_form.hidden_fields %}
+	   								{{ hidden_field }}
+									{% endfor %}
+						  			<fieldset>				
+							  			<table>
+								  			{% for pt_field in modelformset.empty_form.visible_fields %}
+											<tbody class="field">
+												{% if pt_field.errors %}
+												<tr class="field_error">
+													<td></td><td>{{ pt_field.errors|first }}</td>
+												</tr>
+												{% endif %}
+											<tr class="{% if pt_field.errors %}field_error{% endif %}" >
+												<td>{{ pt_field.label_tag }}</td>
+												<td>
+													{{ pt_field }}
+												    {% if pt_field|isfk %}
+												    	<a id="add_{{ pt_field.auto_id }}" class="add_subform" href="{% url add_contratto_fk "tariffa" %}">
+												    		<img src="{{ STATIC_URL }}/img/add.png" />
+											    		</a>
+										    		{% endif %}												
+												</td>
+											</tr>
+												{% if pt_field.help_text %}
+												<tr class="field_help">
+													<td></td><td>{{ pt_field.help_text }}</td>
+												</tr>
+												{% endif %}
+											</tbody>
+									  		{% endfor %}
+									  	</table>
+						  			</fieldset>
+					  			</td>			  					
+			  				</tr>
+				  		</tbody>
+				  		{% endif %}	
+					{% endfor %}				
+				</table>
+			</fieldset>
+		</div>
+		<div class="submitrow">
+			<input type="submit" class="modelform_save" value="salva" />
+			<input type="button" class="modelform_save_and_add" value="salva e aggiungi un altro" />
+			<button class="cancel">Annulla</button>
+		</div>
+	</form>
+</div>
+{% endblock %}

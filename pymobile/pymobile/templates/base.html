@@ -1,0 +1,38 @@
+<html lang="it-IT">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/css/anytime.css" />
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/css/base.css" />
+ 	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/css/custom/jquery-ui-1.8.17.custom.css" />	
+
+	<script type="text/javascript" src="{{ STATIC_URL }}/js/jquery-1.7.1.min.js"></script>
+ 	<script type="text/javascript" src="{{ STATIC_URL }}/js/jquery-ui-1.8.17.custom.min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}/js/anytime.js"></script> 
+   	<script type="text/javascript" src="{{ STATIC_URL }}/js/combobox.js"></script>
+   		
+  	{% block extrahead %}{% endblock %}
+</head>
+<body> 
+  	<header id="header">
+  		{%block header %}{% endblock %}
+	</header>
+	<div id="left_bar">
+		<div id="navigation_link">
+			<span><b>Men&ugrave;</b></span>
+			<ul>
+				<li><a href="{% url init_dipendente %}">Amministrazione Dipendenti</a></li>
+				<li><a href="{% url init_cliente %}">Amministrazione Clienti</a></li>
+				<li><a href="{% url init_tariffa %}">Amministrazione Tariffe</a></li>
+				<li><a href="{% url init_appuntamento %}">Amministrazione Appuntamenti</a></li>
+				<li><a href="{% url init_contratto %}">Amministrazione Contratti</a></li>
+				<li><a href="{% url canvas_tim_telecom %}">Statistiche</a></li>	
+			</ul>
+		</div>
+		{% block extraleft_bar %}{% endblock %}
+	</div>
+  	<div id="content">
+  		{% block content %}{% endblock %}
+	</div>
+</body>
+</html>

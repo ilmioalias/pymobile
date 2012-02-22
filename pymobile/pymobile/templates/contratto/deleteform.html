@@ -1,0 +1,27 @@
+{% extends "popup_base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Contratti</title> 
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Contratti | Elimina Contratto</h2>
+{% endblock %}
+
+{% block content %}
+<form action="{% url del_contratto %}" method="POST">
+	{% csrf_token %}
+	<span>Sei sicuro di voler eliminare i seguenti contratti</span>
+	<ul>
+	{% for obj in objs %}
+		<li>
+			<b>{{ obj }}</b>
+			<input type="hidden" name="id" value="{{ obj.id }}" />
+		</li>
+	{% endfor %}
+	</ul>
+<!-- 	<input type="hidden" name="id_obj" value="{{ obj.id }}" /><br /> -->
+	<input type="submit" value="Continua" />
+	<button onclick="window.close()">Annulla</button>
+</form>
+{% endblock %}

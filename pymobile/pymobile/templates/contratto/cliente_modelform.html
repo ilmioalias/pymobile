@@ -1,0 +1,65 @@
+{% extends "popup_base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Contratto</title>
+{{ modelform.media }}
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Contratti | {{ action }} Cliente</h2>
+{% endblock %}
+
+{% block content %}
+{% load tags %}
+<div class="modelform_div">
+	<form class="modelform" action="." method="post">
+		<div class="modelform_fieldset_div">
+			<fieldset class="modelform_fieldset">
+			<legend><b>Dati Cliente</b></legend>
+				{% csrf_token %}
+				{% for hidden_field in modelform.hidden_fields %}
+				   {{ hidden_field }}
+				{% endfor %}						
+				<table>	
+					{% if modelform.non_field_errors %}
+					<tbody>
+						<tr class="field_error">
+							<td colspan="2">{{ field.non_field_errors|first }}</td>
+						</tr>					
+					</tbody>
+					{% endif %}					
+					{% for field in modelform.visible_fields %}
+					<tbody class="field">
+						{% if field.errors %}
+							<tr class="field_error">
+								<td></td><td>{{ field.errors|first }}</td>
+							</tr>
+						{% endif %}
+						<tr class="{% if field.errors %}field_error{% endif %}" >
+							<td>{{ field.label_tag }}</td>
+							<td>
+								{{ field }}
+							    {% if field|isfk %}
+							    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_fk field.html_name %}">
+							    		<img src="{{ STATIC_URL }}/img/add.png" />
+						    		</a>
+					    		{% endif %}
+							</td>
+						</tr>
+						{% if field.help_text %}
+							<tr class="field_help">
+								<td></td><td>{{ field.help_text }}</td>
+							</tr>
+						{% endif %}
+					</tbody>
+					{% endfor %}				
+				</table>
+			</fieldset>
+		</div>
+		<div class="submitrow">
+			<input type="submit" class="modelform_save" value="salva" />
+			<button onclick="window.close()">Annulla</button>
+		</div>
+	</form>
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "popup_base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Dipendenti</title> 
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Dipendenti | Elimina provvigione di {{ dipendente }}</h2>
+{% endblock %}
+
+{% block content %}
+{% if tipo == "tmp" %}
+<form action="{% url del_vartmp dipendente.id %}" method="POST">
+{% else %}
+<form action="{% url del_retribuzione dipendente.id %}" method="POST">
+{% endif %}
+	{% csrf_token %}	
+	<span>Sei sicuro di voler eliminare le seguenti variazioni della provvigione di <b>{{ dipendente }}</b></span>
+	<ul>
+	{% for obj in objs %}
+		<li>
+			<b>{{ obj }}</b>
+			<input type="hidden" name="id" value="{{ obj.id }}" />
+		</li>
+	{% endfor %}
+	</ul>
+	<input type="submit" value="Continua" />
+	<button onclick="window.close()">Annulla</button>
+</form>
+{% endblock %}

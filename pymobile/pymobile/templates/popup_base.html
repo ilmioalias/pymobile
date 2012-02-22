@@ -1,0 +1,24 @@
+<html lang="it-IT">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/css/anytime.css" />
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/css/base.css" />
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}/css/custom/jquery-ui-1.8.17.custom.css" />
+	
+	<script type="text/javascript" src="{{ STATIC_URL }}/js/jquery-1.7.1.min.js"></script>
+ 	<script type="text/javascript" src="{{ STATIC_URL }}/js/jquery-ui-1.8.17.custom.min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}/js/anytime.js"></script> 
+   	<script type="text/javascript" src="{{ STATIC_URL }}/js/combobox.js"></script>
+	
+  	{% block extrahead %}{% endblock %}
+</head>
+<body> 
+  	<header id="header">
+  		{%block header %}{% endblock %}
+	</header>
+  	<div id="content">
+  		{% block content %}{% endblock %}
+	</div>
+</body>
+</html>
