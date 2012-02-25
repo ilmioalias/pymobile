@@ -74,7 +74,15 @@ urlpatterns += patterns('pymobile.administration.views',
    url(r'^pymobile/tariffa/mod/(?P<object_id>\d+)/$', "tariffa.admin.mod_object", name="mod_tariffa"),
    url(r'^pymobile/tariffa/del/$', "tariffa.admin.del_object", name="del_tariffa"),
    url(r'^pymobile/tariffa/add/popup:add-(?P<field_name>\w+)/$', "tariffa.admin.add_child_object", name="add_tariffa_fk"), 
-   url(r'^pymobile/tariffa/(?P<object_id>\d+)/$', object_detail, INFO_TAR, name="view_tariffa"), 
+   url(r'^pymobile/tariffa/(?P<object_id>\d+)/$', object_detail, INFO_TAR, name="view_tariffa"),
+   url(r'^pymobile/tariffa/(?P<attribute>\btipologia\b|\bfascia\b|\bservizio\b)/$', 
+       "tariffa.admin.init_attribute", name="init_attribute"),
+   url(r'^pymobile/tariffa/(?P<attribute>\btipologia\b|\bfascia\b|\bservizio\b)/add/$', 
+       "tariffa.admin.add_attribute", name="add_attribute"),
+   url(r'^pymobile/tariffa/(?P<attribute>\btipologia\b|\bfascia\b|\bservizio\b)/mod/(?P<object_id>\d+)/$', 
+       "tariffa.admin.mod_attribute", name="mod_attribute"),
+   url(r'^pymobile/tariffa/(?P<attribute>\btipologia\b|\bfascia\b|\bservizio\b)/del/$', 
+       "tariffa.admin.del_attribute", name="del_attribute"),
 )
 
 # cliente

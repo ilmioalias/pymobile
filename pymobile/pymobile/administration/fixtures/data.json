@@ -160,16 +160,7 @@
             "name": "session", 
             "app_label": "sessions"
         }
-    }, 
-    {
-        "pk": 24, 
-        "model": "contenttypes.contenttype", 
-        "fields": {
-            "model": "siccontratto", 
-            "name": "sic contratto", 
-            "app_label": "administration"
-        }
-    }, 
+    },  
     {
         "pk": 7, 
         "model": "contenttypes.contenttype", 
@@ -230,133 +221,7 @@
             "domain": "example.com", 
             "name": "example.com"
         }
-    }, 
-    {
-        "pk": 4, 
-        "model": "administration.dipendente", 
-        "fields": {
-            "attivo": false, 
-            "provvigione": "50.00", 
-            "nome": "francesco", 
-            "cognome": "anzivino", 
-            "modifica": "2012-01-25 18:52:40", 
-            "creazione": "2012-01-25 18:52:40", 
-            "ruolo": "agt", 
-            "data_nonattivo": "2012-01-25", 
-            "cellulare": "33544477788", 
-            "telefono": "", 
-            "email": "anzivino@indie.it", 
-            "fisso": "200.00"
-        }
-    }, 
-    {
-        "pk": 2, 
-        "model": "administration.dipendente", 
-        "fields": {
-            "attivo": true, 
-            "provvigione": "2.00", 
-            "nome": "marina", 
-            "cognome": "cipolloni", 
-            "modifica": "2012-01-25 18:51:48", 
-            "creazione": "2012-01-25 18:51:48", 
-            "ruolo": "tel", 
-            "data_nonattivo": null, 
-            "cellulare": "3346189712", 
-            "telefono": "", 
-            "email": "maringia3@yahoo.it", 
-            "fisso": "200.00"
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "administration.dipendente", 
-        "fields": {
-            "attivo": true, 
-            "provvigione": "50.00", 
-            "nome": "luigi", 
-            "cognome": "curzi", 
-            "modifica": "2012-01-25 18:51:17", 
-            "creazione": "2012-01-25 18:51:17", 
-            "ruolo": "agt", 
-            "data_nonattivo": null, 
-            "cellulare": "", 
-            "telefono": "073585879", 
-            "email": "luigi_curzi@yahoo.it", 
-            "fisso": "200.00"
-        }
-    }, 
-    {
-        "pk": 6, 
-        "model": "administration.dipendente", 
-        "fields": {
-            "attivo": true, 
-            "provvigione": "50.00", 
-            "nome": "carla", 
-            "cognome": "mate", 
-            "modifica": "2012-01-25 18:53:45", 
-            "creazione": "2012-01-25 18:53:45", 
-            "ruolo": "agt", 
-            "data_nonattivo": null, 
-            "cellulare": "", 
-            "telefono": "", 
-            "email": "mate.carla@yahoo.org", 
-            "fisso": "200.00"
-        }
-    }, 
-    {
-        "pk": 5, 
-        "model": "administration.dipendente", 
-        "fields": {
-            "attivo": true, 
-            "provvigione": "2.00", 
-            "nome": "silvia", 
-            "cognome": "talamonti", 
-            "modifica": "2012-01-25 18:53:12", 
-            "creazione": "2012-01-25 18:53:12", 
-            "ruolo": "tel", 
-            "data_nonattivo": null, 
-            "cellulare": "", 
-            "telefono": "0736897845", 
-            "email": "tala@caucciu.com", 
-            "fisso": "200.00"
-        }
-    }, 
-    {
-        "pk": 7, 
-        "model": "administration.dipendente", 
-        "fields": {
-            "attivo": true, 
-            "provvigione": "50.00", 
-            "nome": "mauro", 
-            "cognome": "torresi", 
-            "modifica": "2012-01-25 20:14:23", 
-            "creazione": "2012-01-25 20:14:23", 
-            "ruolo": "agt", 
-            "data_nonattivo": null, 
-            "cellulare": "", 
-            "telefono": "", 
-            "email": "torresi@mauro.it", 
-            "fisso": "200.00"
-        }
-    }, 
-    {
-        "pk": 3, 
-        "model": "administration.dipendente", 
-        "fields": {
-            "attivo": true, 
-            "provvigione": "50.00", 
-            "nome": "carlo", 
-            "cognome": "zippilli", 
-            "modifica": "2012-01-25 18:52:09", 
-            "creazione": "2012-01-25 18:52:09", 
-            "ruolo": "agt", 
-            "data_nonattivo": null, 
-            "cellulare": "", 
-            "telefono": "", 
-            "email": "carlo.zippo@italia.it", 
-            "fisso": "200.00"
-        }
-    }, 
+    },  
     {
         "pk": 6, 
         "model": "administration.cliente", 
@@ -752,7 +617,6 @@
         "pk": 10, 
         "model": "administration.tariffa", 
         "fields": {
-            "sic_anni": "0.00", 
             "attivo": true, 
             "servizio": null, 
             "tipo": 2, 
@@ -761,7 +625,6 @@
             "gestore": "tim", 
             "modifica": "2012-01-25 19:42:04", 
             "creazione": "2012-01-25 19:42:04", 
-            "sic": "0.00", 
             "punteggio": "0.50", 
             "fascia": null
         }
@@ -770,7 +633,6 @@
         "pk": 7, 
         "model": "administration.tariffa", 
         "fields": {
-            "sic_anni": "0.00", 
             "attivo": true, 
             "servizio": 1, 
             "tipo": 1, 
@@ -779,7 +641,6 @@
             "gestore": "tim", 
             "modifica": "2012-01-25 19:40:11", 
             "creazione": "2012-01-25 19:40:11", 
-            "sic": "0.00", 
             "punteggio": "0.50", 
             "fascia": null
         }
@@ -788,7 +649,6 @@
         "pk": 8, 
         "model": "administration.tariffa", 
         "fields": {
-            "sic_anni": "0.00", 
             "attivo": true, 
             "servizio": 2, 
             "tipo": 1, 
@@ -797,7 +657,6 @@
             "gestore": "tim", 
             "modifica": "2012-01-25 19:40:37", 
             "creazione": "2012-01-25 19:40:37", 
-            "sic": "0.00", 
             "punteggio": "0.50", 
             "fascia": null
         }
@@ -805,8 +664,7 @@
     {
         "pk": 9, 
         "model": "administration.tariffa", 
-        "fields": {
-            "sic_anni": "0.00", 
+        "fields": { 
             "attivo": true, 
             "servizio": 3, 
             "tipo": 1, 
@@ -814,8 +672,7 @@
             "profilo": "azienda 12", 
             "gestore": "tim", 
             "modifica": "2012-01-25 19:41:16", 
-            "creazione": "2012-01-25 19:41:16", 
-            "sic": "0.00", 
+            "creazione": "2012-01-25 19:41:16",  
             "punteggio": "0.50", 
             "fascia": null
         }
@@ -824,7 +681,6 @@
         "pk": 1, 
         "model": "administration.tariffa", 
         "fields": {
-            "sic_anni": "0.00", 
             "attivo": true, 
             "servizio": 1, 
             "tipo": 1, 
@@ -833,7 +689,6 @@
             "gestore": "tim", 
             "modifica": "2012-01-25 19:35:18", 
             "creazione": "2012-01-25 19:35:18", 
-            "sic": "0.00", 
             "punteggio": "1.00", 
             "fascia": null
         }
@@ -842,7 +697,6 @@
         "pk": 3, 
         "model": "administration.tariffa", 
         "fields": {
-            "sic_anni": "0.00", 
             "attivo": true, 
             "servizio": 1, 
             "tipo": 1, 
@@ -851,7 +705,6 @@
             "gestore": "tim", 
             "modifica": "2012-01-25 19:36:08", 
             "creazione": "2012-01-25 19:36:08", 
-            "sic": "0.00", 
             "punteggio": "1.00", 
             "fascia": null
         }
@@ -860,7 +713,6 @@
         "pk": 2, 
         "model": "administration.tariffa", 
         "fields": {
-            "sic_anni": "0.00", 
             "attivo": true, 
             "servizio": 3, 
             "tipo": 1, 
@@ -869,7 +721,6 @@
             "gestore": "tim", 
             "modifica": "2012-01-25 19:35:48", 
             "creazione": "2012-01-25 19:35:48", 
-            "sic": "0.00", 
             "punteggio": "1.00", 
             "fascia": null
         }
@@ -878,7 +729,6 @@
         "pk": 11, 
         "model": "administration.tariffa", 
         "fields": {
-            "sic_anni": "0.00", 
             "attivo": true, 
             "servizio": null, 
             "tipo": 2, 
@@ -887,7 +737,6 @@
             "gestore": "tim", 
             "modifica": "2012-01-25 19:43:34", 
             "creazione": "2012-01-25 19:43:34", 
-            "sic": "0.00", 
             "punteggio": "0.50", 
             "fascia": null
         }
@@ -896,7 +745,6 @@
         "pk": 4, 
         "model": "administration.tariffa", 
         "fields": {
-            "sic_anni": "0.00", 
             "attivo": true, 
             "servizio": null, 
             "tipo": 1, 
@@ -905,7 +753,6 @@
             "gestore": "tim", 
             "modifica": "2012-01-25 19:37:08", 
             "creazione": "2012-01-25 19:37:08", 
-            "sic": "0.00", 
             "punteggio": "0.50", 
             "fascia": 1
         }
@@ -914,7 +761,6 @@
         "pk": 5, 
         "model": "administration.tariffa", 
         "fields": {
-            "sic_anni": "0.00", 
             "attivo": true, 
             "servizio": null, 
             "tipo": 1, 
@@ -923,7 +769,6 @@
             "gestore": "tim", 
             "modifica": "2012-01-25 19:37:33", 
             "creazione": "2012-01-25 19:37:33", 
-            "sic": "0.00", 
             "punteggio": "1.00", 
             "fascia": 2
         }
@@ -932,7 +777,6 @@
         "pk": 6, 
         "model": "administration.tariffa", 
         "fields": {
-            "sic_anni": "0.00", 
             "attivo": true, 
             "servizio": null, 
             "tipo": 1, 
@@ -941,57 +785,8 @@
             "gestore": "tim", 
             "modifica": "2012-01-25 19:37:58", 
             "creazione": "2012-01-25 19:37:58", 
-            "sic": "0.00", 
             "punteggio": "1.50", 
             "fascia": 3
-        }
-    }, 
-    {
-        "pk": 2, 
-        "model": "administration.contratto", 
-        "fields": {
-            "caricato": false, 
-            "data_scadenza": "2014-01-28", 
-            "data_rescissione": null, 
-            "data_inviato": null, 
-            "attivato": false, 
-            "appuntamento": null, 
-            "agente": 4, 
-            "data_caricato": null, 
-            "completo": false, 
-            "creazione": "2012-01-28 22:17:32", 
-            "data_attivato": null, 
-            "modifica": "2012-01-28 22:17:32", 
-            "data_completato": null, 
-            "data_stipula": "2012-01-29", 
-            "pdf_contratto": "", 
-            "nota": "", 
-            "inviato": false, 
-            "cliente": 1
-        }
-    }, 
-    {
-        "pk": 1, 
-        "model": "administration.contratto", 
-        "fields": {
-            "caricato": false, 
-            "data_scadenza": "2014-01-28", 
-            "data_rescissione": null, 
-            "data_inviato": null, 
-            "attivato": false, 
-            "appuntamento": null, 
-            "agente": 4, 
-            "data_caricato": null, 
-            "completo": false, 
-            "creazione": "2012-01-28 21:35:39", 
-            "data_attivato": null, 
-            "modifica": "2012-01-28 21:35:39", 
-            "data_completato": null, 
-            "data_stipula": "2012-01-28", 
-            "pdf_contratto": "", 
-            "nota": "", 
-            "inviato": false, 
-            "cliente": 6
         }
     }, 
     {
@@ -1364,34 +1159,7 @@
             "name": "Can delete servizio tariffa", 
             "content_type": 16
         }
-    }, 
-    {
-        "pk": 70, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "add_siccontratto", 
-            "name": "Can add sic contratto", 
-            "content_type": 24
-        }
-    }, 
-    {
-        "pk": 71, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "change_siccontratto", 
-            "name": "Can change sic contratto", 
-            "content_type": 24
-        }
-    }, 
-    {
-        "pk": 72, 
-        "model": "auth.permission", 
-        "fields": {
-            "codename": "delete_siccontratto", 
-            "name": "Can delete sic contratto", 
-            "content_type": 24
-        }
-    }, 
+    },  
     {
         "pk": 49, 
         "model": "auth.permission", 

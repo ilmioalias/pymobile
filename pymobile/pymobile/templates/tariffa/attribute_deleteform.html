@@ -1,0 +1,35 @@
+{% extends "popup_base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Tariffe</title> 
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Tariffe | Elimina {{ attributo|capfirst }}</h2>
+{% endblock %}
+
+{% block content %}
+<form action="{% url del_tariffa %}" method="POST">
+	{% csrf_token %}
+	{% attributo == "tipologia" %}
+	<span>Sei sicuro di voler eliminare le seguenti tipologie:</span>
+	{% endif %}
+	{% attributo == "fascia" %}
+	<span>Sei sicuro di voler eliminare le seguenti fascie:</span>
+	{% endif %}
+	{% attributo == "servizio" %}
+	<span>Sei sicuro di voler eliminare i seguenti servizi:</span>
+	{% endif %}	
+	<ul>
+	{% for obj in objs %}
+		<li>
+			<b>{{ obj }}</b>
+			<input type="hidden" name="id" value="{{ obj.id }}" />
+		</li>
+	{% endfor %}
+	</ul>
+<!-- 	<input type="hidden" name="id_obj" value="{{ obj.id }}" /><br /> -->
+	<input type="submit" value="Continua" />
+	<button onclick="window.close()">Annulla</button>
+</form>
+{% endblock %}

@@ -220,7 +220,8 @@ var redirectAfter = function(win, url){
 
 var selectAllRow = function(j_obj){
 	var table = j_obj.closest("#modeltable");
-	table.find("td > input.selection").each(function(){
+	table.find("tbody input.selection").each(function(){
+ 		console.log($(this));
 		if (j_obj.attr("checked")){
 			$(this).attr("checked", true);	
 		} else {
@@ -245,12 +246,12 @@ var assignRows = function(rows, agt){
 };
 
 var tableClickHandlers = function(){
-	$("div.table-container").on("click", "th > input.selection_header", function(e){
+	$("div.table-container").on("click", "thead input.selection_header", function(e){
 		selectAllRow($(this));
 	});
-	$("div.table-container").on("click", "td > input.selection", function(e){
+	$("div.table-container").on("click", "tbody input.selection", function(e){
 		if (!$(this).attr("checked")){
-			var header = $(".table-container th > input.selection_header");
+			var header = $("div.table-container thead input.selection_header");
 			if (header.attr("checked")){
 				header.attr("checked", false);
 			};

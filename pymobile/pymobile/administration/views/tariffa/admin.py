@@ -7,7 +7,7 @@ from django.template import RequestContext
 from django.db.models import Q
 #from django.utils import simplejson
 from django.core.urlresolvers import reverse
-#from django.db.models.loading import get_model
+from django.db.models.loading import get_model
 #from django.views.generic.simple import redirect_to
 #from django.forms.models import inlineformset_factory
 
@@ -178,10 +178,128 @@ def add_child_object(request, field_name):
                     </script>'''.format(new_obj.pk, new_obj))
     else:
         form_class, gestore, template = get_child_form(field_name)
-        form = form_class()
+        form = form_class(post_query)
       
-    data = {"modelform": form, "action": action, "gestore": gestore}     
+    data = {"modelform": form, "action": action, "gestore": gestore,}     
     return render_to_response(template, 
                               data,
                               context_instance=RequestContext(request))
 
+def init_attribute(request, attribute):
+    template = "tariffa/admin_attribute.html"
+    model = get_model("administration", attribute + "tariffa")
+    objs = model.objects.all()
+    initial = {}
+    pag = 1
+    ordering = None
+    
+    if request.method == "GET" and request.GET:
+        query_get = request.GET.copy()
+        initial = {}
+        
+        if query_get.has_key("pag"):
+            pag = query_get["pag"]
+            del query_get["pag"]
+        if query_get.has_key("sort"):
+            ordering = query_get["sort"]
+            del query_get["sort"]
+        if query_get:
+            objs, initial = u.filter_objs(objs, query_get)
+        
+    table = u.get_table(attribute + "tariffatable")(objs, order_by=(ordering,))
+    table.paginate(page=pag)
+    
+    if request.is_ajax():
+        template = table.as_html()
+        return HttpResponse(template)
+        
+    filterform = u.get_form(attribute + "tariffafilterform")(initial=initial)
+    
+    data = {"modeltable": table, "filterform": filterform, "attributo": attribute,}
+    return render_to_response(template, data,
+                              context_instance=RequestContext(request))
+
+def add_attribute(request, attribute):  
+    template = "tariffa/attribute_modelform.html"
+    action = "Aggiungi"
+    
+    if request.method == "POST":
+        post_query = request.POST.copy()
+        form = u.get_form(attribute + "tariffaform")(post_query)
+        
+        if form.is_valid():
+            form.save()
+        
+            if request.POST.has_key("add_another"):              
+                return HttpResponseRedirect(reverse("add_tariffa")) 
+            else:
+                url = reverse("init_attribute", args=[attribute])
+                return HttpResponse('''
+                                <script type='text/javascript'>
+                                    opener.redirectAfter(window, '{}');
+                                </script>'''.format(url))
+    else:
+        form = u.get_form(attribute + "tariffaform")()
+
+    data = {"modelform": form, "action": action, "attributo": attribute,}                
+    return render_to_response(template, 
+                              data,
+                              context_instance=RequestContext(request))
+
+def mod_attribute(request, attribute, object_id):
+    template = "tariffa/attribute_modelform.html"
+    action = "Modifica"
+    model = get_model("administration", attribute + "tariffa")
+    
+    if request.method == "POST":
+        post_query = request.POST.copy()
+        obj = get_object_or_404(model, pk=object_id)
+        form = u.get_form(attribute + "tariffaform")(post_query, instance=obj)
+    
+        if form.is_valid():
+            form.save()
+            
+            if request.POST.has_key("add_another"):              
+                return HttpResponseRedirect(reverse("add_tariffa")) 
+            else:
+                url = reverse("init_attribute", args=[attribute])
+                return HttpResponse('''
+                                <script type='text/javascript'>
+                                    opener.redirectAfter(window, '{}');
+                                </script>'''.format(url))                
+    else:
+        obj = get_object_or_404(model, pk=object_id)         
+        form = u.get_form(attribute + "tariffaform")(instance=obj)
+    
+    data = {"modelform": form, "action": action, "attributo": attribute,}
+    return render_to_response(template,
+                              data,
+                              context_instance=RequestContext(request))
+
+def del_attribute(request, attribute):
+    template = "tariffa/attribute_deleteform.html"
+    model = get_model("administration", attribute + "tariffa")
+    
+    if request.method == "POST":
+        query_post = request.POST.copy()
+        
+        if query_post.has_key("id"):
+            # cancelliamo
+            ids = query_post.getlist("id")
+            model.objects.filter(id__in=ids).delete()
+            url = reverse("init_tariffa")
+            
+            return HttpResponse('''
+                <script type='text/javascript'>
+                    opener.redirectAfter(window, '{}');
+                </script>'''.format(url))
+    
+    query_get = request.GET.copy()
+    ids = query_get.getlist("id")      
+    objs = model.objects.filter(id__in=ids)
+    
+    data = {"objs": objs, "attributo": attribute}
+    return render_to_response(template,
+                              data,
+                              context_instance=RequestContext(request))
+    

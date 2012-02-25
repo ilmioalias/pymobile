@@ -19,7 +19,8 @@
 	</header>
 	<div id="left_bar">
 		<div id="navigation_link">
-			<span><b>Men&ugrave;</b></span>
+			<fieldset>
+			<legend>Navigazione</legend>
 			<ul>
 				<li><a href="{% url init_dipendente %}">Amministrazione Dipendenti</a></li>
 				<li><a href="{% url init_cliente %}">Amministrazione Clienti</a></li>
@@ -28,6 +29,7 @@
 				<li><a href="{% url init_contratto %}">Amministrazione Contratti</a></li>
 				<li><a href="{% url canvas_tim_telecom %}">Statistiche</a></li>	
 			</ul>
+			</fieldset>
 		</div>
 		{% block extraleft_bar %}{% endblock %}
 	</div>

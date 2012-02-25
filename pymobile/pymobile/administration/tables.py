@@ -43,7 +43,8 @@ class DipendenteTable(tables.Table):
     
     attivo = BooleanColumn()  
     selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
-                                      header_attrs={"class": "selection_header"})
+                                      header_attrs={"class": "selection_header"},
+                                      sortable=False,)
     operazioni = tables.TemplateColumn(TMP_OP, sortable=False)
 
     class Meta:
@@ -108,7 +109,8 @@ class ClienteTable(tables.Table):
     
     blindato = BooleanColumn()    
     selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
-                                      header_attrs={"class": "selection_header"})
+                                      header_attrs={"class": "selection_header"},
+                                      sortable=False,)
     operazioni = tables.TemplateColumn(TMP_OP, sortable=False)
     
     class Meta:
@@ -118,6 +120,66 @@ class ClienteTable(tables.Table):
         empty_text = "Nessun Cliente"
         sequence = ("selection", "...")
         order_by = ("denominazione", "cognome")
+
+class TipologiaTariffaTable(tables.Table):
+    TMP_OP='''
+        {% load tags %}
+        <a id="mod_id_{{ record.pk }}" class="modifyrow" href="{% url mod_attribute "tipologia" record.pk %}">Modifica</a>
+        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_attribute "tipologia" %}?id={{ record.pk }}">Elimina</a>
+    '''
+    
+    selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
+                                      header_attrs={"class": "selection_header"},
+                                      sortable=False,)
+    operazioni = tables.TemplateColumn(TMP_OP, sortable=False)
+    
+    class Meta:
+        model = models.TipologiaTariffa
+        attrs = {"id": "modeltable"}
+        exclude = ("id",)
+        empty_text = "Nessuna Tipologia"
+        sequence = ("selection", "...")
+        order_by = ("gestore", "denominazione")
+
+class FasciaTariffaTable(tables.Table):
+    TMP_OP='''
+        {% load tags %}
+        <a id="mod_id_{{ record.pk }}" class="modifyrow" href="{% url mod_attribute "fascia" record.pk %}">Modifica</a>
+        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_attribute "fascia" %}?id={{ record.pk }}">Elimina</a>
+    '''
+
+    selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
+                                      header_attrs={"class": "selection_header"},
+                                      sortable=False,)
+    operazioni = tables.TemplateColumn(TMP_OP, sortable=False)
+    
+    class Meta:
+        model = models.TipologiaTariffa
+        attrs = {"id": "modeltable"}
+        exclude = ("id",)
+        empty_text = "Nessuna Tipologia"
+        sequence = ("selection", "...")
+        order_by = ("gestore", "denominazione")
+
+class ServizioTariffaTable(tables.Table):
+    TMP_OP='''
+        {% load tags %}
+        <a id="mod_id_{{ record.pk }}" class="modifyrow" href="{% url mod_attribute "servizio" record.pk %}">Modifica</a>
+        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_attribute "servizio" %}?id={{ record.pk }}">Elimina</a>
+    '''
+
+    selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
+                                      header_attrs={"class": "selection_header"},
+                                      sortable=False,)
+    operazioni = tables.TemplateColumn(TMP_OP, sortable=False)
+    
+    class Meta:
+        model = models.TipologiaTariffa
+        attrs = {"id": "modeltable"}
+        exclude = ("id",)
+        empty_text = "Nessuna Tipologia"
+        sequence = ("selection", "...")
+        order_by = ("gestore", "denominazione")
 
 class TariffaTable(tables.Table):
     TMP_OP='''
@@ -131,7 +193,8 @@ class TariffaTable(tables.Table):
     servizio = NullColumn()
     attivo = BooleanColumn()
     selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
-                                      header_attrs={"class": "selection_header"})
+                                      header_attrs={"class": "selection_header"},
+                                      sortable=False,)
     operazioni = tables.TemplateColumn(TMP_OP, sortable=False)
     
     class Meta:
@@ -175,7 +238,8 @@ class AppuntamentoTable(tables.Table):
     richiamare = BooleanColumn()
     contratto = tables.TemplateColumn(TMP_CONTRATTO, sortable=False)
     selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
-                                      header_attrs={"class": "selection_header"})
+                                      header_attrs={"class": "selection_header"},
+                                      sortable=False,)
     operazioni = tables.TemplateColumn(TMP_OP, sortable=False)
     
     class Meta:
@@ -213,7 +277,8 @@ class ContrattoTable(tables.Table):
     caricato = BooleanColumn()
     attivato = BooleanColumn()
     selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
-                                      header_attrs={"class": "selection_header"})
+                                      header_attrs={"class": "selection_header"},
+                                      sortable=False,)
     operazioni = tables.TemplateColumn(TMP_OP, sortable=False)
     
     class Meta:

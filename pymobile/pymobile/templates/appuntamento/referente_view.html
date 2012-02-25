@@ -13,10 +13,13 @@
 
 {% block content %}
 <div class="navigation">
-	<a href="../../../../">home</a> &gt; 
-	<a href="../../../">amministrazione appuntamenti</a> &gt;
-	<a href="../../">appuntamento: <b>{{ appuntamento }}</b></a> &gt;
-	<a href="./">referente: <b>{{ object }}</b></a>
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../../../../">home</a> &gt; 
+		<a href="../../../">amministrazione appuntamenti</a> &gt;
+		<a href="../../">appuntamento: <b>{{ appuntamento }}</b></a> &gt;
+		<a href="./">referente: <b>{{ object }}</b></a>
+	</fieldset>
 </div>
 <div class="div_menu">
 	<ul id="menu_list">	

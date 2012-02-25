@@ -4,6 +4,10 @@ from django.db.models import Q
 import operator
 from datetime import datetime, timedelta
 import calendar
+import tables
+import forms
+import django_tables2.tables as dt2
+import django.forms.models as dfm
 
 def filter_objs(objs, query):
     filters = []
@@ -184,3 +188,55 @@ def get_telefonisti_ids(query):
 #        
 #        for provvigione in provvigioni_bonus:
 #            otps = provvigione.split(",")
+
+def values_from_provvigione_bonus(provvigione_bonus):
+    provvigione_bonus = provvigione_bonus.strip()
+    if not provvigione_bonus:
+        return []
+    
+    values = []
+    vs = provvigione_bonus.split(";")
+    for var in vs:
+        if var:
+            opts = var.split(",")
+            d = {}
+            
+            for opt in opts:
+                item = opt.split(":")
+                
+                if len(item) == 2:
+                    k = item[0].strip()
+                    v = item[1].strip()
+                    d[k] = v
+                    
+            values.append(d)
+            
+    return values    
+
+def provvigione_bonus_cleaned_from_values(values):
+    if not values:
+        return
+    
+    provvigione_bonus = ""
+    for d in values:
+        if d:
+            for k,v in d.iteritems():
+                provvigione_bonus += str(k) + ":" + str(v) + ","
+            provvigione_bonus = provvigione_bonus[:-1] + ";"
+
+    return provvigione_bonus  
+
+def get_table(table_name):
+    for k, v in tables.__dict__.iteritems():
+        if k.lower() == table_name.lower():
+            if isinstance(v, dt2.DeclarativeColumnsMetaclass):
+                return v
+    raise LookupError("Non esiste la tabella con nome '{}'".format(table_name))
+        
+def get_form(form_name):
+    for k, v in forms.__dict__.iteritems():
+        if k.lower() == form_name.lower():
+            if isinstance(v, dfm.ModelFormMetaclass):
+                return v
+    raise LookupError("Non esiste il form con nome '{}'".format(form_name))
+    

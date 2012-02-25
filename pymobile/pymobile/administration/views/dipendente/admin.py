@@ -10,7 +10,6 @@ from django.core.urlresolvers import reverse
 #from django.db.models.loading import get_model
 #from django.views.generic.simple import redirect_to
 #from django.forms.models import inlineformset_factory
-
 import operator
 import pymobile.administration.models as models
 import pymobile.administration.forms as forms
@@ -83,16 +82,16 @@ def add_object(request):
                 form.save()
                 formset.save()        
             
-            if request.POST.has_key("add_another"):              
-                return HttpResponseRedirect(reverse("add_dipendente")) 
-            else:
-                url = reverse("init_dipendente")
-                return HttpResponse('''
-                                <script type='text/javascript'>
-                                    opener.redirectAfter(window, '{}');
-                                </script>'''.format(url))   
+                if request.POST.has_key("add_another"):              
+                    return HttpResponseRedirect(reverse("add_dipendente")) 
+                else:
+                    url = reverse("init_dipendente")
+                    return HttpResponse('''
+                                    <script type='text/javascript'>
+                                        opener.redirectAfter(window, '{}');
+                                    </script>'''.format(url))   
         else:
-            formset = forms.RetribuzioneFormset(instance=models.Dipendente())
+            formset = forms.RetribuzioneFormset(instance=form.instance)
             # sistemiano i valori iniziali
             data = {"principale": True}
             for subform in formset.forms:
