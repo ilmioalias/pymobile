@@ -189,6 +189,31 @@ def get_telefonisti_ids(query):
 #        for provvigione in provvigioni_bonus:
 #            otps = provvigione.split(",")
 
+#def values_from_provvigione_bonus_field(provvigione_bonus):
+#    provvigione_bonus = provvigione_bonus.strip()
+#    if not provvigione_bonus:
+#        return []
+#    
+#    values = []
+#    vs = provvigione_bonus.split(";")
+#    for var in vs:
+#        if var:
+#            opts = var.split(",")
+#            d = {}
+#            
+#            for opt in opts:
+#                item = opt.split(":")
+#            
+#                if len(item) == 2:
+#                    k = item[0].strip()
+#                    v = item[1].strip()
+#                    d[k] = v
+#                    
+#            values.append(d)
+#            
+#    return values    
+    
+
 def values_from_provvigione_bonus(provvigione_bonus):
     provvigione_bonus = provvigione_bonus.strip()
     if not provvigione_bonus:
@@ -199,16 +224,20 @@ def values_from_provvigione_bonus(provvigione_bonus):
     for var in vs:
         if var:
             opts = var.split(",")
-            d = {}
-            
+            par = {}
+            prov = None
             for opt in opts:
                 item = opt.split(":")
-                
+            
                 if len(item) == 2:
                     k = item[0].strip()
                     v = item[1].strip()
-                    d[k] = v
-                    
+                    if k == "provvigione":
+                        prov = v                        
+                    else:
+                        par[k] = v
+            
+            d = {"parameters": par, "provvigione": prov}            
             values.append(d)
             
     return values    
@@ -220,9 +249,9 @@ def provvigione_bonus_cleaned_from_values(values):
     provvigione_bonus = ""
     for d in values:
         if d:
-            for k,v in d.iteritems():
+            for k, v in d["parameters"].iteritems():
                 provvigione_bonus += str(k) + ":" + str(v) + ","
-            provvigione_bonus = provvigione_bonus[:-1] + ";"
+            provvigione_bonus += str(d["provvigione"]) + ";"
 
     return provvigione_bonus  
 
