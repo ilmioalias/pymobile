@@ -24,9 +24,6 @@ pip-log.txt
 #Translations
 *.mo
 
-#Mr Developer
-.mr.developer.cfg
-
 ## generic files to ignore
 *~
 *.lock
@@ -35,7 +32,7 @@ pip-log.txt
 *.out
 
 # project directories to ignore
-media/*
+media/
 
 # django
 *.log
