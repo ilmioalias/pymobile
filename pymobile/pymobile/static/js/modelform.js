@@ -159,7 +159,11 @@ var initModelformClickHandler = function(){
         return this.id.match(/tariffa/);
     }).combobox();
     $("form.modelform select#id_appuntamento:visible").combobox();
-	// $(".ui-autocomplete-input").attr("value", "ciao");
+    // FIXME: la funzione unload mi pare un poco invasiva
+    // meglio spostare tutto in una nuova pagina invece che su un popup?
+    $(window).unload(function(){
+		window.opener.location.reload();
+    });
 };
 
 $(document).ready(function(){

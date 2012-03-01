@@ -1,5 +1,31 @@
 #python specific
-*.pyc
+*.py[co]
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+
+# Installer logs
+pip-log.txt
+
+# Unit test / coverage reports
+.coverage
+.tox
+
+#Translations
+*.mo
+
+#Mr Developer
+.mr.developer.cfg
 
 ## generic files to ignore
 *~
@@ -7,3 +33,11 @@
 *.DS_Store
 *.swp
 *.out
+
+# project directories to ignore
+media/*
+
+# django
+*.log
+*.pot
+local_settings.py

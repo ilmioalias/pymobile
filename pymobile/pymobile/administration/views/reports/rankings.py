@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import operator
-from django.http import HttpResponse 
+#from django.http import HttpResponse 
 import pymobile.administration.utils as u
 import pymobile.administration.models as models
 import pymobile.administration.tables as tables
 import pymobile.administration.forms as forms
-from django.shortcuts import render_to_response, HttpResponseRedirect, get_object_or_404, render
+from django.shortcuts import render_to_response
 from django.db.models import Sum
 from django.template import RequestContext
-from datetime import datetime
+#from datetime import datetime
 
 def canvas_tim_telecom(request):
     template = "statistiche/canvas_tim_telecom.html"

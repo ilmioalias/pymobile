@@ -2,7 +2,7 @@
 
 from django.db.models import Q
 import operator
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import calendar
 import tables
 import forms
@@ -106,14 +106,14 @@ def get_current_quarter():
 def get_current_year():
     now = datetime.now()
     y = now.year
-    return (datetime.date(y, 1, 1), datetime.date(y, 12, 31))
+    return (date(y, 1, 1), date(y, 12, 31))
 #    return (str(y) + "-1-1", str(y) + "-12-31")
 
 def get_current_month():
     now = datetime.now()
     r = calendar.monthrange(now.year, now.month)
-    a = datetime.date(now.year, now.month, 1)
-    b = datetime.date(now.year, now.month, r[1]) 
+    a = date(now.year, now.month, 1)
+    b = date(now.year, now.month, r[1]) 
     
     return (a, b)
 
@@ -134,7 +134,7 @@ def get_yesterday():
     return (d, d)
 
 def get_period(query):
-    period = (datetime.date(2012, 1, 1), datetime.now())
+    period = (date(2012, 1, 1), datetime.now())
 #    period = ("2012-1-1", datetime.now().strftime("%Y-%m-%d"))
     
     if query["fperiodo"] == "=today":
@@ -152,7 +152,7 @@ def get_period(query):
     elif query["fperiodo"] == "=manual":
         # data "a" farloccha, "b" data odierna
         if query.has_key("fdata"):
-            a = datetime.date(2012, 1, 1)
+            a = date(2012, 1, 1)
             b = datetime.now().date()
             for data in query.getlist("fdata"):
                 if data.startswith(">"):
@@ -173,46 +173,7 @@ def get_agenti_ids(query):
 def get_telefonisti_ids(query):
     ids = [tel[1:] for tel in query.getlist("ftelefonista")]
     
-    return ids
-
-#def get_dict_provvigioni_bonus(p_bonus_text):
-#    p_bonus = p_bonus_text.split(";")
-#    
-#    for p in p_bonus:
-        
-    
-
-#def is__in(p_bonus_dipendente):
-#    if p_bonus_dipendente:
-#        provvigioni_bonus = p_bonus_dipendente.split(";")
-#        
-#        for provvigione in provvigioni_bonus:
-#            otps = provvigione.split(",")
-
-#def values_from_provvigione_bonus_field(provvigione_bonus):
-#    provvigione_bonus = provvigione_bonus.strip()
-#    if not provvigione_bonus:
-#        return []
-#    
-#    values = []
-#    vs = provvigione_bonus.split(";")
-#    for var in vs:
-#        if var:
-#            opts = var.split(",")
-#            d = {}
-#            
-#            for opt in opts:
-#                item = opt.split(":")
-#            
-#                if len(item) == 2:
-#                    k = item[0].strip()
-#                    v = item[1].strip()
-#                    d[k] = v
-#                    
-#            values.append(d)
-#            
-#    return values    
-    
+    return ids   
 
 def values_from_provvigione_bonus(provvigione_bonus):
     provvigione_bonus = provvigione_bonus.strip()
@@ -242,7 +203,7 @@ def values_from_provvigione_bonus(provvigione_bonus):
             
     return values    
 
-def provvigione_bonus_cleaned_from_values(values):
+def provvigione_bonus_from_values(values):
     if not values:
         return
     

@@ -1,7 +1,7 @@
 {% spaceless %}
 {% load django_tables2 %}
 <div class="table-container">
-<p><b>Tabella delle Entrate</b></p>
+<p>Tabella delle Entrate</p>
 <p><b>Periodo</b>: da <b>{{ period.0 }}</b> a <b>{{ period.1 }}</b></p>
 <table{% if table_in.attrs %} {{ table_in.attrs.as_html }}{% endif %}>
     <thead>
@@ -39,6 +39,7 @@
     	</tr>
     </tfoot>
 </table>
+{% if table.page %}
 <ul class="pagination">
     {% if table.page.has_previous %}
     <li class="previous"><a href="{% set_url_param page=table.page.previous_page_number %}">Previous</a></li>
@@ -48,8 +49,9 @@
     <li class="next"><a href="{% set_url_param page=table.page.next_page_number %}">Next</a></li>
     {% endif %}
 </ul>
+{% endif %}
 
-<p><b>Tabella delle Uscite</b></p>
+<p>Tabella delle Uscite</p>
 <p><b>Periodo</b>: da <b>{{ period.0 }}</b> a <b>{{ period.1 }}</b></p>
 <table{% if table_out.attrs %} {{ table_out.attrs.as_html }}{% endif %}>
     <thead>
@@ -87,6 +89,7 @@
     	</tr>
     </tfoot>
 </table>
+{% if table.page %}
 <ul class="pagination">
     {% if table.page.has_previous %}
     <li class="previous"><a href="{% set_url_param page=table.page.previous_page_number %}">Previous</a></li>
@@ -96,5 +99,6 @@
     <li class="next"><a href="{% set_url_param page=table.page.next_page_number %}">Next</a></li>
     {% endif %}
 </ul>
+{% endif %}
 </div>
 {% endspaceless %}

@@ -134,6 +134,34 @@ class RetribuzioneDipendente(models.Model):
     principale = models.BooleanField(default=False)
     creazione = models.DateTimeField(auto_now_add=True)
     modifica = models.DateTimeField(auto_now=True)     
+
+    def values_from_provvigione_bonus(self, provvigione_bonus):
+        provvigione_bonus = provvigione_bonus.strip()
+        if not provvigione_bonus:
+            return []
+        
+        values = []
+        vs = provvigione_bonus.split(";")
+        for var in vs:
+            if var:
+                opts = var.split(",")
+                par = {}
+                prov = None
+                for opt in opts:
+                    item = opt.split(":")
+                
+                    if len(item) == 2:
+                        k = item[0].strip()
+                        v = item[1].strip()
+                        if k == "provvigione":
+                            prov = v                        
+                        else:
+                            par[k] = v
+                
+                d = {"parameters": par, "provvigione": prov}            
+                values.append(d)
+                
+        return values
     
     def clean(self):
         if not self.variazione:
@@ -433,14 +461,16 @@ class Contratto(models.Model):
     appuntamento = models.ForeignKey(Appuntamento, blank=True, null=True, on_delete=SET_NULL)
     vas_telefonista = models.DecimalField(max_digits=5, decimal_places=2,
                                           verbose_name="bonus per telefonista",
-                                          help_text="bonus per telefonista",)
+                                          help_text="bonus per telefonista",
+                                          default=0, blank=True)
     vas_agente = models.DecimalField(max_digits=5, decimal_places=2,
                                      verbose_name="bonus per agente",
-                                     help_text="bonus per agente",)    
+                                     help_text="bonus per agente",
+                                     default=0, blank=True)    
     data_rescissione = models.DateField(blank=True, 
                                         verbose_name="data di rescissione",
                                         null=True)
-    pdf_contratto = models.FileField(upload_to="%Y/%m", blank=True, null=True)
+    pdf_contratto = models.FileField(upload_to="contratti/%Y/%m/", blank=True, null=True)
     completo = models.BooleanField(default=False, 
                                    help_text="contratto completato")
     data_completato = models.DateTimeField(blank=True, 
@@ -465,7 +495,7 @@ class Contratto(models.Model):
     creazione = models.DateTimeField(auto_now_add=True)
     modifica = models.DateTimeField(auto_now=True)         
     
-    def clean(self):     
+    def clean(self): 
         if not self.completo and self.data_completato:
             self.data_completato = None
         elif self.completo and not self.data_completato:

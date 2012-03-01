@@ -32,6 +32,14 @@
 	<legend>Dati Appuntamento</legend>
 		<table class="table_detail">
 			<tr><td>Data</td><td>{{ object.data }}</td></tr>
+			<tr>
+				<td>Telefonista</td>
+				<td>
+					<a href="{% url view_dipendente object.telefonista.pk %}">
+						{{ object.telefonista }}
+					</a>
+				</td>
+			</tr>
 			<tr><td>Cliente</td><td><a href="{% url view_cliente object.cliente.pk %}">{{ object.cliente }}</a></td></tr>
 			<tr>
 				<td>Referente</td>

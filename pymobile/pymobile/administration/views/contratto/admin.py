@@ -7,6 +7,7 @@ from django.template import RequestContext
 from django.db.models import Q
 #from django.utils import simplejson
 from django.core.urlresolvers import reverse
+from django.forms.models import inlineformset_factory
 #from django.db.models.loading import get_model
 #from django.views.generic.simple import redirect_to
 #from django.forms.models import inlineformset_factory
@@ -60,32 +61,39 @@ def init(request):
 def add_object(request):  
     template = TMP_FORM
     action = "Aggiungi"
+    PianoTariffarioFormset = inlineformset_factory(models.Contratto, 
+                                                   models.PianoTariffario, 
+                                                   forms.PianoTariffarioForm,
+                                                   formset = forms.PianoTariffarioInlineFormset,
+                                                   can_delete=False,
+                                                   extra=1,)
         
     if request.method == "POST":
         post_query = request.POST.copy()
-        form = forms.ContrattoForm(post_query)
+        print(request.FILES)
+        form = forms.ContrattoForm(post_query, request.FILES)
         
         if form.is_valid():
             contratto = form.save(commit=False)
-            formset = forms.PianoTariffarioFormSet(post_query, instance=contratto)
+            formset = PianoTariffarioFormset(post_query, instance=contratto)
             
             if formset.is_valid():
                 form.save()
                 formset.save()
             
-            if request.POST.has_key("add_another"):              
-                return HttpResponseRedirect(reverse("add_contratto")) 
-            else:
-                url = reverse("init_contratto")
-                return HttpResponse('''
-                                <script type='text/javascript'>
-                                    opener.redirectAfter(window, '{}');
-                                </script>'''.format(url)) 
+                if request.POST.has_key("add_another"):              
+                    return HttpResponseRedirect(reverse("add_contratto")) 
+                else:
+                    url = reverse("init_contratto")
+                    return HttpResponse('''
+                                    <script type='text/javascript'>
+                                        opener.redirectAfter(window, '{}');
+                                    </script>'''.format(url)) 
         else:
-            formset = forms.PianoTariffarioFormSet(instance=models.Contratto())
+            formset = PianoTariffarioFormset(post_query)
     else:
         form = forms.ContrattoForm()
-        formset = forms.PianoTariffarioFormSet(instance=models.Contratto())                
+        formset = PianoTariffarioFormset(instance=models.Contratto())                
     
     data = {"modelform": form, "action": action, "modelformset": formset,}                
     return render_to_response(template, 
@@ -95,35 +103,43 @@ def add_object(request):
 def mod_object(request, object_id):
     template = TMP_FORM
     action = "Modifica"
-
+    PianoTariffarioFormset = inlineformset_factory(models.Contratto, 
+                                                   models.PianoTariffario, 
+                                                   forms.PianoTariffarioForm,
+                                                   formset = forms.PianoTariffarioInlineFormset,
+                                                   can_delete=True,
+                                                   extra=0,)
+    
     if request.method == "POST":
         post_query = request.POST.copy()
         
+        print(request.FILES)
+        
         obj = get_object_or_404(models.Contratto, pk=object_id)
-        form = forms.ContrattoForm(post_query, instance=obj)
+        form = forms.ContrattoForm(post_query, request.FILES, instance=obj)
         
         if form.is_valid():
             contratto = form.save(commit=False)
-            formset = forms.PianoTariffarioFormSet(post_query, instance=contratto)
+            formset = PianoTariffarioFormset(post_query, instance=contratto)
             
             if formset.is_valid():
                 form.save()
                 formset.save() 
             
-            if request.POST.has_key("add_another"):              
-                return HttpResponseRedirect(reverse("add_contratto")) 
-            else:
-                url = reverse("view_contratto", args=[object_id,])
-                return HttpResponse('''
-                                <script type='text/javascript'>
-                                    opener.redirectAfter(window, '{}');
-                                </script>'''.format(url))   
+                if request.POST.has_key("add_another"):              
+                    return HttpResponseRedirect(reverse("add_contratto")) 
+                else:
+                    url = reverse("view_contratto", args=[object_id,])
+                    return HttpResponse('''
+                                    <script type='text/javascript'>
+                                        opener.redirectAfter(window, '{}');
+                                    </script>'''.format(url))   
         else:
-            formset = forms.PianoTariffarioFormSet(instance=obj)
+            formset = PianoTariffarioFormset(post_query, instance=obj)
     else:
         contratto = get_object_or_404(models.Contratto, pk=object_id)
         form = forms.ContrattoForm(instance=contratto)
-        formset = forms.PianoTariffarioFormSet(instance=contratto)        
+        formset = PianoTariffarioFormset(instance=contratto)        
     
     data = {"modelform": form, "action": action, "modelformset": formset,} 
     return render_to_response(template,

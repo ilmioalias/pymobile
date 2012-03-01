@@ -91,11 +91,7 @@ def add_object(request):
                                         opener.redirectAfter(window, '{}');
                                     </script>'''.format(url))   
         else:
-            formset = forms.RetribuzioneFormset(instance=form.instance)
-            # sistemiano i valori iniziali
-            data = {"principale": True}
-            for subform in formset.forms:
-                subform.initial = data 
+            formset = forms.RetribuzioneFormset(post_query)
     else:
         form = forms.DipendenteForm()    
         formset = forms.RetribuzioneFormset(instance=models.Dipendente())

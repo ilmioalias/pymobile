@@ -137,7 +137,7 @@ urlpatterns += patterns('pymobile.administration.views',
 urlpatterns += patterns('pymobile.administration.views.reports',
    url(r'^pymobile/statistiche/classifiche/canvas/$', "rankings.canvas_tim_telecom", 
        name="canvas_tim_telecom"),
-   url(r'^pymobile/statistiche/finanze/entrate_uscite/$', "inout.entrate_uscite", 
-       name="entrate_uscite"),
+   url(r'^pymobile/statistiche/finanze/inout/$', "business.inout", 
+       name="inout"),
 )
                             

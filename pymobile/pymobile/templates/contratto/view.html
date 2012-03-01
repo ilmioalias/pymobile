@@ -30,7 +30,10 @@
 <div class="div_detail">
 	<fieldset>
 	<legend>Dati Contratto</legend>
-		<table class="table_detail">
+		<table class="table_detail">stipula
+			<tr><td>Data stipula</td><td>{{ object.data_stipula }}</td></tr>
+			<tr><td>Data scadenza</td><td>{{ object.data_scadenza }}</td></tr>
+			<tr><td>Data rescissione</td><td>{% if object.data_rescissione %}{{ object.data_rescissione }}{% endif %}</td></tr>
 			<tr><td>Cliente</td><td><a href="{% url view_cliente object.cliente.pk %}">{{ object.cliente }}</a></td></tr>
 			<tr><td>Agente</td><td><a href="{% url view_dipendente object.agente.pk %}">{{ object.agente }}</a></td></tr>
 			<tr>
@@ -45,6 +48,14 @@
 							{% endfor %}
 						</table>
 					</fieldset>
+				</td>
+			</tr>
+			<tr>
+				<td>Appuntamento</td>
+				<td>{% if object.appuntamento %}
+					<a href="{% url view_appuntamento object.appuntamento.pk %}">
+						{{ object.appuntamento }}</a>
+					{% endif %}
 				</td>
 			</tr>
 			{% if object.pdf_contratto %}

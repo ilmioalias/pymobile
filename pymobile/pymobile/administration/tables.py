@@ -291,36 +291,6 @@ class ContrattoTable(tables.Table):
         empty_text = "Nessuna Contratto"
         order_by = ("-data_stipula", "-data_scadenza",)
 
-#class ProvvigioneTable(tables.Table):
-#    TMP_PRO='''
-#        {{ record.provvigione }}{% if record.dipendente.ruolo == "agt" %}&#37;{% else %}&euro;{% endif %}
-#    '''
-#    
-#    TMP_OP='''
-#        <a id="mod_id_{{ record.pk }}" class="modifyrow" href="{% url mod_provvigione record.dipendente.pk record.pk %}">Modifica</a>
-#        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_provvigione record.dipendente.pk %}?id={{ record.pk }}">Elimina</a>
-#    '''
-#    
-#    TMP_DATA='''
-#        {% load tags %}
-#        {{ record.data.month|get_month_name }} / {{ record.data.year }}
-#    '''
-#    TMP_MESE='''
-#        {% load tags %}
-#        {{ record.mese|get_month_name }}
-#    '''
-#    
-#    data = tables.TemplateColumn(TMP_DATA, verbose_name="Mese/Anno Variazione")  
-#    provvigione = tables.TemplateColumn(TMP_PRO)
-#    operazioni = tables.TemplateColumn(TMP_OP, sortable=False)
-#     
-#    class Meta:
-#        model = models.ProvvigioneDipendente
-#        exclude = ("id", "creazione", "modifica", "dipendente",)
-#        sequence = ("data", "provvigione", "...")
-#        empty_text = "Nessuna Variazione della Provvigione"
- 
-
 #-------------------------------------------------------------------------------
 # STATISTICHE
 
@@ -353,17 +323,17 @@ class CanvasEdisonTable(tables.Table):
         attrs = {"id": "reporttable"}
 
 class InTable(tables.Table):
-    TMP_STIP_N='''
-        {{ record.stip }}/{{ record.inv }}/{{ record.car }}/{{ record.att }}
-    '''
-    
-    TMP_IN='''
-        {{ record.stip_in }}/{{ record.att_in }}
-    '''    
+#    TMP_N_STIP='''
+#        {{ record.stip }}/{{ record.inv }}/{{ record.car }}/{{ record.att }}
+#    '''
+#    
+#    TMP_IN='''
+#        {{ record.stip_in }}/{{ record.att_in }}
+#    '''    
     
     data = tables.Column()
-    stip_n = tables.TemplateColumn(TMP_STIP_N)
-    entrate = tables.TemplateColumn(TMP_IN)
+    n_stipulati = tables.Column()
+    entrate = tables.Column()
 
     class Meta:
         empty_text = "Tabella vuota"
@@ -371,9 +341,12 @@ class InTable(tables.Table):
 
 class OutTable(tables.Table):
     data = tables.Column()
+    n_stipulati = tables.Column()
     prov_agt = tables.Column()
+    prov_bonus_agt = tables.Column()
     prov_tel = tables.Column()
-    tot = tables.Column()
+    prov_bonus_tel = tables.Column()
+    uscite = tables.Column()
     
     class Meta:
         empty_text = "Tabella vuota"
