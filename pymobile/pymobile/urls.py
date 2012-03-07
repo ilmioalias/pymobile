@@ -134,10 +134,31 @@ urlpatterns += patterns('pymobile.administration.views',
 
 #-------------------------------------------------------------------------------
 # STATISTICHE
+# canvas
 urlpatterns += patterns('pymobile.administration.views.reports',
    url(r'^pymobile/statistiche/classifiche/canvas/$', "rankings.canvas_tim_telecom", 
        name="canvas_tim_telecom"),
+   url(r'^pymobile/statistiche/classifiche/canvas/$', "rankings.canvas_edison", 
+       name="canvas_edison"),
+)
+
+# entrate uscite
+urlpatterns += patterns('pymobile.administration.views.reports',
    url(r'^pymobile/statistiche/finanze/inout/$', "business.inout", 
        name="inout"),
+)
+
+# Obiettivi
+urlpatterns += patterns('pymobile.administration.views.reports',
+#   url(r'^pymobile/statistiche/obiettivi/$', "goals.canvas_obiettivi_trimestrale", 
+#       name="canvas_obiettivi_trimestrale"),
+   url(r'^pymobile/statistiche/obiettivi/admin/$', "goals.init_obiettivo_trimestrale", 
+       name="init_obiettivo_trimestrale"),
+   url(r'^pymobile/statistiche/obiettivi/add/$', "goals.add_obiettivo_trimestrale", 
+       name="add_obiettivo_trimestrale"),
+   url(r'^pymobile/statistiche/obiettivi/mod/(?P<object_id>\d+)/$', "goals.mod_obiettivo_trimestrale", 
+       name="mod_obiettivo_trimestrale"),
+   url(r'^pymobile/statistiche/obiettivi/del/$', "goals.del_obiettivo_trimestrale", 
+       name="del_obiettivo_trimestrale"),                        
 )
                             

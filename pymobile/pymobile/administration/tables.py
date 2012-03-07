@@ -269,8 +269,8 @@ class ContrattoTable(tables.Table):
         <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_contratto %}?id={{ record.pk }}">Elimina</a>
     '''
     
-    cliente = tables.LinkColumn("view_cliente", args=[A("pk")],)
-    agente = tables.LinkColumn("view_dipendente", args=[A("pk")])
+    cliente = tables.LinkColumn("view_cliente", args=[A("cliente.pk")],)
+    agente = tables.LinkColumn("view_dipendente", args=[A("agente.pk")])
     piano_tariffario = tables.TemplateColumn(TMP_PT, sortable=False, verbose_name="piano tariffario")
     completo = BooleanColumn()
     inviato = BooleanColumn()
@@ -330,9 +330,13 @@ class InTable(tables.Table):
 #    TMP_IN='''
 #        {{ record.stip_in }}/{{ record.att_in }}
 #    '''    
+    TMP_DATA='''
+        {% load tags %}
+        <a href="{% url init_contratto %}?fdata_stipula=={{ record.data|get_date }}">{{ record.data }}</a>
+    '''
     
-    data = tables.Column()
-    n_stipulati = tables.Column()
+    data = tables.TemplateColumn(TMP_DATA)
+    n_stipulati = tables.Column(verbose_name="Stipulati")
     entrate = tables.Column()
 
     class Meta:
@@ -340,12 +344,17 @@ class InTable(tables.Table):
         attrs = {"id": "entratetable"}
 
 class OutTable(tables.Table):
-    data = tables.Column()
-    n_stipulati = tables.Column()
-    prov_agt = tables.Column()
-    prov_bonus_agt = tables.Column()
-    prov_tel = tables.Column()
-    prov_bonus_tel = tables.Column()
+    TMP_DATA='''
+        {% load tags %}
+        <a href="{% url init_contratto %}?fdata_stipula=={{ record.data|get_date }}">{{ record.data }}</a>
+    '''
+    
+    data = tables.TemplateColumn(TMP_DATA)
+    n_stipulati = tables.Column(verbose_name="Stipulati")
+    prov_agt = tables.Column(verbose_name="Prov. agente")
+    prov_bonus_agt = tables.Column(verbose_name="Prov. bonus agente")
+    prov_tel = tables.Column(verbose_name="Prov. tel.")
+    prov_bonus_tel = tables.Column(verbose_name="Prov. bonus tel.")
     uscite = tables.Column()
     
     class Meta:

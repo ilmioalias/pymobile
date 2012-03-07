@@ -9,10 +9,13 @@ import pymobile.administration.forms as forms
 from django.shortcuts import render_to_response
 #from django.db.models import Sum
 from django.template import RequestContext
+from decimal import Decimal, getcontext
 #from datetime import datetime
 #from django.db.models import Q
 
 def inout(request):
+    #TODO: controllare che effettivamente i calcoli siano giusti
+    getcontext().prec = 2
     template = "statistiche/entrate_uscite.html"
     
     if request.method == "GET" and request.GET.has_key("fperiodo"):
@@ -43,6 +46,15 @@ def inout(request):
     objs_out = []
     
     if contratti.exists():
+        n_stipulati = 0
+        n_attivati = 0
+        in_tot = 0
+        out_tot = 0
+        out_tot_prov_agt = 0
+        out_tot_prov_bonus_agt = 0
+        out_tot_prov_tel = 0
+        out_tot_prov_bonus_tel = 0
+        
         dates = contratti.values("data_stipula").distinct()
         for date in dates:
             in_tot_day = 0
@@ -50,10 +62,15 @@ def inout(request):
             out_tot_prov_agt_day = 0
             out_tot_prov_tel_day = 0
             out_tot_prov_bonus_agt_day = 0
-            out_tot_prov_bonus_tel_day = 0 
-            print(date)
+            out_tot_prov_bonus_tel_day = 0
+
             contratti_day = contratti.filter(data_stipula=date["data_stipula"]).iterator()
+            
             n = 0
+            a = 0
+            c = 0
+            i = 0
+            cr = 0
             for contratto in contratti_day:
                 # informazioni utili
                 cliente = contratto.cliente
@@ -63,13 +80,12 @@ def inout(request):
                     telefonista = contratto.appuntamento.telefonista
                 
                 # uscite: bonus per agente/telefonista in base al contratto
-                vas_agente = contratto.vas_agente
-                vas_telefonista = contratto.vas_telefonista
+                vas_agente = float(contratto.vas_agente)
+                vas_telefonista = float(contratto.vas_telefonista)
                 
                 # determiniamo il piano tariffario
                 pts = models.PianoTariffario.objects.filter(contratto=contratto).iterator()
-                print(pts)
-#                pts = contratto.piano_tariffario.iterator()
+            
                 in_tot_contratto = 0
                 out_tot_prov_agt_contratto = 0
                 out_tot_prov_tel_contratto = 0
@@ -78,21 +94,23 @@ def inout(request):
                 for pt in pts:
                     tariffa = pt.tariffa
                     q = pt.num
-                    sac = tariffa.sac
-                    print(tariffa, q, sac)
+                    sac = float(tariffa.sac)
                     
                     # determiniamo le entrate dovute alla tariffa del contratto considerato
                     in_tot_contratto += sac * q
                     
                     # determiniamo le uscite dovute alla tariffa del contratto considerato
-                    # 1: provvigione dovuta all'agente:
+                    # 1: provvigione dovuta all'agente:                    
                     prov_agente = calc_provvigione(agente, cliente, tariffa, date["data_stipula"])
                     out_tot_prov_agt_contratto += prov_agente[0] * q
                     out_tot_prov_bonus_agt_contratto += prov_agente[1] * q
                     # 2: provvigione dovuta al telefonista
-                    prov_telefonista = calc_provvigione(telefonista, cliente, tariffa, date["data_stipula"])
-                    out_tot_prov_tel_contratto += prov_telefonista[0] * q
-                    out_tot_prov_bonus_tel_contratto += prov_telefonista[1] * q
+                    if telefonista:
+                        prov_telefonista = calc_provvigione(telefonista, cliente, 
+                                                            tariffa, 
+                                                            date["data_stipula"])
+                        out_tot_prov_tel_contratto += prov_telefonista[0] * q
+                        out_tot_prov_bonus_tel_contratto += prov_telefonista[1] * q
                     
                 # determiniamo le entrate della giornata
                 in_tot_day += in_tot_contratto
@@ -107,16 +125,48 @@ def inout(request):
                     vas_telefonista + vas_agente
                 
                 n += 1
+                n_stipulati += 1
+                if contratto.attivato:
+                    a += 1
+                    n_attivati += 1
+                if contratto.completo:
+                    c += 1
+                if contratto.inviato:
+                    i += 1
+                if contratto.caricato:
+                    cr += 1
                 
             # inseriamo i dati per la tabella delle entrate
-            obj_in = {"data": date["data_stipula"], "n_stipulati": n, "entrate": in_tot_day}
-            obj_out = {"data": date["data_stipula"], "n_stipulati": n, "uscite": out_tot_day,
-                       "prov_agt": out_tot_prov_agt_day, 
-                       "prov_bonus_agt": out_tot_prov_bonus_agt_day,
-                       "prov_tel": out_tot_prov_tel_day,
-                       "prov_bonus_tel": out_tot_prov_bonus_tel_day,}
+            t = str(n) + "/" + str(c) + "/" + str(i) + "/" + str(cr) + "/" + str(a)
+            obj_in = {"data": date["data_stipula"], 
+                      "n_stipulati": t, 
+                      "entrate": "{0:.2f}".format(Decimal(in_tot_day))}
+            obj_out = {"data": date["data_stipula"], 
+                       "n_stipulati": t, 
+                       "uscite": "{0:.2f}".format(Decimal(out_tot_day)),
+                       "prov_agt": "{0:.2f}".format(Decimal(out_tot_prov_agt_day)), 
+                       "prov_bonus_agt": "{0:.2f}".format(Decimal(out_tot_prov_bonus_agt_day)),
+                       "prov_tel": "{0:.2f}".format(Decimal(out_tot_prov_tel_day)),
+                       "prov_bonus_tel": "{0:.2f}".format(Decimal(out_tot_prov_bonus_tel_day)),}
             objs_in.append(obj_in)
             objs_out.append(obj_out)
+            
+            # aggoirniamo i totali
+            in_tot += in_tot_day
+            out_tot += out_tot_day
+            out_tot_prov_agt += out_tot_prov_agt_day
+            out_tot_prov_bonus_agt += out_tot_prov_bonus_agt_day
+            out_tot_prov_tel += out_tot_prov_tel_day
+            out_tot_prov_bonus_tel += out_tot_prov_bonus_tel_day
+    
+    totals_in = ["{}/{}".format(n_stipulati, n_attivati), 
+                 "{0:.2f}".format(Decimal(in_tot)),]
+    totals_out = ["{}/{}".format(n_stipulati, n_attivati),
+                  "{0:.2f}".format(Decimal(out_tot_prov_agt)),
+                  "{0:.2f}".format(Decimal(out_tot_prov_bonus_agt)),
+                  "{0:.2f}".format(Decimal(out_tot_prov_tel)),
+                  "{0:.2f}".format(Decimal(out_tot_prov_bonus_tel)),
+                  "{0:.2f}".format(Decimal(out_tot)),]
     
     # creiamo le tabelle 
     table_in = tables.InTable(objs_in, prefix="in")
@@ -129,6 +179,8 @@ def inout(request):
     if request.is_ajax():
         data = {"table_in": table_in,
                 "table_out": table_out,
+                "totals_in": totals_in,
+                "totals_out": totals_out,
                 "period": (period[0], period[1])}
         return render_to_response("statistiche/inouttable_snippet.html", data,
                                   context_instance=RequestContext(request))   
@@ -137,6 +189,8 @@ def inout(request):
     
     data = {"table_in": table_in,
             "table_out": table_out,
+            "totals_in": totals_in,
+            "totals_out": totals_out,
             "filterform": filterform,
             "period": (period[0], period[1])}
     return render_to_response(template, data,
@@ -146,23 +200,26 @@ def calc_provvigione(dipendente, cliente, tariffa, date):
     # determiniamo la modalità di calcolo della retribuzione per il dipendente
     # prima verifichiamo se vi una variazione della retribuzione, altrimenti usiamo
     # la retribuzione standard corrente
-    retribuzione = models.RetribuzioneDipendente.objects.get(variazione=True, 
-                                                             data_inizio__lte=date,
-                                                             data_fine__gte=date)
+    retribuzione = models.RetribuzioneDipendente.objects.filter(variazione=True,
+                                                                dipendente=dipendente, 
+                                                                data_inizio__lte=date,
+                                                                data_fine__gte=date)
     if not retribuzione.exists():
         retribuzione = models.RetribuzioneDipendente.objects.filter(variazione=False,
+                                                                    dipendente=dipendente,
                                                                     data_inizio__lte=date)\
                                                                     .order_by("-data_inizio")[0]
                                                                     
-    provvigione_contratto = retribuzione.provvigione_contratto
+    provvigione_contratto = float(retribuzione.provvigione_contratto)
     provvigione_bonus = retribuzione.provvigione_bonus
+    sac = float(tariffa.sac)
     
     # calcoliamo la provvigione per il contratto, intesa come singola tariffa
     ret_contratto = 0
-    if dipendente.tipo == "agt":
+    if dipendente.ruolo == "agt":
         # provvigione contratto è un valore percentuale
-        ret_contratto = tariffa.sac * provvigione_contratto / 100
-    elif dipendente.tipo == "tel":
+        ret_contratto = sac * provvigione_contratto / 100
+    elif dipendente.ruolo == "tel":
         ret_contratto = provvigione_contratto
     
     # calcoliamo la provvigione bonus (se presente)

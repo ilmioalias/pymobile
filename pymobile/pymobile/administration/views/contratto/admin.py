@@ -44,7 +44,6 @@ def init(request):
             del query_get["sort"]
         if query_get:
             objs, initial = u.filter_objs(objs, query_get)
-        
     table = tables.ContrattoTable(objs, order_by=(ordering,))
     table.paginate(page=pag)                   
 

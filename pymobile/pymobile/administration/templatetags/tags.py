@@ -61,3 +61,7 @@ def get_month_name(month_num):
 @register.filter(name="get_prov")
 def get_prov(objs, i):
     return objs.get(i, "")
+
+@register.filter(name="get_date")
+def get_date(date):
+    return date.strftime("%d/%m/%Y")

@@ -42,7 +42,7 @@
 					<legend>Piano Tariffario</legend>
 						<table>
 							{% for tariffa in object.piano_tariffario.all %}
-							<tr><td>Tariffa</td><td>{{ tariffa }}</td></tr>
+							<tr><td>Tariffa</td><td><a href="{% url view_tariffa tariffa.pk %}">{{ tariffa }}</a></td></tr>
 							<tr><td>Quantità</td><td>{{ tariffa|get_pt_num:object.pk }}</td></tr>
 							<tr><td>Opzione</td><td>{% if tariffa|get_pt_opt:object.pk %}<img src="{{ STATIC_URL }}/img/spunta.png" />{% endif %}</td></tr>
 							{% endfor %}

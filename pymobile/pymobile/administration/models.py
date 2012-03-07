@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
-from django.db.models.loading import get_model
+#from django.db.models.loading import get_model
 #import hashlib
 #from django.contrib.contenttypes.models import ContentType
 #from django.contrib.contenttypes import generic
 from django.db.models import Q, SET_NULL
 import datetime
 import operator
+#import calendar
 
 # Create your models here.
 
@@ -108,68 +109,68 @@ class RetribuzioneDipendente(models.Model):
     provvigione_bonus = models.TextField(blank=True, default="",
                                          verbose_name="provvigioni bonus", 
                                          help_text='''
-            Chiavi: <b>gestore</b>, <b>profilo</b>, <b>tipo</b>, <b>fascia</b>, <b>servizio</b>, <b>blindato</b>, <b>provvigione</b><br/> 
-            La chiave <b>provvigione</b> (valore in euro) è obbligatoria, 
-            ognuna delle altre chiavi è opzionale, ma almeno una deve essere presente oltre a <b>provvigione</b>.
-            Le chiavi <b>gestore</b>, <b>profilo</b>, <b>tipo</b>, <b>fascia</b>, <b>servizio</b> si riferiscono alle tariffe, 
-            mentre <b>blindato</b> al cliente firmatario del contratto; la chiave <b>blindato</b> accetta come valore un intero; 
-            qualunque intero maggiore di 0 corrisponde a <i>vero</i>, 0 a <i>falso</i>. 
-            <br/>Ex: se si volesse aggiungere per il dipendente selezionato una provvigione 
-            bonus di 5€ per tutte le tariffe di tipo SIM e fascia LOW vendute ad un cliente <i>blindato</i>, basterebbe inserire: 
-            <br/><b>tipo: sim, fascia: low, blindato: 1, provvigione: 5;</b><br/> 
-            le chiavi devono essere separate dalla <i>virgola</i>, i <i>due punti</i> servono per indicare 
-            il valore della chiave e il <i>punto e virgola</i> è usato come termine; è possibile inserire
-            più di una provvigione speciale per un singolo dipendente; gli spazi e l'ordine  di inserimento delle chiavi non sono influenti.<br/>
-            <b>NB:</b> Per i telefonisti sono pre-inserite le seguenti provvigioni bonus:
-            <br/><b>tipo: sim, provvigione: 1;<br/> 
-             gestore: telecom, tipo: ull, provvigione: 10;<br/>
-             gestore: telecom, tipo: nip, provvigione: 10;<br/>
-             tipo: adsl, provvigione: 5;<br/>
-             tipo: adsl, fascia: premium, provvigione: 10;</b><br/>
-           Mentre per gli agenti è pre-inserita la seguente provvgione bonus:
-           <br/><b>blindato: 1, provvigione: 10;</b><br/> 
-            ''',)
+        Chiavi: <b>gestore</b>, <b>profilo</b>, <b>tipo</b>, <b>fascia</b>, <b>servizio</b>, <b>blindato</b>, <b>provvigione</b><br/> 
+        La chiave <b>provvigione</b> (valore in euro) è obbligatoria, 
+        ognuna delle altre chiavi è opzionale, ma almeno una deve essere presente oltre a <b>provvigione</b>.
+        Le chiavi <b>gestore</b>, <b>profilo</b>, <b>tipo</b>, <b>fascia</b>, <b>servizio</b> si riferiscono alle tariffe, 
+        mentre <b>blindato</b> al cliente firmatario del contratto; la chiave <b>blindato</b> accetta come valore un intero; 
+        qualunque intero maggiore di 0 corrisponde a <i>vero</i>, 0 a <i>falso</i>. 
+        <br/><b>ex:</b> se si volesse aggiungere per il dipendente selezionato una provvigione 
+        bonus di 5€ per tutte le tariffe di tipo SIM e fascia LOW vendute ad un cliente <i>blindato</i>, basterà inserire: 
+        <br/><b>tipo: sim, fascia: low, blindato: 1, provvigione: 5;</b><br/> 
+        le chiavi devono essere separate dalla <i>virgola</i>, i <i>due punti</i> servono per indicare 
+        il valore della chiave e il <i>punto e virgola</i> è usato come termine; è possibile inserire
+        più di una provvigione speciale per un singolo dipendente; gli spazi e l'ordine  di inserimento delle chiavi non sono influenti.<br/>
+        <b>NB:</b> Per i telefonisti sono pre-inserite le seguenti provvigioni bonus:
+        <br/><b>tipo: sim, provvigione: 1;<br/> 
+        gestore: telecom, tipo: ull, provvigione: 10;<br/>
+        gestore: telecom, tipo: nip, provvigione: 10;<br/>
+        tipo: adsl, provvigione: 5;<br/>
+        tipo: adsl, fascia: premium, provvigione: 10;</b><br/>
+        Mentre per gli agenti è pre-inserita la seguente provvgione bonus:
+        <br/><b>blindato: 1, provvigione: 10;</b><br/> 
+        ''',)
     variazione = models.BooleanField(default=False)
     # "principale" indica la prima retribuzione aasegnata al dipendente
     principale = models.BooleanField(default=False)
     creazione = models.DateTimeField(auto_now_add=True)
     modifica = models.DateTimeField(auto_now=True)     
 
-    def values_from_provvigione_bonus(self, provvigione_bonus):
-        provvigione_bonus = provvigione_bonus.strip()
-        if not provvigione_bonus:
-            return []
-        
-        values = []
-        vs = provvigione_bonus.split(";")
-        for var in vs:
-            if var:
-                opts = var.split(",")
-                par = {}
-                prov = None
-                for opt in opts:
-                    item = opt.split(":")
-                
-                    if len(item) == 2:
-                        k = item[0].strip()
-                        v = item[1].strip()
-                        if k == "provvigione":
-                            prov = v                        
-                        else:
-                            par[k] = v
-                
-                d = {"parameters": par, "provvigione": prov}            
-                values.append(d)
-                
-        return values
+#    def values_from_provvigione_bonus(self, provvigione_bonus):
+#        provvigione_bonus = provvigione_bonus.strip()
+#        if not provvigione_bonus:
+#            return []
+#        
+#        values = []
+#        vs = provvigione_bonus.split(";")
+#        for var in vs:
+#            if var:
+#                opts = var.split(",")
+#                par = {}
+#                prov = None
+#                for opt in opts:
+#                    item = opt.split(":")
+#                
+#                    if len(item) == 2:
+#                        k = item[0].strip()
+#                        v = item[1].strip()
+#                        if k == "provvigione":
+#                            prov = v                        
+#                        else:
+#                            par[k] = v
+#                
+#                d = {"parameters": par, "provvigione": prov}            
+#                values.append(d)
+#                
+#        return values
     
     def clean(self):
+        # FIXME: data_fine delle retirbuzioni (non variazione) deve essere aggioranata 
+        # automaticamente quando viene inserita una nuova retribuzione. deve avvenire
+        # la stessa cosa che avviene cone le var.tmp. e nel template un colore deve 
+        # definire i vari periodi
         if not self.variazione:
             self.data_fine = self.data_inizio
-#            q = RetribuzioneDipendente.objects.filter(data_fine__lt=self.data_inizio,
-#                                                      variazione=False,)
-#            if q.exists():
-#                q[0].data_fine = self.data_inizio - datetime.timedelta(1)
         if self.variazione:
             self.fisso = 0
         models.Model.clean(self)
@@ -217,7 +218,7 @@ class Cliente(models.Model):
     telefono = models.CharField(max_length=45, blank=True)
     cellulare = models.CharField(max_length=45, blank=True)
     fax = models.CharField(max_length=45, blank=True)
-    blindato = models.BooleanField(help_text="cliente blindato", default=0)
+    blindato = models.BooleanField(help_text="cliente blindato", default=False)
     nota = models.TextField(verbose_name="nota del cliente", blank=True)
     creazione = models.DateTimeField(auto_now_add=True)
     modifica = models.DateTimeField(auto_now=True)
@@ -317,48 +318,48 @@ class Tariffa(models.Model):
                    Q(profilo=self.profilo),
                    Q(attivo=self.attivo)]
         
-        if not self.pk:
-            if str(self.gestore) == "edison":
-                if self.tipo is None:
-                    queries.append(Q(tipo__isnull=True))
-                else:
-                    queries.append(Q(tipo=self.tipo))
-                if self.fascia is None:
-                    queries.append(Q(fascia__isnull=True))
-                else:
-                    queries.append(Q(fascia=self.fascia)) 
-                if Tariffa.objects.filter(reduce(operator.and_, queries)).exists():
-                    raise ValidationError("La tariffa è già presente nel DATABASE")
-            elif str(self.gestore) == "tim":
-                if self.tipo is None:
-                    queries.append(Q(tipo__isnull=True))
-                else:
-                    queries.append(Q(tipo=self.tipo))
-                if self.fascia is None:
-                    queries.append(Q(fascia__isnull=True))
-                else:
-                    queries.append(Q(fascia=self.fascia))
-                if self.servizio is None:
-                    queries.append(Q(servizio__isnull=True))
-                else:
-                    queries.append(Q(servizio=self.servizio))    
-                if Tariffa.objects.filter(reduce(operator.and_, queries)):
-                    raise ValidationError("La tariffa è già presente nel DATABASE")
-            elif str(self.gestore) == "telecom":
-                if self.tipo is None:
-                    queries.append(Q(tipo__isnull=True))
-                else:
-                    queries.append(Q(tipo=self.tipo))
-                if self.fascia is None:
-                    queries.append(Q(fascia__isnull=True))
-                else:
-                    queries.append(Q(fascia=self.fascia))
-                if self.servizio is None:
-                    queries.append(Q(servizio__isnull=True))
-                else:
-                    queries.append(Q(servizio=self.servizio))            
-                if Tariffa.objects.filter(reduce(operator.and_, queries)).exists():
-                    raise ValidationError("La tariffa è già presente nel DATABASE")                        
+#        if not self.pk:
+        if str(self.gestore) == "edison":
+            if self.tipo is None:
+                queries.append(Q(tipo__isnull=True))
+            else:
+                queries.append(Q(tipo=self.tipo))
+            if self.fascia is None:
+                queries.append(Q(fascia__isnull=True))
+            else:
+                queries.append(Q(fascia=self.fascia)) 
+            if Tariffa.objects.filter(reduce(operator.and_, queries)).exists():
+                raise ValidationError("La tariffa è già presente nel DATABASE")
+        elif str(self.gestore) == "tim":
+            if self.tipo is None:
+                queries.append(Q(tipo__isnull=True))
+            else:
+                queries.append(Q(tipo=self.tipo))
+            if self.fascia is None:
+                queries.append(Q(fascia__isnull=True))
+            else:
+                queries.append(Q(fascia=self.fascia))
+            if self.servizio is None:
+                queries.append(Q(servizio__isnull=True))
+            else:
+                queries.append(Q(servizio=self.servizio))    
+            if Tariffa.objects.filter(reduce(operator.and_, queries)):
+                raise ValidationError("La tariffa è già presente nel DATABASE")
+        elif str(self.gestore) == "telecom":
+            if self.tipo is None:
+                queries.append(Q(tipo__isnull=True))
+            else:
+                queries.append(Q(tipo=self.tipo))
+            if self.fascia is None:
+                queries.append(Q(fascia__isnull=True))
+            else:
+                queries.append(Q(fascia=self.fascia))
+            if self.servizio is None:
+                queries.append(Q(servizio__isnull=True))
+            else:
+                queries.append(Q(servizio=self.servizio))            
+            if Tariffa.objects.filter(reduce(operator.and_, queries)).exists():
+                raise ValidationError("La tariffa è già presente nel DATABASE")                        
         
         models.Model.clean(self)
     
@@ -538,6 +539,36 @@ class PianoTariffario(models.Model):
     class Meta:
         verbose_name_plural = "Piani Tariffari"
 
+class Obiettivo(models.Model):
+    data_inizio = models.DateField(verbose_name=" data inizio nuovo obiettivo",
+                                   null=True)
+    parametri = models.TextField(blank=True, 
+                                 default="",
+                                 verbose_name="parametri dell'obiettivo", 
+                                 help_text='''
+        Chiavi: <b>gestore</b>, <b>profilo</b>, <b>tipo</b>, <b>fascia</b>, <b>servizio</b><br/> 
+        ognuna delle chiavi è opzionale, lasciando il campo vuoto l'obbiettivo sarà relativo a tutti i contratti stipulati.
+        Le chiavi <b>gestore</b>, <b>profilo</b>, <b>tipo</b>, <b>fascia</b>, <b>servizio</b> si riferiscono alle tariffe. 
+        <br/><b>ex:</b> se si volesse aggiungere un obiettivo per 
+        le tariffe di tipo SIM e fascia LOW, basterà inserire: 
+        <br/><b>tipo: sim, fascia: low</b><br/> 
+        le chiavi devono essere separate dalla <i>virgola</i>, i <i>due punti</i> servono per indicare 
+        il valore della chiave e il <i>punto e virgola</i> è usato come termine; gli spazi extra e l'ordine  di inserimento delle chiavi non sono influenti.<br/>
+        <b>NB:</b> le chiavi possono essere ripetute; <b>ex:</b> si vuole aggiungere un obiettivo 
+        per la vendita di tariffe TIM e TELECOM, allora bisognerà scrivere:
+        <br/><b>gestore: tim, gestore: telecom</b><br/>
+        ''',)
+    obiettivo = models.IntegerField(help_text="meta da raggiungere rispetto ai parametri indicati")
+    
+    creazione = models.DateTimeField(auto_now_add=True)
+    modifica = models.DateTimeField(auto_now=True)
+            
+    def __unicode__(self):
+        return "{}".format(self.parametri)
+    
+    class Meta:
+        verbose_name_plural = "Obiettivi"
+    
 #class RenditaContratto(models.Model):
 #    contratto = models.ForeignKey(Contratto)
 #    rendita = models.DecimalField(max_digits=5, decimal_places=2)

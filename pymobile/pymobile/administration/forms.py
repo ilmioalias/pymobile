@@ -5,6 +5,7 @@
 import pymobile.administration.models as models
 from django import forms
 from django.forms.models import inlineformset_factory
+from django.utils.datetime_safe import datetime
 #from datetime import datetime
 #import calendar
 #import operator
@@ -25,93 +26,203 @@ class DipendenteForm(forms.ModelForm):
 #-------------------------------------------------------------------------------
 #FIXME: ho separato queste due funzioni per evitare gli import ciclici, da ragionarci
 # su
-def values_from_provvigione_bonus_field(provvigione_bonus):
-    provvigione_bonus = provvigione_bonus.strip()
-    if not provvigione_bonus:
-        return []
-    
-    values = []
-    vs = provvigione_bonus.split(";")
-    for var in vs:
-        if var:
-            d = {}
-            opts = var.split(",")
-            for opt in opts:
-                item = opt.split(":")
-            
-                if len(item) == 2:
-                    k = item[0].strip()
-                    v = item[1].strip()
-                    d[k] = v             
-            values.append(d)
-            
-    return values    
-
-def get_provvigione_bonus_cleaned(values):
-    if not values:
-        return
-    
-    provvigione_bonus = ""
-    for d in values:
-        if d:
-            for k, v in d.iteritems():
-                provvigione_bonus += str(k) + ":" + str(v) + ","
-            provvigione_bonus = provvigione_bonus[:-1] + ";"
-
-    return provvigione_bonus  
+#def values_from_provvigione_bonus_field(provvigione_bonus):
+#    provvigione_bonus = provvigione_bonus.strip()
+#    if not provvigione_bonus:
+#        return []
+#    
+#    values = []
+#    vs = provvigione_bonus.split(";")
+#    for var in vs:
+#        if var:
+#            d = {}
+#            opts = var.split(",")
+#            for opt in opts:
+#                item = opt.split(":")
+#            
+#                if len(item) == 2:
+#                    k = item[0].strip()
+#                    v = item[1].strip()
+#                    d[k] = v             
+#            values.append(d)
+#            
+#    return values    
+#
+#def get_provvigione_bonus_cleaned(values):
+#    if not values:
+#        return
+#    
+#    provvigione_bonus = ""
+#    for d in values:
+#        if d:
+#            for k, v in d.iteritems():
+#                provvigione_bonus += str(k) + ":" + str(v) + ","
+#            provvigione_bonus = provvigione_bonus[:-1] + ";"
+#
+#    return provvigione_bonus  
 
 #-------------------------------------------------------------------------------
 
-def check_values(values):
-    if not values:
-        raise forms.ValidationError("provvigione bonus non valida")
-    
-    for d in values:
-        if not "provvigione" in d:
-            provvigione_bonus = get_provvigione_bonus_cleaned([d])
-            raise forms.ValidationError("in <b>{}</b> non è stata indicata la chiave obbligatoria <b>provvigione</b>".format(provvigione_bonus))                
-                    
-        for k, v in d.iteritems():
-            # controlliamo le chiavi e i loro valori
-            if k == "provvigione":
-                v = d["provvigione"]
-                try:
-                    v = float(v)
-                    if v < 0:
-                        raise forms.ValidationError("il valore <b>{}</b> della chiave <b>provvigione</b> deve essere un numero maggiore o uguale di 0".format(v))                                             
-                except:
-                    raise forms.ValidationError("il valore <b>{}</b> della chiave <b>provvigione</b> deve un numero maggiore o uguale di 0".format(v))                         
-                d["provvigione"] = v                    
-            elif k == "gestore":
-                if not models.Gestore.objects.filter(denominazione=v).exists():
-                    raise forms.ValidationError("il gestore <b>{}</b> non esiste nel DATABASE".format(v))
-            elif k == "profilo":
-                if not models.Tariffa.objects.filter(profilo=v).exists():
-                    raise forms.ValidationError("la tariffa <b>{}</b> non esiste nel DATABASE".format(v))
-            elif k == "tipo":
-                if not models.TipologiaTariffa.objects.filter(denominazione=v).exists():
-                    raise forms.ValidationError("il tipo di tariffa <b>{}</b> non esiste nel DATABASE".format(v))
-            elif k == "fascia":
-                if not models.FasciaTariffa.objects.filter(denominazione=v).exists():
-                    raise forms.ValidationError("la fascia <b>{}</b> non esiste nel DATABASE".format(v))   
-            elif k == "servizio":
-                if not models.ServizioTariffa.objects.filter(denominazione=v).exists():
-                    raise forms.ValidationError("il servizio <b>{}</b> non esiste nel DATABASE".format(v))
-            elif k == "blindato":
-                try:
-                    v = int(v)
-                except : 
-                    raise forms.ValidationError("il valore <b>{}</b> della chiave <b>blindato</b> deve essere un intero maggiore o uguale di 0".format(v))                                                 
-                if v < 0:
-                    raise forms.ValidationError("il valore <b>{}</b> della chiave <b>blindato</b> deve essere un intero maggiore o uguale di 0".format(v))
-                d[k] = v
-            else:
-                raise forms.ValidationError("la chiave <b>{}</b> non è ammessa".format(k))                                                                     
+#def check_values(values):
+#    if not values:
+#        raise forms.ValidationError("provvigione bonus non valida")
+#    
+#    for d in values:
+#        if not "provvigione" in d:
+#            provvigione_bonus = get_provvigione_bonus_cleaned([d])
+#            raise forms.ValidationError("in <b>{}</b> non è stata indicata la chiave "\
+#                                        "obbligatoria <b>provvigione</b>".format(provvigione_bonus))                
+#        
+#        if len(d) < 2:
+#            raise forms.ValidationError("in <b>{}</b> oltre alla chiave obbligatoria "\
+#                                        "<b>provvigione</b> devi indicare un'altra chiave".format(provvigione_bonus))
+#        
+#        for k, v in d.iteritems():
+#            # controlliamo le chiavi e i loro valori
+#            if k == "provvigione":
+#                v = d["provvigione"]
+#                try:
+#                    v = float(v)
+#                    if v < 0:
+#                        raise forms.ValidationError("il valore <b>{}</b> della chiave <b>provvigione</b> deve essere un numero maggiore o uguale di 0".format(v))                                             
+#                except:
+#                    raise forms.ValidationError("il valore <b>{}</b> della chiave <b>provvigione</b> deve un numero maggiore o uguale di 0".format(v))                         
+#                d["provvigione"] = v                    
+#            elif k == "gestore":
+#                if not models.Gestore.objects.filter(denominazione=v).exists():
+#                    raise forms.ValidationError("il gestore <b>{}</b> non esiste nel DATABASE".format(v))
+#            elif k == "profilo":
+#                if not models.Tariffa.objects.filter(profilo=v).exists():
+#                    raise forms.ValidationError("la tariffa <b>{}</b> non esiste nel DATABASE".format(v))
+#            elif k == "tipo":
+#                if not models.TipologiaTariffa.objects.filter(denominazione=v).exists():
+#                    raise forms.ValidationError("il tipo di tariffa <b>{}</b> non esiste nel DATABASE".format(v))
+#            elif k == "fascia":
+#                if not models.FasciaTariffa.objects.filter(denominazione=v).exists():
+#                    raise forms.ValidationError("la fascia <b>{}</b> non esiste nel DATABASE".format(v))   
+#            elif k == "servizio":
+#                if not models.ServizioTariffa.objects.filter(denominazione=v).exists():
+#                    raise forms.ValidationError("il servizio <b>{}</b> non esiste nel DATABASE".format(v))
+#            elif k == "blindato":
+#                try:
+#                    v = int(v)
+#                except : 
+#                    raise forms.ValidationError("il valore <b>{}</b> della chiave <b>blindato</b> deve essere un intero maggiore o uguale di 0".format(v))                                                 
+#                if v < 0:
+#                    raise forms.ValidationError("il valore <b>{}</b> della chiave <b>blindato</b> deve essere un intero maggiore o uguale di 0".format(v))
+#                d[k] = v
+#            else:
+#                raise forms.ValidationError("la chiave <b>{}</b> non è ammessa".format(k))                                                                     
+#        
+#    return True
+
+
+class RetribuzioneBaseForm(forms.ModelForm):
+    def values_from_provvigione_bonus_field(self, provvigione_bonus):
+        provvigione_bonus = provvigione_bonus.strip()
+        if not provvigione_bonus:
+            return []
         
-    return True
+        values = []
+        vs = provvigione_bonus.split(";")
+        for var in vs:
+            if var:
+                d = {}
+                opts = var.split(",")
+                for opt in opts:
+                    item = opt.split(":")
+                
+                    if len(item) == 2:
+                        k = item[0].strip()
+                        v = item[1].strip()
+                        d[k] = v             
+                values.append(d)
+                
+        return values    
+    
+    def get_provvigione_bonus_cleaned(self, values):
+        if not values:
+            return
+        
+        provvigione_bonus = ""
+        for d in values:
+            if d:
+                for k, v in d.iteritems():
+                    provvigione_bonus += str(k) + ":" + str(v) + ","
+                provvigione_bonus = provvigione_bonus[:-1] + ";"
+    
+        return provvigione_bonus  
 
+    def check_values(self, values):
+        if not values:
+            raise forms.ValidationError("provvigione bonus non valida, controlla la sintassi")
+        
+        for d in values:
+            if not "provvigione" in d:
+                provvigione_bonus = self.get_provvigione_bonus_cleaned([d])
+                raise forms.ValidationError("in <b>{}</b> non è stata indicata la chiave "\
+                                            "obbligatoria <b>provvigione</b>".format(provvigione_bonus))                
+            
+            if len(d) < 2:
+                raise forms.ValidationError("in <b>{}</b> oltre alla chiave obbligatoria "\
+                                            "<b>provvigione</b> devi indicare un'altra chiave".format(provvigione_bonus))
+            
+            for k, v in d.iteritems():
+                # controlliamo le chiavi e i loro valori
+                if k == "provvigione":
+                    v = d["provvigione"]
+                    try:
+                        v = float(v)
+                        if v < 0:
+                            raise forms.ValidationError("il valore <b>{}</b> della chiave <b>provvigione</b> deve essere un numero maggiore o uguale di 0".format(v))                                             
+                    except:
+                        raise forms.ValidationError("il valore <b>{}</b> della chiave <b>provvigione</b> deve un numero maggiore o uguale di 0".format(v))                         
+                    d["provvigione"] = v                    
+                elif k == "gestore":
+                    if not models.Gestore.objects.filter(denominazione=v).exists():
+                        raise forms.ValidationError("il gestore <b>{}</b> non esiste nel DATABASE".format(v))
+                elif k == "profilo":
+                    if not models.Tariffa.objects.filter(profilo=v).exists():
+                        raise forms.ValidationError("la tariffa <b>{}</b> non esiste nel DATABASE".format(v))
+                elif k == "tipo":
+                    if not models.TipologiaTariffa.objects.filter(denominazione=v).exists():
+                        raise forms.ValidationError("il tipo di tariffa <b>{}</b> non esiste nel DATABASE".format(v))
+                elif k == "fascia":
+                    if not models.FasciaTariffa.objects.filter(denominazione=v).exists():
+                        raise forms.ValidationError("la fascia <b>{}</b> non esiste nel DATABASE".format(v))   
+                elif k == "servizio":
+                    if not models.ServizioTariffa.objects.filter(denominazione=v).exists():
+                        raise forms.ValidationError("il servizio <b>{}</b> non esiste nel DATABASE".format(v))
+                elif k == "blindato":
+                    try:
+                        v = int(v)
+                    except : 
+                        raise forms.ValidationError("il valore <b>{}</b> della chiave <b>blindato</b> deve essere un intero maggiore o uguale di 0".format(v))                                                 
+                    if v < 0:
+                        raise forms.ValidationError("il valore <b>{}</b> della chiave <b>blindato</b> deve essere un intero maggiore o uguale di 0".format(v))
+                    d[k] = v
+                else:
+                    raise forms.ValidationError("la chiave <b>{}</b> non è ammessa".format(k))                                                                     
+            
+        return True
 
-class RetribuzioneForm(forms.ModelForm):
+    def clean_provvigione_bonus(self):     
+        cdata = self.cleaned_data
+        provvigione_bonus = cdata.get("provvigione_bonus")
+        if provvigione_bonus:
+            values = self.values_from_provvigione_bonus_field(provvigione_bonus)
+            self.check_values(values)
+            return self.get_provvigione_bonus_cleaned(values)
+        else:
+            return ""
+   
+    class Media:
+        js = ("js/modelform_retribuzione.js",)
+    
+    class Meta:
+        model = models.RetribuzioneDipendente
+
+class RetribuzioneForm(RetribuzioneBaseForm):
     data_inizio = forms.DateField(label="Data", 
                                   widget=forms.DateInput(format="%d/%m/%Y", 
                                                          attrs={"class": "date"}),)
@@ -141,50 +252,97 @@ class RetribuzioneForm(forms.ModelForm):
                         "questa data <b>{}</b>".format(data_inizio.strftime("%d/%m/%Y"))
                     self._errors["data_inizio"] = self.error_class([msg])        
         return cdata
-                     
-    def clean_provvigione_bonus(self):     
-        cdata = self.cleaned_data
-        provvigione_bonus = cdata.get("provvigione_bonus")
-        if provvigione_bonus:
-            values = values_from_provvigione_bonus_field(provvigione_bonus)
-            check_values(values)
-        return get_provvigione_bonus_cleaned(values)
-   
-    class Media:
-        js = ("js/modelform_retribuzione.js",)
-    
+                         
     class Meta:
-        model = models.RetribuzioneDipendente
         widgets = {"dipendente": forms.HiddenInput(),
                    "principale": forms.HiddenInput(),}
         exclude = ("data_fine", "variazione",)
+
+    
+#class RetribuzioneForm(forms.ModelForm):
+#    data_inizio = forms.DateField(label="Data", 
+#                                  widget=forms.DateInput(format="%d/%m/%Y", 
+#                                                         attrs={"class": "date"}),)
+#    
+#    def clean(self):
+#        cdata = self.cleaned_data
+#        if not self.instance.pk:
+#            data_inizio = cdata.get("data_inizio")
+#            dipendente = cdata.get("dipendente")
+#            if data_inizio and dipendente:
+#                if models.RetribuzioneDipendente.objects.filter(dipendente=dipendente,
+#                                                                variazione=False,
+#                                                                data_inizio=data_inizio).exists():
+#                    # creiamo il msg di errore per il campo "data_inizo"
+#                    msg = "Esiste già una variazione alla retribuzione assegnata in "\
+#                        "questa data <b>{}</b>".format(data_inizio.strftime("%d/%m/%Y"))
+#                    self._errors["data_inizio"] = self.error_class([msg])
+#        else:
+#            data_inizio = cdata.get("data_inizio")
+#            dipendente = cdata.get("dipendente")
+#            if data_inizio and dipendente:
+#                if models.RetribuzioneDipendente.objects.filter(dipendente=dipendente,
+#                                                                variazione=False,
+#                                                                data_inizio=data_inizio).exclude(pk=self.instance.pk).exists():
+#                    # creiamo il msg di errore per il campo "data_inizo"
+#                    msg = "Esiste già una variazione alla retribuzione assegnata in "\
+#                        "questa data <b>{}</b>".format(data_inizio.strftime("%d/%m/%Y"))
+#                    self._errors["data_inizio"] = self.error_class([msg])        
+#        return cdata
+#                     
+#    def clean_provvigione_bonus(self):     
+#        cdata = self.cleaned_data
+#        provvigione_bonus = cdata.get("provvigione_bonus")
+#        if provvigione_bonus:
+#            values = values_from_provvigione_bonus_field(provvigione_bonus)
+#            check_values(values)
+#        return get_provvigione_bonus_cleaned(values)
+#   
+#    class Media:
+#        js = ("js/modelform_retribuzione.js",)
+#    
+#    class Meta:
+#        model = models.RetribuzioneDipendente
+#        widgets = {"dipendente": forms.HiddenInput(),
+#                   "principale": forms.HiddenInput(),}
+#        exclude = ("data_fine", "variazione",)
 
 RetribuzioneFormset = inlineformset_factory(models.Dipendente, 
                                             models.RetribuzioneDipendente, 
                                             RetribuzioneForm,
                                             extra=1,
                                             can_delete=False)
-        
-class VariazioneRetribuzioneForm(forms.ModelForm):
 
-    def clean_provvigione_bonus(self):     
-        cdata = self.cleaned_data
-        provvigione_bonus = cdata.get("provvigione_bonus")
-        values = values_from_provvigione_bonus_field(provvigione_bonus)
-        check_values(values)
-        return get_provvigione_bonus_cleaned(values)   
-    
-    class Media:
-        js = ("js/modelform.js", "js/modelform_retribuzione.js",)
-    
+class VariazioneRetribuzioneForm(RetribuzioneBaseForm):
+        
     class Meta:
-        model = models.RetribuzioneDipendente
         exclude = ("fisso",)
         widgets = {"dipendente": forms.HiddenInput(),
                    "data_inizio": forms.DateInput(format="%d/%m/%Y"),
                    "data_fine": forms.DateInput(format="%d/%m/%Y"),
                    "variazione": forms.HiddenInput(),
                    "principale": forms.HiddenInput(),}
+        
+#class VariazioneRetribuzioneForm(forms.ModelForm):
+#
+#    def clean_provvigione_bonus(self):     
+#        cdata = self.cleaned_data
+#        provvigione_bonus = cdata.get("provvigione_bonus")
+#        values = values_from_provvigione_bonus_field(provvigione_bonus)
+#        check_values(values)
+#        return get_provvigione_bonus_cleaned(values)   
+#    
+#    class Media:
+#        js = ("js/modelform.js", "js/modelform_retribuzione.js",)
+#    
+#    class Meta:
+#        model = models.RetribuzioneDipendente
+#        exclude = ("fisso",)
+#        widgets = {"dipendente": forms.HiddenInput(),
+#                   "data_inizio": forms.DateInput(format="%d/%m/%Y"),
+#                   "data_fine": forms.DateInput(format="%d/%m/%Y"),
+#                   "variazione": forms.HiddenInput(),
+#                   "principale": forms.HiddenInput(),}
 
 class TelefonistaForm(DipendenteForm):
     
@@ -309,11 +467,15 @@ class TariffaForm(forms.ModelForm):
     
     class Meta:
         model = models.Tariffa
+        widgets = {"tipo": forms.HiddenInput(),
+                   "fascia": forms.HiddenInput(),
+                   "servizio": forms.HiddenInput()}
 #        widgets = {"sic": forms.TextInput(attrs={"class": "hidden edison"}),
 #                   "sic_anni": forms.TextInput(attrs={"class": "hidden edison"}),}
         fields = ("gestore", "profilo", "tipo_tim", "fascia_tim", "servizio_tim", 
                   "tipo_telecom", "fascia_telecom", "servizio_telecom", 
-                  "tipo_edison", "fascia_edison", "sac", "attivo", "punteggio",)
+                  "tipo_edison", "fascia_edison", "sac", "attivo", "punteggio",
+                  "tipo", "fascia", "servizio",)
         
 
 class TariffaFilterForm(forms.ModelForm):
@@ -560,4 +722,137 @@ class InOutFilterForm(forms.Form):
     telefonista = forms.ModelMultipleChoiceField(queryset=models.Dipendente.objects.filter(ruolo="tel"),
                                             label="Selezione Telefonisti")
 
+class ObiettivoForm(forms.ModelForm):
+    YEARS=[(y, y) for y in xrange(2012, datetime.today().year + 2)]
+    QUARTERS=[(1, "1°"), (2, "2°"), (3, "3°"), (4, "4°")]
     
+    anno = forms.ChoiceField(choices=YEARS)
+    quarto = forms.ChoiceField(choices=QUARTERS)
+    
+    def values_from_parametri_field(self, parametri):
+        parametri = parametri.strip()
+        if not parametri:
+            return []
+        
+        d = {}
+        opts = parametri.split(",")
+
+        for opt in opts:
+            item = opt.split(":")
+
+            if len(item) == 2:
+                k = item[0].strip()
+                v = item[1].strip()
+                if k in d:
+                    d[k].append(v)
+                else:    
+                    d[k] = [v,]             
+            
+        return d
+    
+    def get_parametri_cleaned(self, values):
+        if not values:
+            return
+        if not isinstance(values, dict):
+            raise Exception("non è un dizionario!")
+        
+        parametri = ""
+        for k, vs in values.iteritems():
+            for v in vs:
+                parametri += str(k) + ":" + str(v) + ","
+    
+        return parametri  
+
+    def check_values(self, values):
+        if not values:
+            raise forms.ValidationError("parametri non validi, controlla la sintassi")
+            
+        for k, vs in values.iteritems():
+            # controlliamo le chiavi e i loro valori
+            if k == "gestore":
+                for v in vs:
+                    if not models.Gestore.objects.filter(denominazione=v).exists():
+                        raise forms.ValidationError("il gestore <b>{}</b> non esiste nel DATABASE".format(v))
+            elif k == "profilo":
+                for v in vs:
+                    if not models.Tariffa.objects.filter(profilo=v).exists():
+                        raise forms.ValidationError("la tariffa <b>{}</b> non esiste nel DATABASE".format(v))
+            elif k == "tipo":
+                for v in vs:
+                    if not models.TipologiaTariffa.objects.filter(denominazione=v).exists():
+                        raise forms.ValidationError("il tipo di tariffa <b>{}</b> non esiste nel DATABASE".format(v))
+            elif k == "fascia":
+                for v in vs:
+                    if not models.FasciaTariffa.objects.filter(denominazione=v).exists():
+                        raise forms.ValidationError("la fascia <b>{}</b> non esiste nel DATABASE".format(v))   
+            elif k == "servizio":
+                for v in vs:
+                    if not models.ServizioTariffa.objects.filter(denominazione=v).exists():
+                        raise forms.ValidationError("il servizio <b>{}</b> non esiste nel DATABASE".format(v))
+            else:
+                raise forms.ValidationError("la chiave <b>{}</b> non è ammessa".format(k))                                                                     
+            
+        return True
+    
+    def __init__(self, *args, **kwargs):
+        forms.ModelForm.__init__(self, *args, **kwargs)
+        
+        if kwargs.has_key("instance"): 
+            instance = kwargs["instance"]
+            
+            date = instance.data_inizio
+            y = date.year
+            m = date.month
+            if 1 <= m <= 3:
+                q = 1
+            elif 4 <= m <= 6:
+                q = 2
+            elif 7 <= m <= 9:
+                q = 3
+            elif 10 <= m <= 12:
+                q = 4
+            
+            self.initial["anno"] = y
+            self.initial["quarto"] = q
+    
+    def clean_parametri(self):
+        cdata = self.cleaned_data
+        parametri = cdata.get("parametri")
+        if parametri:
+            values = self.values_from_parametri_field(parametri)
+            self.check_values(values)
+            return self.get_parametri_cleaned(values)
+        else:
+            return ""
+    
+    def save(self, commit=True):
+        # devo "subclassare" il metodo save() perché non riesco ad aggiungere a 
+        # self.cleaned_data le date di inizio e fine, quindi qualche linea di codice
+        # si ripete con clean
+        instance = forms.ModelForm.save(self, commit=False)
+        
+        cdata = self.cleaned_data
+        y = int(cdata.get("anno"))
+        q = int(cdata.get("quarto"))
+        
+        if q == 1:
+            m = 1
+        elif q == 2:
+            m = 4
+        elif q == 3:
+            m = 7
+        elif q == 4:
+            m = 10
+        
+        data_inizio = datetime(y, m, 1).date()                
+        instance.data_inizio = data_inizio
+        
+        if commit:
+            instance.save()       
+    
+    class Media:
+        js = ("js/modelform.js",)    
+
+    class Meta:
+        model = models.Obiettivo
+        fields = ("anno", "quarto", "parametri", "obiettivo",)

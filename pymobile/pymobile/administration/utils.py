@@ -27,11 +27,11 @@ def filter_objs(objs, query):
             return Q(**query)
         elif bit.startswith('='):
             orm_lookup = "{}".format(field_name)
-#            if bit[1:].isdigit():
-#                orm_lookup = "{}".format(field_name)
-#            else:   
-#                orm_lookup = "{}__iexact".format(field_name)
-            query = {orm_lookup: bit[1:]}
+            if "data" in field_name:
+                d = datetime.strptime(bit[1:], '%d/%m/%Y')
+            else:
+                d = bit[1:]
+            query = {orm_lookup: d}
             return Q(**query)
         elif bit.startswith('!'):
             orm_lookup = "{}".format(field_name)
@@ -45,7 +45,6 @@ def filter_objs(objs, query):
             orm_lookup = "{}__gte".format(field_name)
             if "data" in field_name:
                 d = datetime.strptime(bit[1:], '%d/%m/%Y')
-                d = d.strftime('%Y-%m-%d')
             else:
                 d = bit[1:]
             query = {orm_lookup: d}
@@ -54,7 +53,6 @@ def filter_objs(objs, query):
             orm_lookup = "{}__lte".format(field_name)
             if "data" in field_name:
                 d = datetime.strptime(bit[1:], '%d/%m/%Y')
-                d = d.strftime('%Y-%m-%d')
             else:
                 d = bit[1:]
             query = {orm_lookup:d}
@@ -67,17 +65,17 @@ def filter_objs(objs, query):
     initial = {}
     if filters:
         for fltr in filters:
-            print(fltr)
             field_name = fltr[0]
             values = fltr[1]
             queries = [get_search(str(field_name), value) for value in values]
             objs = objs.filter(reduce(operator.and_, queries))
             # per le chiavi esterne determiniamo il valore inziale, la richiesta 
             # potrebbe provenire da un'altra pagina
+            # FIXME: sta cosa del valore iniziale va assolutamente ripensata 
             if field_name in ("tariffa", "piano_tariffario", "cliente", "contratto", 
                               "agente", "dipendente", "gestore",): 
                 initial[field_name] = values[0][1:]
-
+    
     return objs, initial
 
 def get_current_quarter():
@@ -194,7 +192,9 @@ def values_from_provvigione_bonus(provvigione_bonus):
                     k = item[0].strip()
                     v = item[1].strip()
                     if k == "provvigione":
-                        prov = v                        
+                        prov = float(v)                        
+                    elif k == "blindato":
+                        par[k] = int(v)
                     else:
                         par[k] = v
             
