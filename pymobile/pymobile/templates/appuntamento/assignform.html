@@ -23,6 +23,18 @@
 				   	L'agente verrà cambiato.
 			    </p>
 			{% endif %}
+			{% if agente.data_assunzione > obj.data %}
+				<p class="warning">
+					<b>Attenzione:</b>
+					La data dell'appuntamento è precedente alla data di assunzione dell'agente <b>{{ obj.agente }}</b>
+			    </p>				
+			{% endif %}
+			{% if agente.data_licenziamneto and agente.data_licenziamento > obj.data %}
+				<p class="warning">
+					<b>Attenzione:</b>
+					La data dell'appuntamento è successiva alla data di licenziamento dell'agente <b>{{ obj.agente }}</b>
+			    </p>				
+			{% endif %}
 			<input type="hidden" name="id" value="{{ obj.id }}" />
 		</li>
 	{% endfor %}

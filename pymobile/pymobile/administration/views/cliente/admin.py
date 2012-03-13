@@ -59,7 +59,7 @@ def init(request):
 
 def add_object(request):  
     template = TMP_FORM
-    action = "Aggiungi"
+    action = "add"
     
     if request.method == "POST":
         post_query = request.POST.copy()
@@ -86,7 +86,7 @@ def add_object(request):
 
 def mod_object(request, object_id):
     template = TMP_FORM
-    action = "Modifica"
+    action = "mod"
     
     if request.method == "POST":
         post_query = request.POST.copy()
@@ -108,7 +108,7 @@ def mod_object(request, object_id):
         obj = get_object_or_404(models.Cliente, pk=object_id) 
         form = forms.ClienteForm(instance=obj)
     
-    data = {"modelform": form, "action": action,}
+    data = {"modelform": form, "action": action, "cliente": obj,}
     return render_to_response(template,
                               data,
                               context_instance=RequestContext(request))

@@ -1,35 +1,32 @@
-{% extends "base.html" %}      
+{% extends "base.html" %}
 
 {% block extrahead %}
-<title>PYMOBILE | Dipendenti</title>
+<title>PYMOBILE | Appuntamento</title> 
 {{ modelform.media }}
 {% endblock %}
 
 {% block header %} 
-<h2>Amministrazione Tariffe | {% if action == "add" %}Aggiungi{% else %}Modifica{% endif %} Tariffa</h2>
+<h2>Amministrazione Appuntamenti | {% if action == "add" %}Aggiungi{% else %}Modifica{% endif %} Referente</h2>
 {% endblock %}
 
 {% block content %}
 {% load tags %}
+{% if action == "mod" %}
 <div class="navigation">
 	<fieldset>
 	<legend>Sei qui</legend>
 		<a href="../../">home</a> &gt;
-		<a href="{% url init_tariffa %}">amministrazione tariffe</a> &gt;
-		{% if action == "add" %}
-		<a href=".">aggiungi tariffa</a>
-		{% endif %}
-		{% if action == "mod" %}
-		<a href="{% url view_tariffa tariffa.pk %}">{{ tariffa }}</a> &gt;
-		<a href=".">modifica tariffa</a>
-		{% endif %} 
+		<a href="../">amministrazione appuntamenti</a> &gt;
+		<a href="{% url view_appuntamento appuntamento.pk %}">{{ appuntamento }}</a> &gt;
+		<a href=".">modifica referente</a>
 	</fieldset>
 </div>
+{% endif %}
 <div class="modelform_div">
 	<form class="modelform" action="." method="post">
 		<div class="modelform_fieldset_div">
 			<fieldset class="modelform_fieldset">
-				<legend><b>Dati Tariffa</b></legend>
+				<legend><b>Dati Referente{% if appuntamento %} dell'Appuntamento {{appuntamento}}{% endif %}</b></legend>
 				{% csrf_token %}
 				{% for hidden_field in modelform.hidden_fields %}
 				   {{ hidden_field }}
@@ -38,7 +35,7 @@
 					{% if modelform.non_field_errors %}
 					<tbody>
 						<tr class="field_error">
-							<td colspan="2">{{ modelform.non_field_errors|first }}</td>
+							<td colspan="2">{{ field.non_field_errors|first }}</td>
 						</tr>					
 					</tbody>
 					{% endif %}				
@@ -54,7 +51,7 @@
 							<td>
 								{{ field }}
 							    {% if field|isfk %}
-							    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_tariffa_fk field.html_name %}">
+							    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_fk field.html_name %}">
 							    		<img src="{{ STATIC_URL }}/img/add.png" />
 						    		</a>
 					    		{% endif %}
@@ -72,10 +69,7 @@
 		</div>
 		<div class="submitrow">
 			<input type="submit" class="modelform_save" value="salva" />
-			{% if action == "add" %}
-			<input type="button" class="modelform_save_and_add" value="salva e aggiungi un altro" />
-			{% endif %}
-			<button class="cancel">Annulla</button>
+			<button onclick="window.close()">Annulla</button>
 		</div>
 	</form>
 </div>

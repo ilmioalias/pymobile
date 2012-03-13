@@ -35,22 +35,22 @@ class DipendenteTable(tables.Table):
         {% load tags %}
         <a id="view_id_{{ record.pk }}" href="{% url view_dipendente record.pk %}">Visualizza</a>
         <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_dipendente %}?id={{ record.pk }}">Elimina</a>
-    '''
-    
+    '''    
 #    TMP_PRO='''
 #        {{ record.provvigione }}{% if record.ruolo == "agt" %}% (x contratto){% else %}€ (x appuntamento){% endif %}
 #    '''
     
-    attivo = BooleanColumn()  
+#    attivo = BooleanColumn()  
     selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
                                       header_attrs={"class": "selection_header"},
                                       sortable=False,)
+    data_licenziamento = NullColumn()
     operazioni = tables.TemplateColumn(TMP_OP, sortable=False)
-
+    
     class Meta:
         model = models.Dipendente
         attrs = {"id": "modeltable"}
-        exclude = ("id", "creazione", "modifica", "telefono", "cellulare", "data_nonattivo",)
+        exclude = ("id", "creazione", "modifica", "telefono", "cellulare",)
         empty_text = "Nessun Dipendente"
         sequence = ("selection", "...")
         order_by = ("cognome", "nome")
@@ -254,15 +254,14 @@ class AppuntamentoTable(tables.Table):
 class ContrattoTable(tables.Table):
     TMP_PT='''
         {% load tags %}
-        <table>
-            {% for obj in record.piano_tariffario.all %}
+        <table>            
+            {% for pt in record|get_pt %}
             <tr>
-                <td><a href="{% url view_tariffa obj.pk %}">{{ obj }}</a> ({{ obj|get_pt_num:record }}) {% if obj|get_pt_opt:record %}[opzione]{% endif %}</td>
+                <td><a href="{% url view_tariffa pt|get_pt_tariffa_pk %}">{{ pt|get_pt_tariffa }}</a>({{ pt.num }}) {% if pt.opzione %}[opzione]{% endif %}</td>
             </tr>
             {% endfor %}
         </table>
     '''
-
     TMP_OP='''
         {% load tags %}
         <a id="view_id_{{ record.pk }}" href="{% url view_contratto record.pk %}">Visualizza</a>
@@ -271,7 +270,7 @@ class ContrattoTable(tables.Table):
     
     cliente = tables.LinkColumn("view_cliente", args=[A("cliente.pk")],)
     agente = tables.LinkColumn("view_dipendente", args=[A("agente.pk")])
-    piano_tariffario = tables.TemplateColumn(TMP_PT, sortable=False, verbose_name="piano tariffario")
+    piano_tariffario = tables.TemplateColumn(TMP_PT, sortable=False, verbose_name="Piano tariffario")
     completo = BooleanColumn()
     inviato = BooleanColumn()
     caricato = BooleanColumn()
@@ -360,3 +359,21 @@ class OutTable(tables.Table):
     class Meta:
         empty_text = "Tabella vuota"
         attrs = {"id": "uscitetable"}
+
+class ObiettivoTable(tables.Table):
+    TMP_OP='''
+        {% load tags %}
+        <a id="view_id_{{ record.pk }}" href="{% url view_obiettivo_trimestrale record.pk %}">Visualizza</a>
+        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_obiettivo_trimestrale %}?id={{ record.pk }}">Elimina</a>
+    '''
+    
+    data_fine = NullColumn()
+    operazioni = tables.TemplateColumn(TMP_OP, sortable=False)
+    selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
+                                      header_attrs={"class": "selection_header"},
+                                      sortable=False,)
+    
+    class Meta:
+        model = models.Obiettivo
+        sequence = ("selection", "...", )
+        exclude = ("id", "creazione", "modifica",)

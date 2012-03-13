@@ -17,11 +17,25 @@ from django.utils.datetime_safe import datetime
 # AMMINISTRAZIONE
 
 class DipendenteForm(forms.ModelForm):     
+    def clean(self):
+        cdata = self.cleaned_data
+        data_assunzione = cdata.get("data_assunzione")
+        data_licenziamento = cdata.get("data_licenziamento")
+        if data_assunzione and data_licenziamento:
+            if data_assunzione >= data_licenziamento:
+                # creiamo il msg di errore per il campo "data_inizo"
+                msg = "Data licenziamento precedente o uguale alla data di assunzione"
+                self.errors["data_licenziamento"] = self.error_class([msg])
+        
+        return cdata
+        
     class Media:
         js = ("js/modelform.js", "js/modelform_dipendente.js")
     
     class Meta:
         model = models.Dipendente
+        widgets = {"data_assunzione": forms.DateInput(format="%d/%m/%Y", attrs={"class": "date",}),
+                   "data_licenziamento": forms.DateInput(format="%d/%m/%Y", attrs={"class": "date",}),}
 
 #-------------------------------------------------------------------------------
 #FIXME: ho separato queste due funzioni per evitare gli import ciclici, da ragionarci
@@ -115,8 +129,35 @@ class DipendenteForm(forms.ModelForm):
 #                raise forms.ValidationError("la chiave <b>{}</b> non è ammessa".format(k))                                                                     
 #        
 #    return True
+        
+class TelefonistaForm(DipendenteForm):
+    
+    class Meta(DipendenteForm.Meta):
+        widgets = {"ruolo": forms.HiddenInput(attrs={"value": "tel"})}
 
+class AgenteForm(DipendenteForm):
+        
+    class Meta(DipendenteForm.Meta):
+        widgets = {"ruolo": forms.HiddenInput(attrs={"value": "agt"})}
 
+class DipendenteFilterForm(forms.ModelForm):
+    ATTIVO=((0, "No"), (1, "Sì"))
+    
+    ruolo = forms.MultipleChoiceField(choices=models.Dipendente.RUOLI,
+                                      initial=["adm", "tel", "agt"],
+                                      widget=forms.CheckboxSelectMultiple())
+    attivo = forms.MultipleChoiceField(choices=ATTIVO,
+                                       initial=[0, 1],
+                                       widget=forms.CheckboxSelectMultiple()) 
+
+    class Media:
+        js = ("js/filterform.js",)
+    
+    class Meta:
+        model = models.Dipendente
+        exclude = ("provvigione_contratto", "provvigione_speciale", "fisso", 
+                   "data_assunzione", "data_licenziamento", )  
+        
 class RetribuzioneBaseForm(forms.ModelForm):
     def values_from_provvigione_bonus_field(self, provvigione_bonus):
         provvigione_bonus = provvigione_bonus.strip()
@@ -223,12 +264,11 @@ class RetribuzioneBaseForm(forms.ModelForm):
         model = models.RetribuzioneDipendente
 
 class RetribuzioneForm(RetribuzioneBaseForm):
-    data_inizio = forms.DateField(label="Data", 
-                                  widget=forms.DateInput(format="%d/%m/%Y", 
-                                                         attrs={"class": "date"}),)
-    
     def clean(self):
         cdata = self.cleaned_data
+        
+        # controlliamo che non vi sia un'altra variazione della retribuzione per la
+        # stessa data
         if not self.instance.pk:
             data_inizio = cdata.get("data_inizio")
             dipendente = cdata.get("dipendente")
@@ -239,7 +279,7 @@ class RetribuzioneForm(RetribuzioneBaseForm):
                     # creiamo il msg di errore per il campo "data_inizo"
                     msg = "Esiste già una variazione alla retribuzione assegnata in "\
                         "questa data <b>{}</b>".format(data_inizio.strftime("%d/%m/%Y"))
-                    self._errors["data_inizio"] = self.error_class([msg])
+                    self.errors["data_inizio"] = self.error_class([msg])
         else:
             data_inizio = cdata.get("data_inizio")
             dipendente = cdata.get("dipendente")
@@ -251,61 +291,16 @@ class RetribuzioneForm(RetribuzioneBaseForm):
                     msg = "Esiste già una variazione alla retribuzione assegnata in "\
                         "questa data <b>{}</b>".format(data_inizio.strftime("%d/%m/%Y"))
                     self._errors["data_inizio"] = self.error_class([msg])        
+        
         return cdata
                          
     class Meta:
+        model = models.RetribuzioneDipendente
         widgets = {"dipendente": forms.HiddenInput(),
+                   "data_inizio": forms.DateInput(format="%d/%m/%Y", 
+                                                  attrs={"class": "date",}),
                    "principale": forms.HiddenInput(),}
         exclude = ("data_fine", "variazione",)
-
-    
-#class RetribuzioneForm(forms.ModelForm):
-#    data_inizio = forms.DateField(label="Data", 
-#                                  widget=forms.DateInput(format="%d/%m/%Y", 
-#                                                         attrs={"class": "date"}),)
-#    
-#    def clean(self):
-#        cdata = self.cleaned_data
-#        if not self.instance.pk:
-#            data_inizio = cdata.get("data_inizio")
-#            dipendente = cdata.get("dipendente")
-#            if data_inizio and dipendente:
-#                if models.RetribuzioneDipendente.objects.filter(dipendente=dipendente,
-#                                                                variazione=False,
-#                                                                data_inizio=data_inizio).exists():
-#                    # creiamo il msg di errore per il campo "data_inizo"
-#                    msg = "Esiste già una variazione alla retribuzione assegnata in "\
-#                        "questa data <b>{}</b>".format(data_inizio.strftime("%d/%m/%Y"))
-#                    self._errors["data_inizio"] = self.error_class([msg])
-#        else:
-#            data_inizio = cdata.get("data_inizio")
-#            dipendente = cdata.get("dipendente")
-#            if data_inizio and dipendente:
-#                if models.RetribuzioneDipendente.objects.filter(dipendente=dipendente,
-#                                                                variazione=False,
-#                                                                data_inizio=data_inizio).exclude(pk=self.instance.pk).exists():
-#                    # creiamo il msg di errore per il campo "data_inizo"
-#                    msg = "Esiste già una variazione alla retribuzione assegnata in "\
-#                        "questa data <b>{}</b>".format(data_inizio.strftime("%d/%m/%Y"))
-#                    self._errors["data_inizio"] = self.error_class([msg])        
-#        return cdata
-#                     
-#    def clean_provvigione_bonus(self):     
-#        cdata = self.cleaned_data
-#        provvigione_bonus = cdata.get("provvigione_bonus")
-#        if provvigione_bonus:
-#            values = values_from_provvigione_bonus_field(provvigione_bonus)
-#            check_values(values)
-#        return get_provvigione_bonus_cleaned(values)
-#   
-#    class Media:
-#        js = ("js/modelform_retribuzione.js",)
-#    
-#    class Meta:
-#        model = models.RetribuzioneDipendente
-#        widgets = {"dipendente": forms.HiddenInput(),
-#                   "principale": forms.HiddenInput(),}
-#        exclude = ("data_fine", "variazione",)
 
 RetribuzioneFormset = inlineformset_factory(models.Dipendente, 
                                             models.RetribuzioneDipendente, 
@@ -316,61 +311,16 @@ RetribuzioneFormset = inlineformset_factory(models.Dipendente,
 class VariazioneRetribuzioneForm(RetribuzioneBaseForm):
         
     class Meta:
+        model = models.RetribuzioneDipendente
         exclude = ("fisso",)
         widgets = {"dipendente": forms.HiddenInput(),
-                   "data_inizio": forms.DateInput(format="%d/%m/%Y"),
-                   "data_fine": forms.DateInput(format="%d/%m/%Y"),
+                   "data_inizio": forms.DateInput(format="%d/%m/%Y", 
+                                                  attrs={"class": "date",}),
+                   "data_fine": forms.DateInput(format="%d/%m/%Y", 
+                                                attrs={"class": "date",}),
                    "variazione": forms.HiddenInput(),
                    "principale": forms.HiddenInput(),}
-        
-#class VariazioneRetribuzioneForm(forms.ModelForm):
-#
-#    def clean_provvigione_bonus(self):     
-#        cdata = self.cleaned_data
-#        provvigione_bonus = cdata.get("provvigione_bonus")
-#        values = values_from_provvigione_bonus_field(provvigione_bonus)
-#        check_values(values)
-#        return get_provvigione_bonus_cleaned(values)   
-#    
-#    class Media:
-#        js = ("js/modelform.js", "js/modelform_retribuzione.js",)
-#    
-#    class Meta:
-#        model = models.RetribuzioneDipendente
-#        exclude = ("fisso",)
-#        widgets = {"dipendente": forms.HiddenInput(),
-#                   "data_inizio": forms.DateInput(format="%d/%m/%Y"),
-#                   "data_fine": forms.DateInput(format="%d/%m/%Y"),
-#                   "variazione": forms.HiddenInput(),
-#                   "principale": forms.HiddenInput(),}
 
-class TelefonistaForm(DipendenteForm):
-    
-    class Meta(DipendenteForm.Meta):
-        widgets = {"ruolo": forms.HiddenInput(attrs={"value": "tel"})}
-
-class AgenteForm(DipendenteForm):
-        
-    class Meta(DipendenteForm.Meta):
-        widgets = {"ruolo": forms.HiddenInput(attrs={"value": "agt"})}
-
-class DipendenteFilterForm(forms.ModelForm):
-    ATTIVO=((0, "No"), (1, "Sì"))
-    
-    ruolo = forms.MultipleChoiceField(choices=models.Dipendente.RUOLI,
-                                      initial=["adm", "tel", "agt"],
-                                      widget=forms.CheckboxSelectMultiple())
-    attivo = forms.MultipleChoiceField(choices=ATTIVO,
-                                       initial=[0, 1],
-                                       widget=forms.CheckboxSelectMultiple()) 
-
-    class Media:
-        js = ("js/filterform.js",)
-    
-    class Meta:
-        model = models.Dipendente
-        exclude = ("provvigione_contratto", "provvigione_speciale", "fisso",)  
-        
 class ClienteForm(forms.ModelForm):
 
     class Media:
@@ -543,7 +493,27 @@ class ServizioTariffaFilterForm(forms.ModelForm):
         model = models.ServizioTariffa
 
 class AppuntamentoForm(forms.ModelForm):           
-
+    def clean(self):
+        cdata = self.cleaned_data
+        agente = cdata.get("agente")
+        data = cdata.get("data")
+        if agente and data:
+            data_assunzione = agente.data_assunzione
+            data_licenziamento = agente.data_licenziamento
+            if data_assunzione and data_assunzione > data.date():
+                # creiamo il msg di errore per il campo "data"
+                msg = "La data dell'appuntamento è precedente alla data di assunzione "\
+                    "dell'agente assegnato"
+                self.errors["agente"] = self.error_class([msg])
+            if data_licenziamento and data_licenziamento < data.date():
+                # creiamo il msg di errore per il campo "data"
+                msg = "La data dell'appuntamento è successiva alla data di licenziamento "\
+                    "dell'agente assegnato"
+                self.errors["assegnato"] = self.error_class([msg])
+        
+        print(cdata)
+        return cdata
+    
     class Media:
         js = ("js/modelform.js",)
 
@@ -564,6 +534,27 @@ class AppuntamentoFilterForm(forms.ModelForm):
                                            widget=forms.CheckboxSelectMultiple())
     telefonista = forms.ModelChoiceField(queryset=models.Dipendente.objects.filter(ruolo="tel"))
     agente = forms.ModelChoiceField(queryset=models.Dipendente.objects.filter(ruolo="agt"))
+    
+    def clean(self):
+        cdata = self.cleaned_data
+        agente = cdata.get("agente")
+        data = cdata.get("data")
+        if data and agente:
+            # controlliamo che l'agente selezionato sia assunto per la data dell'appuntamento
+            data_assunzione = agente.data_assunzione
+            if data_assunzione and data < data_assunzione:
+                # creiamo il msg di errore per il campo "data"
+                msg = "La data dell'appuntamento è precedente alla data di assunzione "\
+                    "dell'agente selezionato"
+                self.errors["agente"] = self.error_class([msg])
+            data_licenziamento = agente.data_licenziamento
+            if data_licenziamento and data > data_licenziamento:
+                # creiamo il msg di errore per il campo "data_inizo"
+                msg = "La data dell'appuntamento è successiva alla data di licenziamento "\
+                    "dell'agente selezionato"
+                self.errors["agente"] = self.error_class([msg])
+                
+        return forms.ModelForm.clean(self)
     
     class Media:
         js = ("js/filterform.js",)
@@ -605,7 +596,9 @@ class PianoTariffarioInlineFormset(forms.models.BaseInlineFormSet):
                                         "per ogni contratto inserito")
         
 class ContrattoForm(forms.ModelForm):
-
+    appuntamento = forms.ModelChoiceField(queryset=models.Appuntamento.objects.filter(contratto__isnull=True),
+                                          required=False)
+    
     class Media:
         js = ("js/modelform.js", "js/modelform_contratto.js",)
     
@@ -632,16 +625,21 @@ class ContrattoForm(forms.ModelForm):
         # alla stipula del contratto
         agente = cdata.get("agente")
         if agente:
-            data_assunzione = models.RetribuzioneDipendente.objects\
-                    .filter(dipendente=agente, variazione=False)\
-                    .order_by("data_inizio")\
-                    .values("data_inizio")[0]["data_inizio"]
+            data_assunzione = agente.data_assunzione
             if data_assunzione > data_stipula:
                 # creiamo il msg di errore per il campo "data_inizo"
                 msg = "la data di assunzione dell'agente selezionato è successiva "\
                     "alla data di stipula del contratto"
                 self._errors["agente"] = self.error_class([msg])
-
+            
+            data_licenziamento = agente.data_licenziamento
+            if data_licenziamento and data_licenziamento <= data_stipula:
+                # creiamo il msg di errore per il campo "data_inizo"
+                msg = "la data di licenziamento dell'agente selezionato è precendente "\
+                    "alla data di stipula del contratto"
+                self._errors["agente"] = self.error_class([msg])
+            
+            
         # controlliamo se l'appuntamento selezionato è plausibile, cioè le date
         # corrispondono e il cliente è lo stesso del contratto
         appuntamento = cdata.get("appuntamento")
@@ -723,12 +721,63 @@ class InOutFilterForm(forms.Form):
                                             label="Selezione Telefonisti")
 
 class ObiettivoForm(forms.ModelForm):
-    YEARS=[(y, y) for y in xrange(2012, datetime.today().year + 2)]
-    QUARTERS=[(1, "1°"), (2, "2°"), (3, "3°"), (4, "4°")]
+    anno_inizio = forms.ChoiceField(choices=[("", "")], 
+                                    label="Anno d'inizio")
+    quarto_inizio = forms.ChoiceField(choices=[("", "")], 
+                                      label="Quarto d'inizio")
+    anno_fine = forms.ChoiceField(choices=[("", "")], label="Anno di fine", 
+                                  help_text="lasciare il campo vuoto se l'obbiettivo è ancora in uso",
+                                  required=False)
+    quarto_fine = forms.ChoiceField(choices=[("", "")], label="Quarto di fine",
+                                    help_text="lasciare il campo vuoto se l'obbiettivo è ancora in uso",
+                                    required=False)
     
-    anno = forms.ChoiceField(choices=YEARS)
-    quarto = forms.ChoiceField(choices=QUARTERS)
-    
+    def __init__(self, *args, **kwargs):
+        forms.ModelForm.__init__(self, *args, **kwargs)
+        
+        # hack per aggiungere ai campi "fine" la possibilità della scelta vuota
+        QUARTERS = [("", ""), (1, "1°"), (2, "2°"), (3, "3°"), (4, "4°")]
+        YEARS = [(y, y) for y in xrange(2012, datetime.today().year + 2)]
+        YEARS.insert(0, ("", ""))
+        self.fields["anno_inizio"].choices = YEARS
+        self.fields["quarto_inizio"].choices = QUARTERS
+        self.fields["anno_fine"].choices = YEARS
+        self.fields["quarto_fine"].choices = QUARTERS
+        
+        if kwargs.has_key("instance"): 
+            instance = kwargs["instance"]
+            
+            data_inizio = instance.data_inizio
+            y = data_inizio.year
+            m = data_inizio.month
+            if 1 <= m <= 3:
+                q = 1
+            elif 4 <= m <= 6:
+                q = 2
+            elif 7 <= m <= 9:
+                q = 3
+            elif 10 <= m <= 12:
+                q = 4
+            
+            self.initial["anno_inizio"] = y
+            self.initial["quarto_inizio"] = q
+            
+            data_fine = instance.data_fine
+            if data_fine:
+                y = data_fine.year
+                m = data_fine.month
+                if 1 <= m <= 3:
+                    q = 1
+                elif 4 <= m <= 6:
+                    q = 2
+                elif 7 <= m <= 9:
+                    q = 3
+                elif 10 <= m <= 12:
+                    q = 4
+                
+                self.initial["anno_fine"] = y
+                self.initial["quarto_fine"] = q
+            
     def values_from_parametri_field(self, parametri):
         parametri = parametri.strip()
         if not parametri:
@@ -792,31 +841,49 @@ class ObiettivoForm(forms.ModelForm):
             else:
                 raise forms.ValidationError("la chiave <b>{}</b> non è ammessa".format(k))                                                                     
             
-        return True
-    
-    def __init__(self, *args, **kwargs):
-        forms.ModelForm.__init__(self, *args, **kwargs)
-        
-        if kwargs.has_key("instance"): 
-            instance = kwargs["instance"]
-            
-            date = instance.data_inizio
-            y = date.year
-            m = date.month
-            if 1 <= m <= 3:
-                q = 1
-            elif 4 <= m <= 6:
-                q = 2
-            elif 7 <= m <= 9:
-                q = 3
-            elif 10 <= m <= 12:
-                q = 4
-            
-            self.initial["anno"] = y
-            self.initial["quarto"] = q
+        return True    
     
     def clean_parametri(self):
         cdata = self.cleaned_data
+        
+        # controlliamo che la data di fine, se presente, sia maggiore della data
+        # di inizio
+        y = cdata.get("anno_fine")
+        q = cdata.get("quarto_fine")
+        
+        if y and q:
+            y = int(y)
+            q = int(q)
+            
+            if q == 1:
+                m = 1
+            elif q == 2:
+                m = 4
+            elif q == 3:
+                m = 7
+            elif q == 4:
+                m = 10
+            
+            data_fine = datetime(y, m, 1).date()                
+
+            y = int(cdata.get("anno_inizio"))
+            q = int(cdata.get("quarto_inizio"))
+        
+            if q == 1:
+                m = 1
+            elif q == 2:
+                m = 4
+            elif q == 3:
+                m = 7
+            elif q == 4:
+                m = 10
+            
+            data_inizio = datetime(y, m, 1).date()                
+            if data_fine < data_inizio:
+                # creiamo il msg di errore per i campi "fine"
+                raise forms.ValidationError("la data di fine inserita è precedente "\
+                                            "alla data di inizio")
+                    
         parametri = cdata.get("parametri")
         if parametri:
             values = self.values_from_parametri_field(parametri)
@@ -832,8 +899,8 @@ class ObiettivoForm(forms.ModelForm):
         instance = forms.ModelForm.save(self, commit=False)
         
         cdata = self.cleaned_data
-        y = int(cdata.get("anno"))
-        q = int(cdata.get("quarto"))
+        y = int(cdata.get("anno_inizio"))
+        q = int(cdata.get("quarto_inizio"))
         
         if q == 1:
             m = 1
@@ -847,6 +914,26 @@ class ObiettivoForm(forms.ModelForm):
         data_inizio = datetime(y, m, 1).date()                
         instance.data_inizio = data_inizio
         
+        y = cdata.get("anno_fine")
+        q = cdata.get("quarto_fine")
+        
+        if y and q:
+            
+            y = int(y)
+            q = int(q)
+            
+            if q == 1:
+                m = 1
+            elif q == 2:
+                m = 4
+            elif q == 3:
+                m = 7
+            elif q == 4:
+                m = 10
+            
+            data_fine = datetime(y, m, 1).date()                
+            instance.data_fine = data_fine
+        
         if commit:
             instance.save()       
     
@@ -855,4 +942,21 @@ class ObiettivoForm(forms.ModelForm):
 
     class Meta:
         model = models.Obiettivo
-        fields = ("anno", "quarto", "parametri", "obiettivo",)
+        fields = ("denominazione", "anno_inizio", "quarto_inizio", "anno_fine", 
+                  "quarto_fine", "parametri", "punteggio",)
+
+class ObiettivoFilterForm(forms.Form):
+    anno = forms.ChoiceField(choices=[("", "")], 
+                             label="Anno")
+    quarto = forms.ChoiceField(choices=[("", "")], 
+                               label="Quarto")
+
+    def __init__(self, *args, **kwargs):
+        forms.Form.__init__(self, *args, **kwargs)
+        
+        # hack per aggiungere ai campi "fine" la possibilità della scelta vuota
+        QUARTERS = [("", ""), (1, "1°"), (2, "2°"), (3, "3°"), (4, "4°")]
+        YEARS = [(y, y) for y in xrange(2012, datetime.today().year + 2)]
+        YEARS.insert(0, ("", ""))
+        self.fields["anno"].choices = YEARS
+        self.fields["quarto"].choices = QUARTERS

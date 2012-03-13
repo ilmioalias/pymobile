@@ -7,9 +7,9 @@ $(document).ready(function(){
 		$(".modelform .retribuzione_table tbody.field input[id*='provvigione_contratto']").after("<span>%</span>");
 	} else if (ruolo == "tel"){
 		var txt = "tipo: sim, provvigione: 1;";
-		txt += "gestore: telecom, tipo: ull, provvigione: 10; ";
-		txt += "gestore: telecom, tipo: nip, provvigione: 10; ";
-		txt += "gestore: telecom, tipo: nip, provvigione: 10; ";
+		txt += "gestore: telecom, servizio: ull, provvigione: 10; ";
+		txt += "gestore: telecom, servizio: nip, provvigione: 10; ";
+		txt += "gestore: telecom, servizio: nip, provvigione: 10; ";
 		txt += "tipo: adsl, provvigione: 5; ";
 		txt += "tipo: adsl, fascia: premium, provvigione: 10;";
 		$(".modelform .retribuzione_table tbody.field textarea[id*='provvigione_bonus']").attr("value", txt);
@@ -27,9 +27,9 @@ $(document).ready(function(){
 			form.find(".retribuzione_table input[id*='provvigione_contratto']").next("span").text("%");
 		} else if (value == "tel"){
 			var txt = "tipo: sim, provvigione: 1;";
-			txt += "gestore: telecom, tipo: ull, provvigione: 10; ";
-			txt += "gestore: telecom, tipo: nip, provvigione: 10; ";
-			txt += "gestore: telecom, tipo: nip, provvigione: 10; ";
+			txt += "gestore: telecom, servizio: ull, provvigione: 10; ";
+			txt += "gestore: telecom, servizio: nip, provvigione: 10; ";
+			txt += "gestore: telecom, servizio: nip, provvigione: 10; ";
 			txt += "tipo: adsl, provvigione: 5; ";
 			txt += "tipo: adsl, fascia: premium, provvigione: 10;";
 			form.find(".retribuzione_table textarea[id*='provvigione_bonus']").attr("value", txt);

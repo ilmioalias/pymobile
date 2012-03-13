@@ -14,22 +14,30 @@
 <div class="navigation">
 	<fieldset>
 	<legend>Sei qui</legend>
-		<a href="../">home</a> &gt; 
-		<a href="../">statistiche</a> &gt;
-		<a href=".">obiettivi trimestrali</a>
+		<a href="../../../">home</a> &gt; 
+		<a href="../../">statistiche</a> &gt;
+		<a href="{% url canvas_obiettivo_trimestrale %}">obiettivi trimestrali</a> &gt;
+		<a href=".">amm. obiettivi trimestrali</a>
 	</fieldset>
 </div>
 <div id="modeltable_div">
 	<p class="modeltable_name"><b>Tabella degli Obiettivi Trimestrali</b></p>
-	<a class="addrow" href="{% url add_obiettivo_trimestrale %}">Aggiungi Obiettivo Trimestrale</a><br />
-	{% include "statistiche/obiettivi_trimestrali_table_snippet.html" %}
-	<br />
-	<a class="addrow" href="{% url add_obiettivo_trimestrale %}">Aggiungi Obiettivo Trimestrale</a><br />
+	{% load django_tables2 %}
+	{% render_table modeltable %}
+	
+	<div class="modeltable_actions_div">
+		<img src="{{ STATIC_URL }}/img/freccia_sel.png" />
+		Se selezionati: <select class="modeltable_actions">
+							<option value="delete">Elimina</option>
+						</select>
+						<button class="modeltable_actions_ok">Ok</button>
+	</div>	
+	<a class="addrow" href="{% url add_obiettivo_trimestrale %}">Aggiungi</a>
 </div>
 {% endblock %}
 
 {% block extraleft_bar %}
-<div id="filter_modeltable_div">
+<!-- <div id="filter_modeltable_div">
 	<form id="filter_modeltable_form" action=".">
 		<fieldset class="filter_modeltable_fieldset">
 		<legend>Filtro</legend>
@@ -50,5 +58,5 @@
 		<input type="submit" id="filter_modeltable_search" value="seleziona" />
 		<input type="reset" id="filter_modeltable_reset" value="reset" />
 	</form>
-</div>	
+</div>	 -->
 {% endblock %}

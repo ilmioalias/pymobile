@@ -5,8 +5,10 @@ jQuery(document).ready(function($){
 		labelDayOfMonth: "Giorno del mese",
 		labelMonth: "Mese",
 		labelYear: "Anno",
+		firstDOW: 1,
+		dayAbbreviations: ["dom", "lun", "mar", "mer", "gio", "ven", "sab"],
+		monthAbbreviations : ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
 	};
-	console.log("eccomi");
 	options.earliest = $("input#earliest").val();
 	options.latest = $("input#latest").val();
 	var data_inizio = $("form.modelform input#id_data_inizio");

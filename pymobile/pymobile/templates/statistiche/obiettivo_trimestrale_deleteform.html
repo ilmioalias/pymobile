@@ -5,11 +5,11 @@
 {% endblock %}
 
 {% block header %} 
-<h2>Amministrazione Obiettivi | Elimina obiettivo</h2>
+<h2>Amministrazione Obiettivi | Elimina obiettivo trimestrale</h2>
 {% endblock %}
 
 {% block content %}
-<form action="{% url del_retribuzione dipendente.id %}" method="POST">
+<form action="{% url del_obiettivo_trimestrale %}" method="POST">
 	{% csrf_token %}	
 	<span>Sei sicuro di voler eliminare i seguenti obiettivi</span>
 	<ul>

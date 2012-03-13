@@ -1,4 +1,4 @@
-{% extends "popup_base.html" %}      
+{% extends "base.html" %}      
 
 {% block extrahead %}
 <title>PYMOBILE | Contratti</title>
@@ -6,11 +6,25 @@
 {% endblock %}
 
 {% block header %} 
-<h2>Amministrazione Contratti | {{ action }} Contratto</h2>
+<h2>Amministrazione Contratti | {% if action == "add" %}Aggiungi{% else %}Modifica{% endif %} Contratto</h2>
 {% endblock %}
 
 {% block content %}
 {% load tags %}
+<div class="navigation">
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../../">home</a> &gt;
+		<a href="{% url init_contratto %}">amministrazione contratti</a> &gt;
+		{% if action == "add" %}
+		<a href=".">aggiungi contratto</a>
+		{% endif %}
+		{% if action == "mod" %}
+		<a href="{% url view_contratto contratto.pk %}">{{ contratto }}</a> &gt;
+		<a href=".">modifica contratto</a>
+		{% endif %} 
+	</fieldset>
+</div>
 <div class="modelform_div">
 	<form class="modelform" action="." method="POST" enctype="multipart/form-data">
 		<div class="modelform_fieldset_div">
@@ -40,6 +54,9 @@
 							<td>{{ field.label_tag }}</td>
 							<td>
 								{{ field }}
+								{% if field|isdate %}
+									<input type="button" class="dateclear" value="svuota" />
+					    		{% endif %}
 							    {% if field|isfk %}
 							    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_contratto_fk field.html_name %}">
 							    		<img src="{{ STATIC_URL }}/img/add.png" />
@@ -153,7 +170,9 @@
 		</div>
 		<div class="submitrow">
 			<input type="submit" class="modelform_save" value="salva" />
+			{% if action == "add" %}
 			<input type="button" class="modelform_save_and_add" value="salva e aggiungi un altro" />
+			{% endif %}
 			<button class="cancel">Annulla</button>
 		</div>
 	</form>

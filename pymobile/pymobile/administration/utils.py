@@ -86,7 +86,7 @@ def get_current_quarter():
     q = [(str(y) + "-1-1", str(y) + "-3-31" ),
          (str(y) + "-4-1", str(y) + "-6-30"),
          (str(y) + "-7-1", str(y) + "-9-30"),
-         (str(y) + "-1-10", str(y) + "-12-31")]
+         (str(y) + "-10-1", str(y) + "-12-31")]
 
     if 1 <= m <= 3:
         return (datetime.strptime(q[0][0], "%Y-%m-%d").date(),
@@ -97,7 +97,7 @@ def get_current_quarter():
     elif 7 <= m <= 9:
         return (datetime.strptime(q[2][0], "%Y-%m-%d").date(),
                 datetime.strptime(q[2][1], "%Y-%m-%d").date())
-    else:
+    elif 10 <= m <= 12:
         return (datetime.strptime(q[3][0], "%Y-%m-%d").date(),
                 datetime.strptime(q[3][1], "%Y-%m-%d").date())
 
@@ -131,6 +131,28 @@ def get_yesterday():
     d = (datetime.today() - timedelta(1)).date()
     return (d, d)
 
+def get_quarter(query):
+    y = int(query["fanno"][1:])
+    quarter = int(query["fquarto"][1:])
+    
+    q = [(str(y) + "-1-1", str(y) + "-3-31" ),
+         (str(y) + "-4-1", str(y) + "-6-30"),
+         (str(y) + "-7-1", str(y) + "-9-30"),
+         (str(y) + "-10-1", str(y) + "-12-31")]
+
+    if quarter == 1:
+        return (datetime.strptime(q[0][0], "%Y-%m-%d").date(),
+                datetime.strptime(q[0][1], "%Y-%m-%d").date())
+    elif quarter == 2:
+        return (datetime.strptime(q[1][0], "%Y-%m-%d").date(),
+                datetime.strptime(q[1][1], "%Y-%m-%d").date())
+    elif quarter == 3:
+        return (datetime.strptime(q[2][0], "%Y-%m-%d").date(),
+                datetime.strptime(q[2][1], "%Y-%m-%d").date())
+    elif quarter == 4:
+        return (datetime.strptime(q[3][0], "%Y-%m-%d").date(),
+                datetime.strptime(q[3][1], "%Y-%m-%d").date())
+    
 def get_period(query):
     period = (date(2012, 1, 1), datetime.now())
 #    period = ("2012-1-1", datetime.now().strftime("%Y-%m-%d"))
@@ -215,6 +237,38 @@ def provvigione_bonus_from_values(values):
             provvigione_bonus += str(d["provvigione"]) + ";"
 
     return provvigione_bonus  
+
+def values_from_parametri(parametri):
+    parametri = parametri.strip()
+    if not parametri:
+        return []
+    
+    parametri = parametri.split(",")
+    for parametro in parametri:
+        opts = parametro.split(":")
+        par = {}
+        
+        if len(opts) == 2:
+            k = opts[0].strip()
+            v = opts[1].strip()
+            par[k] = v
+            
+        d = {"parameters": par}            
+            
+    return d   
+
+def parametri_from_values(values):
+    if not values:
+        return
+    
+    parametri = ""
+    for d in values:
+        if d:
+            for k, v in d["parameters"].iteritems():
+                parametri += str(k) + ":" + str(v) + ","
+            parametri = parametri[:-1]
+            
+    return parametri
 
 def get_table(table_name):
     for k, v in tables.__dict__.iteritems():

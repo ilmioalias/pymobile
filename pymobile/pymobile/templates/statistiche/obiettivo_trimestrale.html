@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block header %} 
-<h2>Statistiche: Finanza</h2>
+<h2>Statistiche: Obiettivi</h2>
 {% endblock %}
 
 {% load tags %}
@@ -16,11 +16,10 @@
 <div class="navigation">
 	<a href="../">home</a> &gt;
 	<a href="../">statistiche</a> &gt;
-	<a href="../">finanze</a> &gt;
-	<a href=".">entrate/uscite</a>
+	<a href=".">obiettivi trimestrali</a>
 </div>
 <div id="reporttable_div">
-	{% include "statistiche/entrate_uscite_table_snippet.html" %}
+	{% include "statistiche/obiettivo_trimestrale_table_snippet.html" %}
 </div>
 {% endblock %}
 
@@ -29,7 +28,7 @@
 	<form id="filter_reporttable_form" action=".">
 		<fieldset class="filter_reporttable_fieldset">
 		<legend>Filtro</legend>
-			<table>				
+			<table>	
 				{% for field in filterform.visible_fields %}
 				<tbody>
 					<tr><td><b>{{ field.label_tag }}</b></td><td>{{ field }}</td></tr>

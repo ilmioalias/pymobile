@@ -16,7 +16,7 @@
 	<fieldset>
 	<legend>Sei qui</legend>
 		<a href="../../">home</a> &gt; 
-		<a href="../">amministrazione contratti</a> &gt;
+		<a href="{% url init_contratto %}">amministrazione contratti</a> &gt;
 		<a href="./">{{ object }}</a>
 	</fieldset>
 </div>
@@ -41,10 +41,10 @@
 					<fieldset>
 					<legend>Piano Tariffario</legend>
 						<table>
-							{% for tariffa in object.piano_tariffario.all %}
-							<tr><td>Tariffa</td><td><a href="{% url view_tariffa tariffa.pk %}">{{ tariffa }}</a></td></tr>
-							<tr><td>Quantità</td><td>{{ tariffa|get_pt_num:object.pk }}</td></tr>
-							<tr><td>Opzione</td><td>{% if tariffa|get_pt_opt:object.pk %}<img src="{{ STATIC_URL }}/img/spunta.png" />{% endif %}</td></tr>
+							{% for pt in object|get_pt%}
+							<tr><td>Tariffa</td><td><a href="{% url view_tariffa pt|get_pt_tariffa_pk %}">{{ pt|get_pt_tariffa }}</a></td></tr>
+							<tr><td>Quantità</td><td>{{ pt.num }}</td></tr>
+							<tr><td>Opzione</td><td>{% if pt.opzione %}<img src="{{ STATIC_URL }}/img/spunta.png" />{% endif %}</td></tr>
 							{% endfor %}
 						</table>
 					</fieldset>

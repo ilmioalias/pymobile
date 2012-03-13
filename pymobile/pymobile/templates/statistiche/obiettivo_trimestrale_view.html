@@ -1,0 +1,56 @@
+{% extends "base.html" %}      
+
+{% load tags %}
+
+{% block extrahead %}
+<title>PYMOBILE | Dipendente</title>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/viewobj.js"></script>
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Dipendenti | {{ object }}</h2> 
+{% endblock %}
+
+{% block content %}
+<div class="navigation">
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../../../../">home</a> &gt;
+		<a href="../../../">statistiche</a> &gt;
+		<a href="../../">obiettivi trimestrali</a> &gt; 
+		<a href="{% url init_obiettivo_trimestrale %}">amm. obiettivi trimestrali</a> &gt;
+		<a href=".">{{ object }}</a>
+	</fieldset>
+</div>
+<div class="div_menu">
+	<ul id="menu_list">
+		<li><a href="#">Qualche Azione</a></li>
+		<li><a href="#">Qualche Azione</a></li>
+		<li><a href="#">Qualche Azione</a></li>
+	</ul>
+</div>
+<div class="div_detail">
+	<fieldset>
+	<legend>Dati Dipendente</legend>
+		<table class="table_detail">
+			<tr><td>Denominazione</td><td>{{ object.denominazione }}</td></tr>
+			<tr><td>Parametri</td><td>{{ object.parametri }}</td></tr>
+			<tr><td>Punteggio</td><td>{{ object.punteggio }}</td></tr>
+			<tr><td>Data Inizio</td><td>{{ object.data_inizio }}</td></tr>
+			<tr>
+				{% if object.data_fine %}
+				<td>Data Fine</td><td>{{ object.data_fine }}</td>
+				{% else %}
+				<td>Data Fine</td><td>Obiettivo ancora in uso</td>
+				{% endif %}
+			</tr>
+		</table>
+	</fieldset>
+	<div class="op_detail">
+		<ul id="op_list">
+			<li><a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_obiettivo_trimestrale object.id %}">Modifica</a></li>
+			<li><a id="del_{{ object.id }}" class="deleteobj" href="{% url del_obiettivo_trimestrale %}?id={{ object.id }}">Cancella</a></li>
+		</ul>
+	</div>
+</div>
+{% endblock %}

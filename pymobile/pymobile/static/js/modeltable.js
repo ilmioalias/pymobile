@@ -177,7 +177,14 @@ var dateStartChanged = function(data_start, data_end){
   	erliest.setHours(0,0,0,0);
   	data_end.removeAttr("disabled").AnyTime_noPicker().AnyTime_picker({
   		earliest: erliest,
-        format: "%e/%m/%Y"
+        format: "%d/%m/%Y",
+		labelTitle: "Seleziona il giorno",
+		labelDayOfMonth: "Giorno del mese",
+		labelMonth: "Mese",
+		labelYear: "Anno",
+		firstDOW: 1,
+		dayAbbreviations: ["dom", "lun", "mar", "mer", "gio", "ven", "sab"],
+		monthAbbreviations : ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
 	});		
 };
 
@@ -296,14 +303,14 @@ var tableClickHandlers = function(){
 		e.preventDefault();
 		deleteRow($(this));
 	});
-	$("div#modeltable_div").on("click", "a.addrow", function(e){
-		e.preventDefault();
-		addRow($(this));
-	});
-	$("div#modeltable_div").on("click", "a.modifyrow", function(e){
-		e.preventDefault();
-		modifyRow($(this));
-	});		
+	// $("div#modeltable_div").on("click", "a.addrow", function(e){
+		// e.preventDefault();
+		// addRow($(this));
+	// });
+	// $("div#modeltable_div").on("click", "a.modifyrow", function(e){
+		// e.preventDefault();
+		// modifyRow($(this));
+	// });		
 	$("#filter_modeltable_search").click(function(e){
 		e.preventDefault();
 		filterTable($(this));
@@ -314,11 +321,14 @@ var tableClickHandlers = function(){
 	});
 	$("form#filter_modeltable_form input.date_end").attr("disabled", "true");
 	$("form#filter_modeltable_form input.date_start").AnyTime_picker({
-		format: "%e/%m/%Y",
+		format: "%d/%m/%Y",
 		labelTitle: "Seleziona il giorno",
 		labelDayOfMonth: "Giorno del mese",
 		labelMonth: "Mese",
-		labelYear: "Anno"
+		labelYear: "Anno",
+		firstDOW: 1,
+		dayAbbreviations: ["dom", "lun", "mar", "mer", "gio", "ven", "sab"],
+		monthAbbreviations : ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
 	});		
 	$("form#filter_modeltable_form input.date_start").change(function(e){
 		e.preventDefault();

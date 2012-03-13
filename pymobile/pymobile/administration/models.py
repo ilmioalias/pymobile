@@ -12,7 +12,6 @@ import operator
 
 # Create your models here.
 
-
 class Dipendente(models.Model):
     #FIXME: gestione fisso, come provvigioni?
     RUOLI = (("agt", "agente"), ("tel", "telefonista"))
@@ -23,7 +22,7 @@ class Dipendente(models.Model):
     nome = models.CharField(max_length=45, 
                             help_text="nome del dipendente",
                             verbose_name="Nome")
-    email = models.EmailField(help_text="email del dipendente", unique=True,
+    email = models.EmailField(help_text="email del dipendente",
                               verbose_name="EMail")
     telefono = models.CharField(max_length=45, blank=True)
     cellulare = models.CharField(max_length=45, blank=True)
@@ -31,52 +30,35 @@ class Dipendente(models.Model):
                              choices=RUOLI, 
                              help_text="ruolo del dipendente",
                              verbose_name="Ruolo")
-    attivo = models.BooleanField(verbose_name="In Attività", default=True)
-    data_nonattivo = models.DateField(blank=True, editable=False, null=True)
-#    fisso = models.DecimalField(max_digits=7, decimal_places=2, 
-#                                help_text="stipendio fisso mensile",
-#                                verbose_name="fisso",
-#                                default=200)
-#    
-#    # provvigione X contratto di agente o telefonista
-#    provvigione_contratto = models.DecimalField(max_digits=5, decimal_places=2, 
-#                              help_text="percentuale o quota standard retribuita al dipendente per ogni contratto",
-#                              verbose_name="provvigione standard per contratto",)
-#    # provvigioni bonus
-#    provvigione_bonus = models.TextField(blank=True, default="",
-#                                         verbose_name="provvigioni bonus", 
-#                                         help_text='''
-#            Chiavi: <b>gestore</b>, <b>profilo</b>, <b>tipo</b>, <b>fascia</b>, <b>servizio</b>, <b>blindato</b>, <b>provvigione</b><br/> 
-#            La chiave <b>provvigione</b> (valore in euro) è obbligatoria, 
-#            ognuna delle altre chiavi è opzionale, ma almeno una deve essere presente oltre a <b>provvigione</b>.
-#            Le chiavi <b>gestore</b>, <b>profilo</b>, <b>tipo</b>, <b>fascia</b>, <b>servizio</b> si riferiscono alle tariffe, 
-#            mentre <b>blindato</b> al cliente firmatario del contratto; la chiave <b>blindato</b> accetta come valore un intero; 
-#            qualunque intero maggiore di 0 corrisponde a <i>vero</i>, 0 a <i>falso</i>. 
-#            <br/>Ex: se si volesse aggiungere per il dipendente selezionato una provvigione 
-#            bonus di 5€ per tutte le tariffe di tipo SIM e fascia LOW vendute ad un cliente <i>blindato</i>, basterebbe inserire: 
-#            <br/><b>tipo: sim, fascia: low, blindato: 1, provvigione: 5;</b><br/> 
-#            le chiavi devono essere separate dalla <i>virgola</i>, i <i>due punti</i> servono per indicare 
-#            il valore della chiave e il <i>punto e virgola</i> è usato come termine; è possibile inserire
-#            più di una provvigione speciale per un singolo dipendente; gli spazi e l'ordine  di inserimento delle chiavi non sono influenti.<br/>
-#            <b>NB:</b> Per i telefonisti sono pre-inserite le seguenti provvigioni bonus:
-#            <br/><b>tipo: sim, provvigione: 1;<br/> 
-#             gestore: telecom, tipo: ull, provvigione: 10;<br/>
-#             gestore: telecom, tipo: nip, provvigione: 10;<br/>
-#             tipo: adsl, provvigione: 5;<br/>
-#             tipo: adsl, fascia: premium, provvigione: 10;</b><br/>
-#           Mentre per gli agenti è pre-inserita la seguente provvgione bonus:
-#           <br/><b>blindato: 1, provvigione: 10;</b><br/> 
-#           ''',)
+#    attivo = models.BooleanField(verbose_name="In Attività", default=True)
+    data_assunzione = models.DateField(verbose_name="Data assunzione")
+    data_licenziamento = models.DateField(blank=True, null=True,
+                                          verbose_name="Data licenziamento",
+                                          help_text="lasciare vuoto il campo se il rapporto "\
+                                          "di lavoro è ancora in corso")
     creazione = models.DateTimeField(auto_now_add=True)
     modifica = models.DateTimeField(auto_now=True)
     
     def clean(self):
-        if self.attivo == False and not self.data_nonattivo:
-            self.data_nonattivo = datetime.datetime.now()
+        from django.core.exceptions import ValidationError
+        # controlliamo che il dipendente inserito non sia già presente nel database
+        # se è presente controlliamo che casomai non sia stato licenziato ed ora
+        # riassunto
+        prev_all = Dipendente.objects.filter(email=self.email).exclude(pk=self.pk)
+        if prev_all.exists():
+            for prev in prev_all:
+                if not prev.data_licenziamento:
+                    raise ValidationError("un dipendente con la stessa email è attualmente assunto")
+                                                                 
         models.Model.clean(self)
     
     def __unicode__(self):
-        return "%s %s" % (self.cognome, self.nome)
+        msg = "{} {}".format(self.cognome, self.nome)
+        if self.data_licenziamento:
+            msg += "[{} - {}]".format(self.data_assunzione.strftime("%d/%m/%Y"), 
+                                      self.data_licenziamento.strftime("%d/%m/%Y"))
+        return msg
+#        return "%s %s" % (self.cognome, self.nome)
     
     class Meta:
         ordering = ["cognome", "nome"]
@@ -92,7 +74,8 @@ class Utente(Dipendente):
         verbose_name_plural = "Utenti"
 
 class RetribuzioneDipendente(models.Model):
-    data_inizio = models.DateField(verbose_name="data inizio")
+    data_inizio = models.DateField(verbose_name="data inizio", 
+                                   help_text="data di inizio dell'uso della retribuzione")
     data_fine = models.DateField(verbose_name="data fine", blank=True, null=True)
     dipendente = models.ForeignKey(Dipendente)
     # retribuzione fissa mensile
@@ -123,8 +106,8 @@ class RetribuzioneDipendente(models.Model):
         più di una provvigione speciale per un singolo dipendente; gli spazi e l'ordine  di inserimento delle chiavi non sono influenti.<br/>
         <b>NB:</b> Per i telefonisti sono pre-inserite le seguenti provvigioni bonus:
         <br/><b>tipo: sim, provvigione: 1;<br/> 
-        gestore: telecom, tipo: ull, provvigione: 10;<br/>
-        gestore: telecom, tipo: nip, provvigione: 10;<br/>
+        gestore: telecom, servizio: ull, provvigione: 10;<br/>
+        gestore: telecom, servizio: nip, provvigione: 10;<br/>
         tipo: adsl, provvigione: 5;<br/>
         tipo: adsl, fascia: premium, provvigione: 10;</b><br/>
         Mentre per gli agenti è pre-inserita la seguente provvgione bonus:
@@ -135,34 +118,6 @@ class RetribuzioneDipendente(models.Model):
     principale = models.BooleanField(default=False)
     creazione = models.DateTimeField(auto_now_add=True)
     modifica = models.DateTimeField(auto_now=True)     
-
-#    def values_from_provvigione_bonus(self, provvigione_bonus):
-#        provvigione_bonus = provvigione_bonus.strip()
-#        if not provvigione_bonus:
-#            return []
-#        
-#        values = []
-#        vs = provvigione_bonus.split(";")
-#        for var in vs:
-#            if var:
-#                opts = var.split(",")
-#                par = {}
-#                prov = None
-#                for opt in opts:
-#                    item = opt.split(":")
-#                
-#                    if len(item) == 2:
-#                        k = item[0].strip()
-#                        v = item[1].strip()
-#                        if k == "provvigione":
-#                            prov = v                        
-#                        else:
-#                            par[k] = v
-#                
-#                d = {"parameters": par, "provvigione": prov}            
-#                values.append(d)
-#                
-#        return values
     
     def clean(self):
         # FIXME: data_fine delle retirbuzioni (non variazione) deve essere aggioranata 
@@ -301,13 +256,6 @@ class Tariffa(models.Model):
     sac = models.DecimalField(max_digits=5, decimal_places=2, default=0, 
                               help_text="provvigione 'una tantum' erogata per il contratto stipulato",
                               verbose_name="provvigione per contratto/S.A.C.") 
-#    sic = models.DecimalField(max_digits=5, decimal_places=2, blank=True, default=0,
-#                              help_text="provvigione 'una tantum' erogata sul volume di consumo",
-#                              verbose_name="provvigione S.I.C. 1° anno")
-#    sic_anni = models.DecimalField(max_digits=5, decimal_places=2, blank=True, default=0,
-#                              help_text="provvigione 'una tantum' erogata sul volume di consumo",
-#                              verbose_name="provvigione S.I.C. anni successivi")         
-             
     creazione = models.DateTimeField(auto_now_add=True)
     modifica = models.DateTimeField(auto_now=True) 
     
@@ -400,32 +348,32 @@ class Referente(models.Model):
 class Appuntamento(models.Model):
     telefonista = models.ForeignKey(Dipendente, 
                                     related_name="telefonista", 
-                                    limit_choices_to={"ruolo": "tel", "attivo": 1})
+                                    limit_choices_to={"ruolo": "tel",})
     cliente = models.ForeignKey(Cliente)
-    data = models.DateTimeField(verbose_name="data e ora")
+    data = models.DateTimeField(verbose_name="Data e Ora")
     referente = models.ForeignKey(Referente, related_name="referente", blank=True, 
                                   null=True, on_delete=SET_NULL)
     num_sim = models.CharField(max_length=45, 
                                blank=True,
-                               verbose_name="numero sim del contatto")
+                               verbose_name="Numero sim del contatto")
     gestore_mob = models.CharField(max_length=45, 
                                    blank=True, 
-                                   verbose_name="gestore mobile del contatto")
+                                   verbose_name="Gestore mobile del contatto")
     gestore_fisso = models.CharField(max_length=45, 
                                      blank=True, 
-                                     verbose_name="gestore fisso del contatto")    
+                                     verbose_name="Gestore fisso del contatto")    
     nota = models.TextField(blank=True)
     agente = models.ForeignKey(Dipendente, 
                                related_name="agente", 
-                               limit_choices_to={"ruolo": "agt", "attivo": 1}, 
+                               limit_choices_to={"ruolo": "agt",}, 
                                blank=True, null=True, on_delete=SET_NULL,
-                               verbose_name="agente assegnato")
+                               verbose_name="Agente assegnato")
     data_assegnazione = models.DateField(verbose_name="data dell'assegnazione",
                                          blank=True, null=True, editable=False)
     richiamare = models.BooleanField(help_text="da richiamare", default=False)
     nota_esito = models.TextField(verbose_name="nota dell'esito",
                                   blank=True)
-    data_contatto = models.DateField(auto_now_add=True)
+    data_contatto = models.DateField(auto_now_add=True, verbose_name="Data contatto")
     
     creazione = models.DateTimeField(auto_now_add=True)
     modifica = models.DateTimeField(auto_now=True)
@@ -452,29 +400,29 @@ class Contratto(models.Model):
                                 help_text="cliente che ha stipulato il contratto",)
     agente = models.ForeignKey(Dipendente, 
                                help_text="agente che ha stipulato il contratto",
-                               limit_choices_to={"ruolo": "agt", "attivo": 1})
+                               limit_choices_to={"ruolo": "agt",})
     piano_tariffario = models.ManyToManyField(Tariffa, 
                                               through="PianoTariffario",
-                                              verbose_name="piano tariffario",
+                                              verbose_name="Piano tariffario",
                                               limit_choices_to={"attivo": 1})
-    data_stipula = models.DateField(verbose_name="data di stipulazione")
-    data_scadenza = models.DateField(verbose_name="data di scadenza")
-    appuntamento = models.ForeignKey(Appuntamento, blank=True, null=True, on_delete=SET_NULL)
+    data_stipula = models.DateField(verbose_name="Data di stipulazione")
+    data_scadenza = models.DateField(verbose_name="Data di scadenza")
+    appuntamento = models.ForeignKey(Appuntamento, blank=True, null=True, on_delete=SET_NULL,)
     vas_telefonista = models.DecimalField(max_digits=5, decimal_places=2,
-                                          verbose_name="bonus per telefonista",
+                                          verbose_name="Bonus per telefonista",
                                           help_text="bonus per telefonista",
                                           default=0, blank=True)
     vas_agente = models.DecimalField(max_digits=5, decimal_places=2,
-                                     verbose_name="bonus per agente",
+                                     verbose_name="Bonus per agente",
                                      help_text="bonus per agente",
                                      default=0, blank=True)    
     data_rescissione = models.DateField(blank=True, 
-                                        verbose_name="data di rescissione",
+                                        verbose_name="Data di rescissione",
                                         null=True)
     pdf_contratto = models.FileField(upload_to="contratti/%Y/%m/", blank=True, null=True)
     completo = models.BooleanField(default=False, 
                                    help_text="contratto completato")
-    data_completato = models.DateTimeField(blank=True, 
+    data_completato = models.DateField(blank=True, 
                                            verbose_name="data completamento",
                                            editable=False, null=True)
     inviato = models.BooleanField(default=False, 
@@ -540,74 +488,58 @@ class PianoTariffario(models.Model):
         verbose_name_plural = "Piani Tariffari"
 
 class Obiettivo(models.Model):
-    data_inizio = models.DateField(verbose_name=" data inizio nuovo obiettivo",
+    denominazione = models.CharField(max_length=45,
+                                     unique=True, 
+                                     verbose_name="Etichetta dell'obiettivo",
+                                     help_text="etichetta da assegnare all'obiettivo",)
+    data_inizio = models.DateField(verbose_name="Data inizio obiettivo",
                                    null=True)
+    data_fine = models.DateField(verbose_name="Data fine obiettivo",
+                                 help_text="lasciare questo campo vuoto se l'obbiettivo è tutt'ora in vigore",
+                                 null=True)
     parametri = models.TextField(blank=True, 
                                  default="",
-                                 verbose_name="parametri dell'obiettivo", 
+                                 verbose_name="Parametri dell'obiettivo", 
                                  help_text='''
         Chiavi: <b>gestore</b>, <b>profilo</b>, <b>tipo</b>, <b>fascia</b>, <b>servizio</b><br/> 
-        ognuna delle chiavi è opzionale, lasciando il campo vuoto l'obbiettivo sarà relativo a tutti i contratti stipulati.
-        Le chiavi <b>gestore</b>, <b>profilo</b>, <b>tipo</b>, <b>fascia</b>, <b>servizio</b> si riferiscono alle tariffe. 
-        <br/><b>ex:</b> se si volesse aggiungere un obiettivo per 
-        le tariffe di tipo SIM e fascia LOW, basterà inserire: 
+        ognuna delle chiavi è opzionale, lasciando il campo vuoto l'obbiettivo sarà 
+        relativo a tutti i contratti stipulati.
+        Le chiavi <b>gestore</b>, <b>profilo</b>, <b>tipo</b>, <b>fascia</b>, <b>servizio</b> 
+        si riferiscono alle tariffe. 
+        <br/><b>ex:</b> se si volesse aggiungere un obiettivo per le tariffe di tipo 
+        SIM e fascia LOW, basterà inserire: 
         <br/><b>tipo: sim, fascia: low</b><br/> 
-        le chiavi devono essere separate dalla <i>virgola</i>, i <i>due punti</i> servono per indicare 
-        il valore della chiave e il <i>punto e virgola</i> è usato come termine; gli spazi extra e l'ordine  di inserimento delle chiavi non sono influenti.<br/>
+        le chiavi devono essere separate dalla <i>virgola</i>, i <i>due punti</i> 
+        servono per indicare il valore della chiave e il <i>punto e virgola</i> è 
+        usato come termine; gli spazi extra e l'ordine  di inserimento delle chiavi 
+        non sono influenti.<br/>
         <b>NB:</b> le chiavi possono essere ripetute; <b>ex:</b> si vuole aggiungere un obiettivo 
         per la vendita di tariffe TIM e TELECOM, allora bisognerà scrivere:
         <br/><b>gestore: tim, gestore: telecom</b><br/>
         ''',)
-    obiettivo = models.IntegerField(help_text="meta da raggiungere rispetto ai parametri indicati")
-    
+    punteggio = models.IntegerField(verbose_name="Punteggio", 
+                                    help_text="meta da raggiungere rispetto ai parametri indicati")
     creazione = models.DateTimeField(auto_now_add=True)
     modifica = models.DateTimeField(auto_now=True)
-            
+    
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        
+        models.Model.clean(self)
+        
+        if not self.pk:
+            # controlliamo che non venga assunto un obiettivo con la stessa denominazione
+            # di uno attivo già presente nel database
+            prev_all = Obiettivo.objects.filter(denominazione=self.denominazione)
+            if prev_all.exists():
+                for prev in prev_all:
+                    if not prev.data_fine:
+                        raise ValidationError("un obiettivo denominato <b>{}</b> "\
+                                              "ancora attivo esiste già nel DATBASE"\
+                                              .format(self.denominazione))
+    
     def __unicode__(self):
-        return "{}".format(self.parametri)
+        return "{}".format(self.denominazione)
     
     class Meta:
         verbose_name_plural = "Obiettivi"
-    
-#class RenditaContratto(models.Model):
-#    contratto = models.ForeignKey(Contratto)
-#    rendita = models.DecimalField(max_digits=5, decimal_places=2)
-#    mese = models.PositiveIntegerField()
-#    anno = models.PositiveIntegerField()
-#    creazione = models.DateTimeField(auto_now_add=True)
-#    modifica = models.DateTimeField(auto_now=True)
-#
-#    def __unicode__(self):
-#        return "{}: {} ({}/{})".format(self.contratto, self.rendita, self.mese, 
-#                                       self.anno)
-#
-#    class Meta:
-#        verbose_name_plural = "Rendite Contratti"
-#
-#class ConguaglioContratto(models.Model):
-#    contratto = models.ForeignKey(Contratto)
-#    conguaglio = models.DecimalField(max_digits=5, decimal_places=2)
-#    anno = models.PositiveIntegerField()
-#
-#    def __unicode__(self):
-#        return "{}: {} ({})".format(self.contratto, self.conguaglio, self.anno)
-#
-#    class Meta:
-#        verbose_name_plural = "Conguagli Contratti"
-#
-#class SicContratto(models.Model):
-#    contratto = models.ForeignKey(Contratto)
-#    sic = models.DecimalField(max_digits=3, decimal_places=2, 
-#                              help_text="provvigione 'una tantum' erogata sul volume di consumo",
-#                              verbose_name="provvigione S.I.C.")
-#    #anno = models.PositiveIntegerField()
-#    attivato = models.BooleanField()
-#    
-#    def __unicode__(self):
-#        if self.attivato:
-#            return "{}: {} ({})[x]".format(self.contratto, self.sic, self.anno)
-#        else:
-#            return "{}: {} ({})[ ]".format(self.contratto, self.sic, self.anno)
-#        
-#    class Meta:
-#        verbose_name_plural = "Sic Contratti"

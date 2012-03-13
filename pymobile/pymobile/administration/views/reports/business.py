@@ -177,12 +177,14 @@ def inout(request):
     table_out.order_by = request.GET.get("out-sort")
     
     if request.is_ajax():
+        template = "statistiche/entrate_uscite_table_snippet.html"
         data = {"table_in": table_in,
                 "table_out": table_out,
                 "totals_in": totals_in,
                 "totals_out": totals_out,
                 "period": (period[0], period[1])}
-        return render_to_response("statistiche/inouttable_snippet.html", data,
+        return render_to_response(template, 
+                                  data,
                                   context_instance=RequestContext(request))   
     
     filterform = forms.InOutFilterForm()
@@ -209,6 +211,10 @@ def calc_provvigione(dipendente, cliente, tariffa, date):
                                                                     dipendente=dipendente,
                                                                     data_inizio__lte=date)\
                                                                     .order_by("-data_inizio")[0]
+    
+    if not retribuzione.exists():
+        # vuol dire che nella data scelta il dipendente non viene pagato
+        return (0, 0)
                                                                     
     provvigione_contratto = float(retribuzione.provvigione_contratto)
     provvigione_bonus = retribuzione.provvigione_bonus
@@ -228,45 +234,33 @@ def calc_provvigione(dipendente, cliente, tariffa, date):
         values = u.values_from_provvigione_bonus(provvigione_bonus)
         
         for value in values:
-            res = False
+            res = True
             pars = value["parameters"]
             for k, v in pars.iteritems():
                 if k == "blindato":
                     if cliente.blindato != v:
                         res = False
                         break
-                    else:
-                        res = True
                 elif k == "gestore":
                     if tariffa.gestore != v:
                         res = False
                         break
-                    else:
-                        res = True
                 elif k == "profilo":
                     if tariffa.profilo != v:
                         res = False
                         break
-                    else:
-                        res = True
                 elif k == "tipo":
                     if tariffa.tipo != v:
                         res = False
                         break
-                    else:
-                        res = True
                 elif k == "fascia":
                     if tariffa.fascia != v:
                         res = False
                         break
-                    else:
-                        res = True
                 elif k == "servizio":
                     if tariffa.servizio != v:
                         res = False
                         break
-                    else:
-                        res = True
             
             if res:
                 ret_bonus += value["provvigione"]

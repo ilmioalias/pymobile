@@ -16,7 +16,7 @@
 	<fieldset>
 	<legend>Sei qui</legend>
 		<a href="../../">home</a> &gt; 
-		<a href="../">amministrazione dipendenti</a> &gt;
+		<a href="{% url init_dipendente %}">amministrazione dipendenti</a> &gt;
 		<a href="./">{{ object }}</a>
 	</fieldset>
 </div>
@@ -48,7 +48,14 @@
 			<tr><td>Telefono</td><td>{{ object.telefono }}</td></tr>
 			<tr><td>Cellulare</td><td>{{ object.cellulare }}</td></tr>
 			<tr><td>Ruolo</td><td>{{ object.get_ruolo_display }}</td></tr>
-			<tr><td>Attivo</td><td>{% if object.attivo %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" />{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
+			<tr><td>Data Assunzione</td><td>{{ object.data_assunzione }}</td></tr>
+			<tr>
+				{% if object.data_licenziamento %}
+				<td>Data Licenziamento</td><td>{{ object.data_licenziamento }}</td>
+				{% else %}
+				<td>Data Licenziamento</td><td>Rapporto di lavoro ancora in corso</td>
+				{% endif %}
+			</tr>
 		</table>
 	</fieldset>
 	<div class="op_detail">

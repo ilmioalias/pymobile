@@ -134,6 +134,10 @@ urlpatterns += patterns('pymobile.administration.views',
 
 #-------------------------------------------------------------------------------
 # STATISTICHE
+# contratto
+INFO_OBI={"template_name": "statistiche/obiettivo_trimestrale_view.html", 
+          "queryset": models.Obiettivo.objects.all()}
+
 # canvas
 urlpatterns += patterns('pymobile.administration.views.reports',
    url(r'^pymobile/statistiche/classifiche/canvas/$', "rankings.canvas_tim_telecom", 
@@ -150,15 +154,17 @@ urlpatterns += patterns('pymobile.administration.views.reports',
 
 # Obiettivi
 urlpatterns += patterns('pymobile.administration.views.reports',
-#   url(r'^pymobile/statistiche/obiettivi/$', "goals.canvas_obiettivi_trimestrale", 
-#       name="canvas_obiettivi_trimestrale"),
+   url(r'^pymobile/statistiche/obiettivi/$', "goals.canvas_obiettivo_trimestrale", 
+       name="canvas_obiettivo_trimestrale"),
    url(r'^pymobile/statistiche/obiettivi/admin/$', "goals.init_obiettivo_trimestrale", 
        name="init_obiettivo_trimestrale"),
-   url(r'^pymobile/statistiche/obiettivi/add/$', "goals.add_obiettivo_trimestrale", 
+   url(r'^pymobile/statistiche/obiettivi/admin/add/$', "goals.add_obiettivo_trimestrale", 
        name="add_obiettivo_trimestrale"),
-   url(r'^pymobile/statistiche/obiettivi/mod/(?P<object_id>\d+)/$', "goals.mod_obiettivo_trimestrale", 
+   url(r'^pymobile/statistiche/obiettivi/admin/mod/(?P<object_id>\d+)/$', "goals.mod_obiettivo_trimestrale", 
        name="mod_obiettivo_trimestrale"),
-   url(r'^pymobile/statistiche/obiettivi/del/$', "goals.del_obiettivo_trimestrale", 
-       name="del_obiettivo_trimestrale"),                        
+   url(r'^pymobile/statistiche/obiettivi/admin/del/$', "goals.del_obiettivo_trimestrale", 
+       name="del_obiettivo_trimestrale"),
+   url(r'^pymobile/statistiche/obiettivi/admin/(?P<object_id>\d+)/$', object_detail, INFO_OBI, 
+       name="view_obiettivo_trimestrale"),                         
 )
                             

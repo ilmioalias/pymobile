@@ -1,4 +1,4 @@
-{% extends "popup_base.html" %}      
+{% extends "base.html" %}      
 
 {% block extrahead %}
 <title>PYMOBILE | Dipendenti</title>
@@ -6,11 +6,25 @@
 {% endblock %}
 
 {% block header %} 
-<h2>Amministrazione Clienti | {{ action }} Cliente</h2>
+<h2>Amministrazione Clienti | {% if action == "add" %}Aggiungi{% else %}Modifica{% endif %} Cliente</h2>
 {% endblock %}
 
 {% block content %}
 {% load tags %}
+<div class="navigation">
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../../">home</a> &gt;
+		<a href="{% url init_cliente %}">amministrazione clienti</a> &gt;
+		{% if action == "add" %}
+		<a href=".">aggiungi cliente</a>
+		{% endif %}
+		{% if action == "mod" %}
+		<a href="{% url view_cliente cliente.pk %}">{{ cliente }}</a> &gt;
+		<a href=".">modifica cliente</a>
+		{% endif %} 
+	</fieldset>
+</div>
 <div class="modelform_div">
 	<form class="modelform" action="." method="post">
 		<div class="modelform_fieldset_div">
@@ -58,7 +72,9 @@
 		</div>
 		<div class="submitrow">
 			<input type="submit" class="modelform_save" value="salva" />
+			{% if action == "add" %}
 			<input type="button" class="modelform_save_and_add" value="salva e aggiungi un altro" />
+			{% endif %}
 			<button class="cancel">Annulla</button>
 		</div>
 	</form>

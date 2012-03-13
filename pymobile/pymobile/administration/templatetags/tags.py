@@ -10,6 +10,7 @@ from django import template
 from pymobile.administration import models
 import calendar
 import locale
+from django.utils.datetime_safe import datetime
 locale.setlocale(locale.LC_ALL, "it_IT.utf8")
 
 register = template.Library()
@@ -25,6 +26,19 @@ def isfk(field):
             return False
     except NameError: 
         return
+
+@register.filter(name="isdate")
+def isdate(field):
+    try: 
+        if field.field.widget.attrs.has_key("class"):
+            v = field.field.widget.attrs["class"]
+            clss = v.split(" ")
+            if "date" in clss or "datetime" in clss:
+                return True
+            return False
+    except NameError: 
+        return
+
 
 @register.filter(name="to_hide")
 def to_hide(field):
@@ -43,15 +57,20 @@ def get_class_name(record):
     return record.__class__.__name__.lower()
 
 
-@register.filter(name="get_pt_num")
-def get_pt_num(tariffa, contratto):
-    pt = models.PianoTariffario.objects.get(contratto=contratto, tariffa=tariffa)
-    return pt.num
+@register.filter(name="get_pt")
+def get_pt(contratto):
+    pt = models.PianoTariffario.objects.filter(contratto=contratto)
+    return pt
 
-@register.filter(name="get_pt_opt")
-def get_pt_opt(tariffa, contratto):
-    pt = models.PianoTariffario.objects.get(contratto=contratto, tariffa=tariffa)
-    return pt.opzione
+@register.filter(name="get_pt_tariffa")
+def get_pt_tariffa(pk):
+    tariffa = models.Tariffa.objects.get(pianotariffario=pk)
+    return tariffa
+
+@register.filter(name="get_pt_tariffa_pk")
+def get_pt_tariffa_pk(pk):
+    tariffa = models.Tariffa.objects.get(pianotariffario=pk)
+    return tariffa.pk
 
 @register.filter(name="get_month_name")
 def get_month_name(month_num):
@@ -65,3 +84,27 @@ def get_prov(objs, i):
 @register.filter(name="get_date")
 def get_date(date):
     return date.strftime("%d/%m/%Y")
+
+@register.filter(name="get_data")
+def get_data(d, obiettivo):
+    key = obiettivo.denominazione
+    if d.has_key(key):
+        return d[key]["data"]
+    else:
+        return ""
+    
+@register.filter(name="get_inviati")
+def get_inviati(d, obiettivo):
+    key = obiettivo.denominazione
+    if d.has_key(key):
+        return d[key]["inviati"]
+    else:
+        return ""
+
+@register.filter(name="get_punteggio")
+def get_punteggio(d, obiettivo):
+    key = obiettivo.denominazione
+    if d.has_key(key):
+        return d[key]["punteggio"]
+    else:
+        return ""

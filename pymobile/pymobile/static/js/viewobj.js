@@ -28,12 +28,12 @@ $(document).ready(function(){
 		e.preventDefault();
 		deleteObj($(this));
 	});
-	$(".modifyobj").click(function(e){
-		e.preventDefault();
-		modifyObj($(this));
-	});
-	$(".cancel").click(function(e){
-		e.preventDefault();
-		cancel();
-	});	
+	// $(".modifyobj").click(function(e){
+		// e.preventDefault();
+		// modifyObj($(this));
+	// });
+	// $(".cancel").click(function(e){
+		// e.preventDefault();
+		// cancel();
+	// });	
 });

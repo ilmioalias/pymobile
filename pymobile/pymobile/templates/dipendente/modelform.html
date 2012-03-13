@@ -1,4 +1,4 @@
-{% extends "popup_base.html" %}      
+{% extends "base.html" %}      
 
 {% block extrahead %}
 <title>PYMOBILE | Dipendenti</title> 
@@ -6,11 +6,25 @@
 {% endblock %}
 
 {% block header %} 
-<h2>Amministrazione Dipendenti | {{ action }} Dipendente</h2>
+<h2>Amministrazione Dipendenti | {% if action == "add" %}Aggiungi{% else %}Modifica{% endif %} Dipendenti</h2>
 {% endblock %}
 
 {% block content %}
 {% load tags %}
+<div class="navigation">
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../../">home</a> &gt;
+		<a href="{% url init_dipendente %}">amministrazione dipendenti</a> &gt;
+		{% if action == "add" %}
+		<a href=".">aggiungi dipendente</a>
+		{% endif %}
+		{% if action == "mod" %}
+		<a href="{% url view_dipendente dipendente.pk %}">{{ dipendente }}</a> &gt;
+		<a href=".">modifica dipendente</a>
+		{% endif %} 
+	</fieldset>
+</div>
 <div class="modelform_div">
 	<form class="modelform" action="." method="post">
 		<div class="modelform_fieldset_div">
@@ -39,6 +53,9 @@
 							<td>{{ field.label_tag }}</td>
 							<td>
 								{{ field }}
+								{% if field|isdate %}
+									<input type="button" class="dateclear" value="svuota" />
+					    		{% endif %}
 							    {% if field|isfk %}
 							    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_fk field.html_name %}">
 							    		<img src="{{ STATIC_URL }}/img/add.png" />
@@ -62,6 +79,7 @@
 					{% endif %}	
 				</table>
 			</fieldset>
+			{% if action == "add" %}
 			<fieldset class="modelform_fieldset">
 			<legend><b>Retribuzione</b></legend>
 				<!-- Retribuzione Formset -->
@@ -86,6 +104,9 @@
 							{% if field.label == "Fisso" %}
 							&euro;
 							{% endif %}
+							{% if field|isdate %}
+								<input type="button" class="dateclear" value="svuota" />
+				    		{% endif %}
 						    {% if field|isfk %}
 						    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_fk field.html_name %}">
 						    		<img src="{{ STATIC_URL }}/img/add.png" />
@@ -103,10 +124,13 @@
 				{% endfor %}
 				</table>	
 			</fieldset>
+			{% endif %}
 		</div>
 		<div class="submitrow">
 			<input type="submit" class="modelform_save" value="salva" />
+			{% if action == "add" %}
 			<input type="button" class="modelform_save_and_add" value="salva e aggiungi un altro" />
+			{% endif %}
 			<button class="cancel">Annulla</button>
 		</div>
 	</form>

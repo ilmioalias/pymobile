@@ -34,8 +34,9 @@ var closeSubModelform = function(win, newId, newOpt){
 };
 
 var cancelForm = function(){
-	window.opener.location.reload(true);
-	window.close();
+	window.location.href="../"
+	// window.opener.location.reload(true);
+	// window.close();
 };
 
 var saveAddObject = function(j_obj){
@@ -91,7 +92,14 @@ var dateStartChanged = function(data_start, data_end){
   	earliest.setHours(0,0,0,0);
   	data_end.removeAttr("disabled").AnyTime_noPicker().AnyTime_picker({
   		earliest: earliest,
-        format: "%d/%m/%Y"
+        format: "%d/%m/%Y",
+		labelTitle: "Seleziona il giorno",
+		labelDayOfMonth: "Giorno del mese",
+		labelMonth: "Mese",
+		labelYear: "Anno",
+		firstDOW: 1,
+		dayAbbreviations: ["dom", "lun", "mar", "mer", "gio", "ven", "sab"],
+		monthAbbreviations : ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
 	});		
 };
 
@@ -109,7 +117,10 @@ var initModelformClickHandler = function(){
 		labelTitle: "Seleziona il giorno",
 		labelDayOfMonth: "Giorno del mese",
 		labelMonth: "Mese",
-		labelYear: "Anno"
+		labelYear: "Anno",
+		firstDOW: 1,
+		dayAbbreviations: ["dom", "lun", "mar", "mer", "gio", "ven", "sab"],
+		monthAbbreviations : ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
 	});
 	$("tbody.field input.datetime").AnyTime_picker({
 		format: "%d/%m/%Y %H:%i",
@@ -118,17 +129,27 @@ var initModelformClickHandler = function(){
 		labelMonth: "Mese",
 		labelYear: "Anno",
 		labelHour: "Ora",
-		labelMinute: "Minuto"
+		labelMinute: "Minuto",
+		firstDOW: 1,
+		dayAbbreviations: ["dom", "lun", "mar", "mer", "gio", "ven", "sab"],
+		monthAbbreviations : ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
 	});
 	$("tbody.field input.time").AnyTime_picker({
 		format: "%H:%i",
 		labelTitle: "Seleziona l'ora",
 		labelHour: "Ora",
-		labelMinute: "Minuto"
+		labelMinute: "Minuto",
+		firstDOW: 1,
+		dayAbbreviations: ["dom", "lun", "mar", "mer", "gio", "ven", "sab"],
+		monthAbbreviations : ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
 	});
 	$("form.modelform .cancel").click(function(e){
 		e.preventDefault();
 		cancelForm();
+	});
+	$("form.modelform .dateclear").click(function(e){
+		e.preventDefault();
+		$(this).prev(".date, .datetime").val("").change();
 	});
 	$("form.modelform input.date_end").attr("disabled", "true");
 	$("form.modelform input.date_start").AnyTime_picker({
@@ -136,7 +157,10 @@ var initModelformClickHandler = function(){
 		labelTitle: "Seleziona il giorno",
 		labelDayOfMonth: "Giorno del mese",
 		labelMonth: "Mese",
-		labelYear: "Anno"
+		labelYear: "Anno",
+		firstDOW: 1,
+		dayAbbreviations: ["dom", "lun", "mar", "mer", "gio", "ven", "sab"],
+		monthAbbreviations : ["gen", "feb", "mar", "apr", "mag", "giu", "lug", "ago", "set", "ott", "nov", "dic"]
 	});		
 	$("form.modelform input.date_start").change(function(e){
 		e.preventDefault();
@@ -161,9 +185,10 @@ var initModelformClickHandler = function(){
     $("form.modelform select#id_appuntamento:visible").combobox();
     // FIXME: la funzione unload mi pare un poco invasiva
     // meglio spostare tutto in una nuova pagina invece che su un popup?
-    $(window).unload(function(){
-		window.opener.location.reload();
-    });
+    // FIXME: sistemate assolutamente il reload della pagina quando il popup viene chiuso
+    // $(window).unload(function(){
+		// window.opener.location.reload();
+    // });
 };
 
 $(document).ready(function(){

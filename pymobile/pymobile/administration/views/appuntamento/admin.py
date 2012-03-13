@@ -27,12 +27,14 @@ TMP_VIEW="appuntamento/view.html"
 TMP_ASSIGN="appuntamento/assignform.html"
 TMP_REF="appuntamento/referente_view.html"
 TMP_REFFORM="appuntamento/referente_modelform.html"
+# questa pagina mi serve perché referente estende base.html per la modfica
+TMP_REFMODFORM="appuntamento/referente_mod_modelform.html"
 TMP_REFDELFORM="appuntamento/referente_deleteform.html"
 
 def init(request):
     template = TMP_ADMIN
     objs = models.Appuntamento.objects.all()
-    agenti = models.Dipendente.objects.filter(ruolo="agt").filter(attivo=True)
+    agenti = models.Dipendente.objects.filter(ruolo="agt")
     initial = {}
     pag = 1
     ordering = None
@@ -66,7 +68,7 @@ def init(request):
 
 def add_object(request):  
     template = TMP_FORM
-    action = "Aggiungi"
+    action = "add"
     
     if request.method == "POST":
         post_query = request.POST.copy()
@@ -78,11 +80,12 @@ def add_object(request):
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_appuntamento")) 
             else:
-                url = reverse("init_appuntamento")
-                return HttpResponse('''
-                                <script type='text/javascript'>
-                                    opener.redirectAfter(window, '{}');
-                                </script>'''.format(url))
+                return HttpResponseRedirect(reverse("init_appuntamento"))
+#                url = reverse("init_appuntamento")
+#                return HttpResponse('''
+#                                <script type='text/javascript'>
+#                                    opener.redirectAfter(window, '{}');
+#                                </script>'''.format(url))
     else:
         form = forms.AppuntamentoForm()    
 
@@ -93,7 +96,7 @@ def add_object(request):
 
 def mod_object(request, object_id):
     template = TMP_FORM
-    action = "Modifica"
+    action = "mod"
     
     if request.method == "POST":
         post_query = request.POST.copy()
@@ -106,16 +109,18 @@ def mod_object(request, object_id):
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_appuntamento")) 
             else:
-                url = reverse("view_appuntamento", args=[object_id])
-                return HttpResponse('''
-                                <script type='text/javascript'>
-                                    opener.redirectAfter(window, '{}');
-                                </script>'''.format(url))           
+                return HttpResponseRedirect(reverse("view_appuntamento", 
+                                                    args=[object_id]))
+#                url = reverse("view_appuntamento", args=[object_id])
+#                return HttpResponse('''
+#                                <script type='text/javascript'>
+#                                    opener.redirectAfter(window, '{}');
+#                                </script>'''.format(url))           
     else:
         obj = get_object_or_404(models.Appuntamento, pk=object_id) 
         form = forms.AppuntamentoForm(instance=obj)
     
-    data = {"modelform": form, "action": action,}
+    data = {"modelform": form, "action": action, "appuntamento": obj,}
     return render_to_response(template,
                               data,
                               context_instance=RequestContext(request))
@@ -179,7 +184,7 @@ def assign_object(request):
                                   context_instance=RequestContext(request))
 
 def add_child_object(request, field_name):
-    action = "Aggiungi" 
+    action = "add" 
     
     def get_child_form(field_name):  
         f = field_name.capitalize() + "Form"
@@ -231,31 +236,32 @@ def view_referente(request, object_id, referente_id):
                               context_instance=RequestContext(request))
 
 def mod_referente(request, object_id, referente_id):
-    template = TMP_REFFORM
-    action = "Modifica"
+    template = TMP_REFMODFORM
+    action = "mod"
     
     appuntamento_id = object_id
-    app = get_object_or_404(models.Appuntamento, pk=appuntamento_id)
+    obj = get_object_or_404(models.Appuntamento, pk=appuntamento_id)
     
     if request.method == "POST":
         post_query = request.POST.copy()
-        ref = get_object_or_404(models.Referente, pk=referente_id)
-        form = forms.ReferenteForm(post_query, instance=ref)
+        referente = get_object_or_404(models.Referente, pk=referente_id)
+        form = forms.ReferenteForm(post_query, instance=referente)
     
         if form.is_valid():
             form.save()
             
-            url = reverse("view_referente", args=[appuntamento_id, referente_id])
-            return HttpResponse('''
-                            <script type='text/javascript'>
-                                opener.redirectAfter(window, '{}');
-                            </script>'''.format(url))    
-                      
+            return HttpResponseRedirect(reverse("view_referente", 
+                                                args=[appuntamento_id, referente_id]))
+#            url = reverse("view_referente", args=[appuntamento_id, referente_id])
+#            return HttpResponse('''
+#                            <script type='text/javascript'>
+#                                opener.redirectAfter(window, '{}');
+#                            </script>'''.format(url))    
     else:
-        ref = get_object_or_404(models.Referente, pk=referente_id) 
-        form = forms.ReferenteForm(instance=ref)
+        referente = get_object_or_404(models.Referente, pk=referente_id) 
+        form = forms.ReferenteForm(instance=referente)
     
-    data = {"modelform": form, "action": action, "appuntamento": app}
+    data = {"modelform": form, "action": action, "appuntamento": obj,}
     return render_to_response(template,
                               data,
                               context_instance=RequestContext(request))

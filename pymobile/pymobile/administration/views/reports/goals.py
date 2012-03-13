@@ -9,89 +9,274 @@ import pymobile.administration.forms as forms
 from django.shortcuts import render_to_response, HttpResponseRedirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
-from decimal import Decimal, getcontext
-from datetime import datetime, date
+from datetime import date, timedelta
 
-TMP_INIT= "statistiche/obiettivi_trimestrali_admin.html"
-TMP_TABLE="statistiche/obiettivi_trimestrali_snippet_table.html"
-TMP_FORM="statistiche/obiettivi_trimestrali_modelform.html"
-TMP_DEL="statistiche/obiettivi_trimestrali_deleteform.html"
+# sistemiamo il locale al locale di default della macchina 
+import locale
+from django.utils.datetime_safe import datetime
+locale.setlocale(locale.LC_ALL, '')
 
-def init_obiettivo_trimestrale(request):
-    template = TMP_INIT
-   
-    obiettivi = models.Obiettivo.objects.all().order_by("-data_inizio")
+TMP_CANVAS="statistiche/obiettivo_trimestrale.html"
+TMP_ADMIN= "statistiche/obiettivo_trimestrale_admin.html"
+TMP_TABLE="statistiche/obiettivo_trimestrale_table_snippet.html"
+TMP_FORM="statistiche/obiettivo_trimestrale_modelform.html"
+TMP_DEL="statistiche/obiettivo_trimestrale_deleteform.html"
+
+def canvas_obiettivo_trimestrale(request):
+    template = TMP_CANVAS
     
-    today = datetime.today().date()
-    
-    # creaiamo un dizionario con tutte le variazioni e le retribuzioni
-    objs = {}
-    # variazioni
-    if obiettivi.exists():
-        date_max = obiettivi[0].data_inizio if obiettivi[0].data_inizio > today else today
-        date_min = obiettivi[obiettivi.count() - 1].data_inizio
-
-        for obiettivo in obiettivi:
-            date_cur = obiettivo.data_inizio
-            parameters = obiettivo.parametri
-            k = date_cur.strftime("%Y-%m-%d")
-            if k in objs:
-                objs[k].append(parameters)
-            else:
-                objs[k] = [parameters,]    
+    # FIXME: ragionare sulla gestione del periodo
+    if request.method == "GET" and request.GET.has_key("fanno") and request.GET.has_key("fquarto"):
+        period = u.get_quarter(request.GET)
     else:
-        today = datetime.today()
-        y = today.year
-        date_max = date(y, 10, 31)
-        date_min = date(y, 1, 1)
+        period = u.get_current_quarter()
     
-    # creiamo i dati per la tabella della gestion obiettivi 
-    rows = [] 
-    date_cur = date_max
-    while date_cur >= date_min:
-        month_cur = date_cur.month
-        year_cur = date_cur.year
-        
-        if 1 <= month_cur <= 3:
-            quarter_cur = (1, (date(year_cur, 1, 1), date(year_cur, 3, 31)))
-        elif 4 <= month_cur <= 6:
-            quarter_cur = (2, (date(year_cur, 4, 1), date(year_cur, 6, 30)))
-        elif 7 <= month_cur <= 9:
-            quarter_cur = (3, (date(year_cur, 7, 1), date(year_cur, 9, 30)))
-        elif 10 <= month_cur <= 12:
-            quarter_cur = (4, (date(year_cur, 10, 1), date(year_cur, 12, 31)))
-        
-        k = date_cur.strftime("%Y-%m-%d")
-        if not k in objs:
-            rows.append({"anno": year_cur, "quarto": quarter_cur})
+    # in conteggio per il raggiungimento degli obiettivi è fatto sui contratti
+    # inviati nel quarto di riferimento
+    contratti_inviati = models.Contratto.objects.filter(data_inviato__gte=period[0], 
+                                                        data_inviato__lte=period[1], 
+                                                        inviato=True)\
+                                                .order_by("data_inviato")\
+                                                .select_related("piano_tariffario")
+    
+    # ricaviamo contratti solo degli agenti/telefonisti selezionati 
+    if request.method == "GET" and request.GET.has_key("fagente"):
+        agenti_ids = u.get_agenti_ids(request.GET)
+        if agenti_ids:
+            contratti_inviati = contratti_inviati.filter(agente__in=agenti_ids) 
+    if request.method == "GET" and request.GET.has_key("ftelefonista"):
+        tel_ids = u.get_telefonisti_ids(request.GET)
+        if tel_ids:
+            contratti_inviati = contratti_inviati.filter(telefonista__in=tel_ids)    
+    
+    obiettivi = models.Obiettivo.objects.filter(data_inizio__lte=period[0])
+    
+    rows = []
+    totals = {}
+    for obiettivo in obiettivi:
+        totals[obiettivo.denominazione] = {"inviati": 0, 
+                                          "caricati": 0,
+                                          "punteggio": 0,}
+    d = {}
+    if contratti_inviati.exists():        
+        dates = contratti_inviati.values("data_inviato").distinct()
+
+        for date in dates:
+            data_inviato = date["data_inviato"].strftime("%d/%m/%Y")
+            d[data_inviato] = {}
+            
+            for obiettivo in obiettivi:
+                punteggio_day = 0
+                
+                contratti_day = contratti_inviati.filter(data_inviato=date["data_inviato"])
+                n_inviati = 0
+                for contratto in contratti_day:
+                    # determiniamo il piano tariffario
+                    pts = models.PianoTariffario.objects.filter(contratto=contratto).iterator()
+                    
+                    punteggio_contratto = 0
+                    for pt in pts:
+                        q = pt.num
+                        tariffa = pt.tariffa      
+                        
+                        if check_tariffa(obiettivo, tariffa):
+                            punteggio_contratto = +q
+                    
+                    n_inviati += 1
+                    punteggio_day += punteggio_contratto
+                
+                d[data_inviato][obiettivo.denominazione] = {"data": data_inviato,
+                                                            "punteggio": punteggio_day,
+                                                            "inviati": n_inviati,}    
+                totals[obiettivo.denominazione]["punteggio"] += punteggio_day
+                totals[obiettivo.denominazione]["inviati"] += n_inviati
+            
+    date_cur = period[0]
+    today = datetime.today().date()
+    y_cur = 0
+    m_cur = 0
+    
+    while date_cur <= period[1]:
+        if date_cur.year != y_cur:
+            year = date_cur.year
+            y_cur = date_cur.year
         else:
-            rows.append({"anno": year_cur, "quarto": quarter_cur, "parametri": objs[k]})
+            year = None
         
-        # aggiorniamo il contatore della data "date_cur"
-        month_cur -= 3 
-        if month_cur < 0:
-            # il conto è alla rovescia, dalla data più recente a quella meno recente
-            # scaliamo di 3 mesi in 3 mesi, quando arriviamo a gennaio dobbiamo
-            # scalare di un anno
-            month_cur = 10 # ottobre
-            year_cur = year_cur - 1
-        date_cur = date(year_cur, month_cur, 1)
+        if date_cur.month != m_cur:
+            m_cur = date_cur.month
+            if date_cur == today:
+                month = (date_cur.strftime("%B"), today)
+            else:
+                month = (date_cur.strftime("%B"), None)
+        else:
+            if date_cur == today:
+                month = (None, today)
+            else:    
+                month = (None, None)
         
+        row = {"anno": year, "mese": month}
+        k = date_cur.strftime("%d/%m/%Y")
+        if k in d:
+            for obiettivo in obiettivi:
+                row[obiettivo.denominazione] = d[k][obiettivo.denominazione]
+        rows.append(row)
+        date_cur += timedelta(1)
+    
     if request.is_ajax():
         template = TMP_TABLE
-        data = {"rows": rows, "period": (date_min, date_max)}
+        data = {"rows": rows, "obiettivi": obiettivi, "period": period, "totali": totals}
         return render_to_response(template,
                                   data,
                                   context_instance=RequestContext(request))        
     
-    data = {"rows": rows, "period": (date_min, date_max)}
+    filterform = forms.ObiettivoFilterForm()
+    data = {"rows": rows, "obiettivi": obiettivi, "period": period, 
+            "totali": totals, "filterform": filterform,}
     return render_to_response(template,
                               data,
                               context_instance=RequestContext(request))
+                
+def check_tariffa(obiettivo, tariffa):
+    parametri = obiettivo.parametri
+    values = u.values_from_parametri(parametri)
+    result = True
+    if values:
+        for k, v in values.iteritems():
+            if k == "gestore":
+                if tariffa.gestore != v:
+                    result = False
+                    break
+            if k == "profilo":
+                if tariffa.profilo != v:
+                    result = False
+                    break
+            if k == "tipo":
+                if tariffa.tipo != v:
+                    result = False
+                    break
+            if k == "fascia":
+                if tariffa.fascia != v:
+                    result = False
+                    break
+            if k == "servizio":
+                if tariffa.servizio != v:
+                    result = False
+                    break
+        
+    return result
+   
+def init_obiettivo_trimestrale(request):
+    template = TMP_ADMIN
+    # determiniamo solo gli obiettivi attivi
+    objs = models.Obiettivo.objects.filter(data_fine__isnull=True)
+    initial = {}
+    pag = 1
+    ordering = None
+    
+    if request.method == "GET" and request.GET:
+        query_get = request.GET.copy()
+        initial = {}
+        
+        if query_get.has_key("pag"):
+            pag = query_get["pag"]
+            del query_get["pag"]
+        if query_get.has_key("sort"):
+            ordering = query_get["sort"]
+            del query_get["sort"]
+        if query_get:
+            objs, initial = u.filter_objs(objs, query_get)
+        
+    table = tables.ObiettivoTable(objs, order_by=(ordering,))
+    table.paginate(page=pag)
+    
+    if request.is_ajax():
+        template = table.as_html()
+        return HttpResponse(template)
+        
+    data = {"modeltable": table,}
+    return render_to_response(template, data,
+                              context_instance=RequestContext(request))
+
+    
+#    # FIXME: aggiungere scelta periodi, per ora solo quarto corrente
+#    period = u.get_current_quarter()
+#    
+#    obiettivi = models.Obiettivo.objects.filter(Q(data_fine__gte=period[1]) \
+#                                                | Q(data_fine__isnull=True),
+#                                                data_inizio__lte=period[0],)
+#    
+#    # creaiamo un dizionario con tutte le variazioni e le retribuzioni
+#    objs = {}
+#    # variazioni
+#    if obiettivi.exists():
+#        denominazioni = obiettivi.values_list("denominazione")
+#        
+#        today = datetime.today().date()
+#        
+#        date_max = obiettivi[0].data_inizio if obiettivi[0].data_inizio > today else today
+#        date_min = obiettivi[obiettivi.count() - 1].data_inizio
+#
+#        for obiettivo in obiettivi:
+#            date_cur = obiettivo.data_inizio
+#            k = date_cur.strftime("%Y-%m-%d")
+#            if k in objs:
+#                objs[k].append(obiettivo)
+#            else:
+#                objs[k] = [obiettivo,]
+#    else:
+#        today = datetime.today()
+#        y = today.year
+#        date_max = date(y, 10, 31)
+#        date_min = date(y, 1, 1)
+#    
+#    # creiamo i dati per la tabella della gestion obiettivi 
+#    rows = [] 
+#    date_cur = date_max
+#    while date_cur >= date_min:
+#        month_cur = date_cur.month
+#        year_cur = date_cur.year
+#        
+#        if 1 <= month_cur <= 3:
+#            quarter_cur = (1, (date(year_cur, 1, 1), date(year_cur, 3, 31)))
+#        elif 4 <= month_cur <= 6:
+#            quarter_cur = (2, (date(year_cur, 4, 1), date(year_cur, 6, 30)))
+#        elif 7 <= month_cur <= 9:
+#            quarter_cur = (3, (date(year_cur, 7, 1), date(year_cur, 9, 30)))
+#        elif 10 <= month_cur <= 12:
+#            quarter_cur = (4, (date(year_cur, 10, 1), date(year_cur, 12, 31)))
+#        
+#        k = date_cur.strftime("%Y-%m-%d")
+#        if not k in objs:
+#            rows.append({"anno": year_cur, "quarto": quarter_cur})
+#        else:
+#            rows.append({"anno": year_cur, "quarto": quarter_cur, "obiettivo": objs[k]})
+#        
+#        # aggiorniamo il contatore della data "date_cur"
+#        month_cur -= 3 
+#        if month_cur < 0:
+#            # il conto è alla rovescia, dalla data più recente a quella meno recente
+#            # scaliamo di 3 mesi in 3 mesi, quando arriviamo a gennaio dobbiamo
+#            # scalare di un anno
+#            month_cur = 10 # ottobre
+#            year_cur = year_cur - 1
+#        date_cur = date(year_cur, month_cur, 1)
+#        
+#    if request.is_ajax():
+#        template = TMP_TABLE
+#        data = {"rows": rows, "period": (date_min, date_max)}
+#        return render_to_response(template,
+#                                  data,
+#                                  context_instance=RequestContext(request))        
+#    
+#    data = {"rows": rows, "period": (date_min, date_max)}
+#    return render_to_response(template,
+#                              data,
+#                              context_instance=RequestContext(request))
 
 def add_obiettivo_trimestrale(request):  
     template = TMP_FORM
-    action = "Aggiungi"
+    action = "add"
     
     if request.method == "POST":
         post_query = request.POST.copy()
@@ -103,11 +288,12 @@ def add_obiettivo_trimestrale(request):
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_obiettivo_trimestrale")) 
             else:
-                url = reverse("init_obiettivo_trimestrale")
-                return HttpResponse('''
-                    <script type='text/javascript'>
-                        opener.redirectAfter(window, '{}');
-                    </script>'''.format(url))   
+                return HttpResponseRedirect(reverse("init_obiettivo_trimestrale"))
+#                url = reverse("init_obiettivo_trimestrale")
+#                return HttpResponse('''
+#                    <script type='text/javascript'>
+#                        opener.redirectAfter(window, '{}');
+#                    </script>'''.format(url))   
     else:
         form = forms.ObiettivoForm()    
         
@@ -118,7 +304,7 @@ def add_obiettivo_trimestrale(request):
 
 def mod_obiettivo_trimestrale(request, object_id):
     template = TMP_FORM
-    action = "Modifica"
+    action = "mod"
     
     if request.method == "POST":
         post_query = request.POST.copy()
@@ -131,16 +317,18 @@ def mod_obiettivo_trimestrale(request, object_id):
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_obiettivo_trimestrale")) 
             else:
-                url = reverse("init_obiettivo_trimestrale", args=[object_id])
-                return HttpResponse('''
-                    <script type='text/javascript'>
-                        opener.redirectAfter(window, '{}');
-                    </script>'''.format(url))                    
+                return HttpResponseRedirect(reverse("init_obiettivo_trimestrale", 
+                                                    args=[object_id]))
+#                url = reverse("init_obiettivo_trimestrale", args=[object_id])
+#                return HttpResponse('''
+#                    <script type='text/javascript'>
+#                        opener.redirectAfter(window, '{}');
+#                    </script>'''.format(url))                    
     else:
         obj = get_object_or_404(models.Obiettivo, pk=object_id) 
         form = forms.ObiettivoForm(instance=obj)
     
-    data = {"modelform": form, "action": action,}
+    data = {"modelform": form, "action": action, "obiettivo": obj,}
     return render_to_response(template,
                               data,
                               context_instance=RequestContext(request))

@@ -59,7 +59,7 @@ def init(request):
 
 def add_object(request):  
     template = TMP_FORM
-    action = "Aggiungi"
+    action = "add"
     
     if request.method == "POST":
         post_query = request.POST.copy()
@@ -71,11 +71,12 @@ def add_object(request):
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_tariffa")) 
             else:
-                url = reverse("init_tariffa")
-                return HttpResponse('''
-                                <script type='text/javascript'>
-                                    opener.redirectAfter(window, '{}');
-                                </script>'''.format(url))
+                return HttpResponseRedirect(reverse("init_tariffa"))
+#                url = reverse("init_tariffa")
+#                return HttpResponse('''
+#                                <script type='text/javascript'>
+#                                    opener.redirectAfter(window, '{}');
+#                                </script>'''.format(url))
     else:
         form = forms.TariffaForm()    
 
@@ -86,7 +87,7 @@ def add_object(request):
 
 def mod_object(request, object_id):
     template = TMP_FORM
-    action = "Modifica"
+    action = "mod"
     
     if request.method == "POST":
         post_query = request.POST.copy()
@@ -99,16 +100,18 @@ def mod_object(request, object_id):
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_tariffa")) 
             else:
-                url = reverse("view_tariffa", args=[object_id])
-                return HttpResponse('''
-                                <script type='text/javascript'>
-                                    opener.redirectAfter(window, '{}');
-                                </script>'''.format(url))                
+                return HttpResponseRedirect(reverse("view_tariffa", 
+                                                    args=[object_id]))
+#                url = reverse("view_tariffa", args=[object_id])
+#                return HttpResponse('''
+#                                <script type='text/javascript'>
+#                                    opener.redirectAfter(window, '{}');
+#                                </script>'''.format(url))                
     else:
         obj = get_object_or_404(models.Tariffa, pk=object_id) 
         form = forms.TariffaForm(instance=obj)
     
-    data = {"modelform": form, "action": action,}
+    data = {"modelform": form, "action": action, "tariffa": obj,}
     return render_to_response(template,
                               data,
                               context_instance=RequestContext(request))
@@ -186,7 +189,7 @@ def add_child_object(request, field_name):
                               context_instance=RequestContext(request))
 
 def init_attribute(request, attribute):
-    template = "tariffa/admin_attribute.html"
+    template = "tariffa/attribute_admin.html"
     model = get_model("administration", attribute + "tariffa")
     objs = model.objects.all()
     initial = {}
@@ -233,11 +236,13 @@ def add_attribute(request, attribute):
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_tariffa")) 
             else:
-                url = reverse("init_attribute", args=[attribute])
-                return HttpResponse('''
-                                <script type='text/javascript'>
-                                    opener.redirectAfter(window, '{}');
-                                </script>'''.format(url))
+                return HttpResponseRedirect(reverse("init_attribute", 
+                                                    args=[attribute]))
+#                url = reverse("init_attribute", args=[attribute])
+#                return HttpResponse('''
+#                                <script type='text/javascript'>
+#                                    opener.redirectAfter(window, '{}');
+#                                </script>'''.format(url))
     else:
         form = u.get_form(attribute + "tariffaform")()
 
@@ -262,11 +267,13 @@ def mod_attribute(request, attribute, object_id):
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_tariffa")) 
             else:
-                url = reverse("init_attribute", args=[attribute])
-                return HttpResponse('''
-                                <script type='text/javascript'>
-                                    opener.redirectAfter(window, '{}');
-                                </script>'''.format(url))                
+                return HttpResponseRedirect(reverse("init_attribute", 
+                                                    args=[attribute]))
+#                url = reverse("init_attribute", args=[attribute])
+#                return HttpResponse('''
+#                                <script type='text/javascript'>
+#                                    opener.redirectAfter(window, '{}');
+#                                </script>'''.format(url))                
     else:
         obj = get_object_or_404(model, pk=object_id)         
         form = u.get_form(attribute + "tariffaform")(instance=obj)
@@ -287,7 +294,7 @@ def del_attribute(request, attribute):
             # cancelliamo
             ids = query_post.getlist("id")
             model.objects.filter(id__in=ids).delete()
-            url = reverse("init_tariffa")
+            url = reverse("init_attribute")
             
             return HttpResponse('''
                 <script type='text/javascript'>

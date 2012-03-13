@@ -11,13 +11,13 @@
 {% block content %}
 <form action="{% url del_tariffa %}" method="POST">
 	{% csrf_token %}
-	{% attributo == "tipologia" %}
+	{% if attributo == "tipologia" %}
 	<span>Sei sicuro di voler eliminare le seguenti tipologie:</span>
 	{% endif %}
-	{% attributo == "fascia" %}
+	{% if attributo == "fascia" %}
 	<span>Sei sicuro di voler eliminare le seguenti fascie:</span>
 	{% endif %}
-	{% attributo == "servizio" %}
+	{% if attributo == "servizio" %}
 	<span>Sei sicuro di voler eliminare i seguenti servizi:</span>
 	{% endif %}	
 	<ul>

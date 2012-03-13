@@ -68,7 +68,7 @@ def init(request):
 
 def add_object(request):  
     template = TMP_FORM
-    action = "Aggiungi"
+    action = "add"
     
     if request.method == "POST":
         post_query = request.POST.copy()
@@ -85,11 +85,12 @@ def add_object(request):
                 if request.POST.has_key("add_another"):              
                     return HttpResponseRedirect(reverse("add_dipendente")) 
                 else:
-                    url = reverse("init_dipendente")
-                    return HttpResponse('''
-                                    <script type='text/javascript'>
-                                        opener.redirectAfter(window, '{}');
-                                    </script>'''.format(url))   
+                    return HttpResponseRedirect(reverse("init_dipendente"))
+#                    url = reverse("init_dipendente")
+#                    return HttpResponse('''
+#                                    <script type='text/javascript'>
+#                                        opener.redirectAfter(window, '{}');
+#                                    </script>'''.format(url))   
         else:
             formset = forms.RetribuzioneFormset(post_query)
     else:
@@ -107,7 +108,7 @@ def add_object(request):
 
 def mod_object(request, object_id):
     template = TMP_FORM
-    action = "Modifica"
+    action = "mod"
     
     if request.method == "POST":
         post_query = request.POST.copy()
@@ -120,16 +121,18 @@ def mod_object(request, object_id):
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_dipendente")) 
             else:
-                url = reverse("view_dipendente", args=[object_id])
-                return HttpResponse('''
-                                <script type='text/javascript'>
-                                    opener.redirectAfter(window, '{}');
-                                </script>'''.format(url))                    
+                return HttpResponseRedirect(reverse("view_dipendente", 
+                                                    args=[object_id]))
+#                url = reverse("view_dipendente", args=[object_id])
+#                return HttpResponse('''
+#                                <script type='text/javascript'>
+#                                    opener.redirectAfter(window, '{}');
+#                                </script>'''.format(url))                    
     else:
         obj = get_object_or_404(models.Dipendente, pk=object_id) 
         form = forms.DipendenteForm(instance=obj)
     
-    data = {"modelform": form, "action": action,}
+    data = {"modelform": form, "action": action, "dipendente": obj}
     return render_to_response(template,
                               data,
                               context_instance=RequestContext(request))
@@ -161,6 +164,8 @@ def del_object(request):
                               context_instance=RequestContext(request))
 
 def init_provvigione(request, object_id):
+    # FIXME: data licenziamento non è presa in considerazione
+    # da correggere, non ora però
     template = TMP_PROV
     
     dipendente = get_object_or_404(models.Dipendente, pk=object_id)
@@ -280,8 +285,15 @@ def add_retribuzione(request, object_id):
     dipendente_id = object_id 
     dipendente = get_object_or_404(models.Dipendente, pk=dipendente_id)
     
-    data_inizio = models.RetribuzioneDipendente.objects.get(dipendente=dipendente, 
-                                                            principale=True).data_inizio
+    # data_inizio indica la data di prima retribuzione/assunzione, cioè prima della quale
+    # non possono essere assegnate variazioni di retribuzione/variazioni temporanee
+    data_inizio = dipendente.data_assunzione.strftime("%d/%m/%Y")
+    # data_fine, se esiste, è la data di licenziamento del dipendente, cioè la data
+    # oltre la quale non è possibile assegnare variazioni di retribuzuione/variazioni temporanee
+    if dipendente.data_licenziamento:
+        data_fine = dipendente.data_licenziamento.strftime("%d/%m/%Y")
+    else:
+        data_fine = ""
             
     if request.method == "POST":
         post_query = request.POST.copy()
@@ -309,7 +321,8 @@ def add_retribuzione(request, object_id):
             "modelform": form, 
             "action": action, 
             "dipendente": dipendente,
-            "data_inizio": data_inizio.strftime("%d/%m/%Y"),}              
+            "data_inizio": data_inizio,
+            "data_fine": data_fine}              
     return render_to_response(template, 
                               data,
                               context_instance=RequestContext(request))    
@@ -320,6 +333,16 @@ def add_vartmp(request, object_id):
     
     dipendente_id = object_id 
     dipendente = get_object_or_404(models.Dipendente, pk=dipendente_id)
+
+    # data_inizio indica la data di prima retribuzione/assunzione, cioè prima della quale
+    # non possono essere assegnate variazioni di retribuzione/variazioni temporanee
+    data_inizio = dipendente.data_assunzione.strftime("%d/%m/%Y")
+    # data_fine, se esiste, è la data di licenziamento del dipendente, cioè la data
+    # oltre la quale non è possibile assegnare variazioni di retribuzuione/variazioni temporanee
+    if dipendente.data_licenziamento:
+        data_fine = dipendente.data_licenziamento.strftime("%d/%m/%Y")
+    else:
+        data_fine = ""
     
     if request.method == "POST":
         post_query = request.POST.copy()
@@ -401,14 +424,12 @@ def add_vartmp(request, object_id):
                                                          "provvigione_contratto": last_retribuzione.provvigione_contratto,
                                                          "provvigione_bonus": last_retribuzione.provvigione_bonus,},)
 
-    data_inizio = models.RetribuzioneDipendente.objects.get(dipendente=dipendente, 
-                                                            principale=True).data_inizio
-
     data = {"tipo":"tmp",
             "modelform": form, 
             "action": action, 
             "dipendente": dipendente,
-            "data_inizio": data_inizio.strftime("%d/%m/%Y"),}              
+            "data_inizio": data_inizio,
+            "data_fine": data_fine}              
     return render_to_response(template, 
                               data,
                               context_instance=RequestContext(request))

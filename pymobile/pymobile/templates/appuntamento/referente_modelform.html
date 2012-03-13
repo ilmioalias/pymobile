@@ -1,4 +1,4 @@
-{% extends "popup_base.html" %}      
+{% extends "popup_base.html" %}
 
 {% block extrahead %}
 <title>PYMOBILE | Appuntamento</title> 
@@ -6,11 +6,22 @@
 {% endblock %}
 
 {% block header %} 
-<h2>Amministrazione Appuntamenti | {{ action }} Referente</h2>
+<h2>Amministrazione Appuntamenti | {% if action == "add" %}Aggiungi{% else %}Modifica{% endif %} Referente</h2>
 {% endblock %}
 
 {% block content %}
 {% load tags %}
+{% if action == "mod" %}
+<div class="navigation">
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../../">home</a> &gt;
+		<a href="../">amministrazione appuntamenti</a> &gt;
+		<a href="{% url view_appuntamento appuntamento.pk %}">{{ appuntamento }}</a> &gt;
+		<a href=".">modifica referente</a>
+	</fieldset>
+</div>
+{% endif %}
 <div class="modelform_div">
 	<form class="modelform" action="." method="post">
 		<div class="modelform_fieldset_div">
