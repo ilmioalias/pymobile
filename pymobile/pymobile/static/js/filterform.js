@@ -9,4 +9,4 @@ $(document).ready(function(){
 	$("#id_tipo").combobox();
 	$("#id_fascia").combobox();
 	$("#id_servizio").combobox();
-})
+});

@@ -3,15 +3,10 @@
 from django.http import HttpResponse          
 from django.shortcuts import render_to_response, HttpResponseRedirect, get_object_or_404
 from django.template import RequestContext
-#from django.template.loader import render_to_string
-from django.db.models import Q
-#from django.utils import simplejson
 from django.core.urlresolvers import reverse
 from django.db.models.loading import get_model
-#from django.views.generic.simple import redirect_to
-#from django.forms.models import inlineformset_factory
+from django.contrib import messages
 
-import operator
 import pymobile.administration.models as models
 import pymobile.administration.forms as forms
 import pymobile.administration.tables as tables
@@ -67,16 +62,12 @@ def add_object(request):
         
         if form.is_valid():
             form.save()
-        
+            
+            messages.add_message(request, messages.SUCCESS, 'Tariffa aggiunta')
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_tariffa")) 
             else:
                 return HttpResponseRedirect(reverse("init_tariffa"))
-#                url = reverse("init_tariffa")
-#                return HttpResponse('''
-#                                <script type='text/javascript'>
-#                                    opener.redirectAfter(window, '{}');
-#                                </script>'''.format(url))
     else:
         form = forms.TariffaForm()    
 
@@ -97,16 +88,12 @@ def mod_object(request, object_id):
         if form.is_valid():
             form.save()
             
+            messages.add_message(request, messages.SUCCESS, 'Tariffa modificata')
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_tariffa")) 
             else:
                 return HttpResponseRedirect(reverse("view_tariffa", 
                                                     args=[object_id]))
-#                url = reverse("view_tariffa", args=[object_id])
-#                return HttpResponse('''
-#                                <script type='text/javascript'>
-#                                    opener.redirectAfter(window, '{}');
-#                                </script>'''.format(url))                
     else:
         obj = get_object_or_404(models.Tariffa, pk=object_id) 
         form = forms.TariffaForm(instance=obj)
@@ -128,6 +115,10 @@ def del_object(request):
             models.Tariffa.objects.filter(id__in=ids).delete()
             url = reverse("init_tariffa")
             
+            if len(ids) == 1:
+                messages.add_message(request, messages.SUCCESS, 'Tariffa eliminata')
+            elif len(ids) > 1:
+                messages.add_message(request, messages.SUCCESS, 'Tariffe eliminate')
             return HttpResponse('''
                 <script type='text/javascript'>
                     opener.redirectAfter(window, '{}');
@@ -224,7 +215,7 @@ def init_attribute(request, attribute):
 
 def add_attribute(request, attribute):  
     template = "tariffa/attribute_modelform.html"
-    action = "Aggiungi"
+    action = "add"
     
     if request.method == "POST":
         post_query = request.POST.copy()
@@ -232,17 +223,16 @@ def add_attribute(request, attribute):
         
         if form.is_valid():
             form.save()
-        
+            
+            if attribute == "servizio":
+                messages.add_message(request, messages.SUCCESS, '{} aggiunto'.format(attribute.title()))
+            else:
+                messages.add_message(request, messages.SUCCESS, '{} aggiunta'.format(attribute.title()))
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_tariffa")) 
             else:
                 return HttpResponseRedirect(reverse("init_attribute", 
                                                     args=[attribute]))
-#                url = reverse("init_attribute", args=[attribute])
-#                return HttpResponse('''
-#                                <script type='text/javascript'>
-#                                    opener.redirectAfter(window, '{}');
-#                                </script>'''.format(url))
     else:
         form = u.get_form(attribute + "tariffaform")()
 
@@ -253,7 +243,7 @@ def add_attribute(request, attribute):
 
 def mod_attribute(request, attribute, object_id):
     template = "tariffa/attribute_modelform.html"
-    action = "Modifica"
+    action = "mod"
     model = get_model("administration", attribute + "tariffa")
     
     if request.method == "POST":
@@ -263,17 +253,16 @@ def mod_attribute(request, attribute, object_id):
     
         if form.is_valid():
             form.save()
-            
+
+            if attribute == "servizio":
+                messages.add_message(request, messages.SUCCESS, '{} modificato'.format(attribute.title()))
+            else:
+                messages.add_message(request, messages.SUCCESS, '{} modificata'.format(attribute.title()))            
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_tariffa")) 
             else:
                 return HttpResponseRedirect(reverse("init_attribute", 
                                                     args=[attribute]))
-#                url = reverse("init_attribute", args=[attribute])
-#                return HttpResponse('''
-#                                <script type='text/javascript'>
-#                                    opener.redirectAfter(window, '{}');
-#                                </script>'''.format(url))                
     else:
         obj = get_object_or_404(model, pk=object_id)         
         form = u.get_form(attribute + "tariffaform")(instance=obj)
@@ -294,8 +283,18 @@ def del_attribute(request, attribute):
             # cancelliamo
             ids = query_post.getlist("id")
             model.objects.filter(id__in=ids).delete()
-            url = reverse("init_attribute")
             
+            if attribute == "servizio" :
+                if len(ids) == 1:
+                    messages.add_message(request, messages.SUCCESS, 'Servizio eliminato')
+                elif len(ids) > 1:
+                    messages.add_message(request, messages.SUCCESS, 'Servizi eliminati')
+            else:
+                if len(ids) == 1:
+                    messages.add_message(request, messages.SUCCESS, '{} eliminata'.format((attribute[:-1] + "e").title()))
+                elif len(ids) > 1:
+                    messages.add_message(request, messages.SUCCESS, '{} eliminate'.format((attribute[:-1] + "e").title()))
+            url = reverse("init_attribute", args=[attribute,])
             return HttpResponse('''
                 <script type='text/javascript'>
                     opener.redirectAfter(window, '{}');

@@ -12,6 +12,8 @@
  	<script type="text/javascript" src="{{ STATIC_URL }}/js/jquery-ui-1.8.17.custom.min.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}/js/anytime.js"></script> 
    	<script type="text/javascript" src="{{ STATIC_URL }}/js/combobox.js"></script>
+   	<script type="text/javascript" src="{{ STATIC_URL }}/js/messages.js"></script>
+
    		
   	{% block extrahead %}{% endblock %}
 </head>
@@ -36,6 +38,16 @@
 		{% block extraleft_bar %}{% endblock %}
 	</div>
   	<div id="content">
+  		{% if messages %}
+		<div class="messages">
+			<fieldset>
+			<legend>Messaggi</legend>
+		    	{% for message in messages %}
+		    	<p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+		    	{% endfor %}
+		    </fieldset>
+		</div>
+		{% endif %}
   		{% block content %}{% endblock %}
 	</div>
 </body>

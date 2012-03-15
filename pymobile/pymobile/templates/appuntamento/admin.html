@@ -32,15 +32,17 @@
 							<option value="assign">Assegna</option>
 						</select>
 						{% if agenti %}
-							<select class="assign" style="display: none;">
+						<span class="assign"  style="display: none;">
+							<select id="id_assign">
 								{% for agente in agenti %}
 									<option value="{{ agente.id }}">{{ agente }}</option>
 								{% endfor %}		
 							</select>
+						</span>
 						{% else %}
-							<span class="assign" style="display: none;">
-								Nessun Agente presente nel database
-							</span>	
+						<span class="assign" style="display: none;">
+							Nessun Agente presente nel database
+						</span>	
 						{% endif %}
 						<button class="modeltable_actions_ok">Ok</button>
 	</div>	

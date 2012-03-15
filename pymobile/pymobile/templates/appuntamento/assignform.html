@@ -1,7 +1,8 @@
 {% extends "popup_base.html" %}      
 
 {% block extrahead %}
-<title>PYMOBILE | Appuntamenti</title> 
+<title>PYMOBILE | Appuntamenti</title>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/assignform.js"></script> 
 {% endblock %}
 
 {% block header %} 
@@ -41,6 +42,7 @@
 	</ul>
 	<input type="hidden" name="agente" value="{{ agente.id }}"/>
 	<input type="submit" value="Salva" />
+	<input type="submit" class="save_and_send_mail" value="Salva e invia Mail">
 	<button onclick="window.close()">Annulla</button>
 </form>
 {% endblock %}

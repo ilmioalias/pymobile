@@ -1,0 +1,25 @@
+{% extends "popup_base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Appuntamenti</title>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/assignform.js"></script> 
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Appuntamenti | Invia EMail</h2>
+{% endblock %}
+
+{% block content %}
+<form action="{% url send_mail_appuntamento appuntamento.id %}" method="POST">
+	{% csrf_token %}	
+	<span>Sei sicuro di voler inviare l'email di notiifca all'agente <b>{{ agente }}</b> assegnato al seguente appuntamento</span>
+	<ul>
+		<li>
+			<b>{{ appuntamento }}</b>
+		</li>
+	</ul>
+	<input type="hidden" name="agente" value="{{ agente.id }}"/>
+	<input type="submit" value="Invia" />
+	<button onclick="window.close()">Annulla</button>
+</form>
+{% endblock %}

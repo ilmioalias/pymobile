@@ -14,14 +14,19 @@
 
 {% block content %}
 <div class="navigation">
-	<a href="../">home</a> &gt;
-	<a href="../">statistiche</a> &gt;
-	<a href="../">classifiche</a> &gt;
-	<a href=".">canvas agenti: edison</a>
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../">home</a> &gt;
+		<a href="../">statistiche</a> &gt;
+		<a href="../">classifiche</a> &gt;
+		<a href=".">canvas agenti: edison</a>
+	</fieldset>
 </div>
 <div id="reporttable_div">
-	<p class="reporttable_name"><b>Canvas Agenti: Edison</b></p>
-	{% include "statistiche/reporttable_snippet.html" %}
+	{% load django_tables2 %}
+	<p><b>Periodo</b>: da <b>{{ period.0 }}</b> a <b>{{ period.1 }}</b></p>
+	<p class="reporttable_name">Tabella Canvas Edison</p>
+	{% render_table table %}
 </div>
 {% endblock %}
 

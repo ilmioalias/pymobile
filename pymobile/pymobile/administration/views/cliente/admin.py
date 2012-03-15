@@ -3,15 +3,9 @@
 from django.http import HttpResponse          
 from django.shortcuts import render_to_response, HttpResponseRedirect, get_object_or_404
 from django.template import RequestContext
-#from django.template.loader import render_to_string
-from django.db.models import Q
-#from django.utils import simplejson
 from django.core.urlresolvers import reverse
-#from django.db.models.loading import get_model
-#from django.views.generic.simple import redirect_to
-#from django.forms.models import inlineformset_factory
+from django.contrib import messages
 
-import operator
 import pymobile.administration.models as models
 import pymobile.administration.forms as forms
 import pymobile.administration.tables as tables
@@ -67,7 +61,8 @@ def add_object(request):
         
         if form.is_valid():
             form.save()
-        
+            
+            messages.add_message(request, messages.SUCCESS, 'Cliente aggiunto')
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_cliente")) 
             else:
@@ -96,6 +91,7 @@ def mod_object(request, object_id):
         if form.is_valid():
             form.save()
             
+            messages.add_message(request, messages.SUCCESS, 'Cliente modificato')
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_cliente")) 
             else:
@@ -123,8 +119,12 @@ def del_object(request):
             # cancelliamo
             ids = query_post.getlist("id")
             models.Cliente.objects.filter(id__in=ids).delete()
-            url = reverse("init_cliente")
             
+            if len(ids) == 1:
+                messages.add_message(request, messages.SUCCESS, 'Cliente elimnato')
+            elif len(ids) > 1:
+                messages.add_message(request, messages.SUCCESS, 'Clienti eliminati')
+            url = reverse("init_cliente")
             return HttpResponse('''
                 <script type='text/javascript'>
                     opener.redirectAfter(window, '{}');

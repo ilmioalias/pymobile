@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-#import operator
 from django.http import HttpResponse 
 import pymobile.administration.utils as u
 import pymobile.administration.models as models
@@ -123,8 +122,16 @@ def canvas_obiettivo_trimestrale(request):
         rows.append(row)
         date_cur += timedelta(1)
     
+    for obiettivo in obiettivi:
+        diff = obiettivo.punteggio - totals[obiettivo.denominazione]["punteggio"]
+        if diff < 0:
+            totals[obiettivo.denominazione]["msg"] = "Obiettivo raggiunto (+{})".format(diff)
+        elif diff == 0:
+            totals[obiettivo.denominazione]["msg"] = "Obiettivo raggiunto"
+        else:
+            totals[obiettivo.denominazione]["msg"] = "Per raggiungere l'obiettivo mancano {} punti".format(diff)    
+            
     if request.is_ajax():
-        template = TMP_TABLE
         data = {"rows": rows, "obiettivi": obiettivi, "period": period, "totali": totals}
         return render_to_response(template,
                                   data,
@@ -198,82 +205,6 @@ def init_obiettivo_trimestrale(request):
     return render_to_response(template, data,
                               context_instance=RequestContext(request))
 
-    
-#    # FIXME: aggiungere scelta periodi, per ora solo quarto corrente
-#    period = u.get_current_quarter()
-#    
-#    obiettivi = models.Obiettivo.objects.filter(Q(data_fine__gte=period[1]) \
-#                                                | Q(data_fine__isnull=True),
-#                                                data_inizio__lte=period[0],)
-#    
-#    # creaiamo un dizionario con tutte le variazioni e le retribuzioni
-#    objs = {}
-#    # variazioni
-#    if obiettivi.exists():
-#        denominazioni = obiettivi.values_list("denominazione")
-#        
-#        today = datetime.today().date()
-#        
-#        date_max = obiettivi[0].data_inizio if obiettivi[0].data_inizio > today else today
-#        date_min = obiettivi[obiettivi.count() - 1].data_inizio
-#
-#        for obiettivo in obiettivi:
-#            date_cur = obiettivo.data_inizio
-#            k = date_cur.strftime("%Y-%m-%d")
-#            if k in objs:
-#                objs[k].append(obiettivo)
-#            else:
-#                objs[k] = [obiettivo,]
-#    else:
-#        today = datetime.today()
-#        y = today.year
-#        date_max = date(y, 10, 31)
-#        date_min = date(y, 1, 1)
-#    
-#    # creiamo i dati per la tabella della gestion obiettivi 
-#    rows = [] 
-#    date_cur = date_max
-#    while date_cur >= date_min:
-#        month_cur = date_cur.month
-#        year_cur = date_cur.year
-#        
-#        if 1 <= month_cur <= 3:
-#            quarter_cur = (1, (date(year_cur, 1, 1), date(year_cur, 3, 31)))
-#        elif 4 <= month_cur <= 6:
-#            quarter_cur = (2, (date(year_cur, 4, 1), date(year_cur, 6, 30)))
-#        elif 7 <= month_cur <= 9:
-#            quarter_cur = (3, (date(year_cur, 7, 1), date(year_cur, 9, 30)))
-#        elif 10 <= month_cur <= 12:
-#            quarter_cur = (4, (date(year_cur, 10, 1), date(year_cur, 12, 31)))
-#        
-#        k = date_cur.strftime("%Y-%m-%d")
-#        if not k in objs:
-#            rows.append({"anno": year_cur, "quarto": quarter_cur})
-#        else:
-#            rows.append({"anno": year_cur, "quarto": quarter_cur, "obiettivo": objs[k]})
-#        
-#        # aggiorniamo il contatore della data "date_cur"
-#        month_cur -= 3 
-#        if month_cur < 0:
-#            # il conto è alla rovescia, dalla data più recente a quella meno recente
-#            # scaliamo di 3 mesi in 3 mesi, quando arriviamo a gennaio dobbiamo
-#            # scalare di un anno
-#            month_cur = 10 # ottobre
-#            year_cur = year_cur - 1
-#        date_cur = date(year_cur, month_cur, 1)
-#        
-#    if request.is_ajax():
-#        template = TMP_TABLE
-#        data = {"rows": rows, "period": (date_min, date_max)}
-#        return render_to_response(template,
-#                                  data,
-#                                  context_instance=RequestContext(request))        
-#    
-#    data = {"rows": rows, "period": (date_min, date_max)}
-#    return render_to_response(template,
-#                              data,
-#                              context_instance=RequestContext(request))
-
 def add_obiettivo_trimestrale(request):  
     template = TMP_FORM
     action = "add"
@@ -289,11 +220,6 @@ def add_obiettivo_trimestrale(request):
                 return HttpResponseRedirect(reverse("add_obiettivo_trimestrale")) 
             else:
                 return HttpResponseRedirect(reverse("init_obiettivo_trimestrale"))
-#                url = reverse("init_obiettivo_trimestrale")
-#                return HttpResponse('''
-#                    <script type='text/javascript'>
-#                        opener.redirectAfter(window, '{}');
-#                    </script>'''.format(url))   
     else:
         form = forms.ObiettivoForm()    
         
@@ -319,11 +245,6 @@ def mod_obiettivo_trimestrale(request, object_id):
             else:
                 return HttpResponseRedirect(reverse("init_obiettivo_trimestrale", 
                                                     args=[object_id]))
-#                url = reverse("init_obiettivo_trimestrale", args=[object_id])
-#                return HttpResponse('''
-#                    <script type='text/javascript'>
-#                        opener.redirectAfter(window, '{}');
-#                    </script>'''.format(url))                    
     else:
         obj = get_object_or_404(models.Obiettivo, pk=object_id) 
         form = forms.ObiettivoForm(instance=obj)

@@ -13,6 +13,13 @@ var modifyObj = function(j_obj){
 	win.focus();
 };
 
+var sendMail = function(j_obj){
+	var href = j_obj.attr("href");
+	var name = j_obj.attr("id").replace(/^del_/, "");
+	var win = window.open(href, name, 'height=600,width=800,resizable=yes,scrollbars=yes');
+	win.focus();
+};
+
 var cancel = function(){
 	window.opener.location.reload(true);
 	window.close();
@@ -27,6 +34,10 @@ $(document).ready(function(){
 	$(".deleteobj").click(function(e){
 		e.preventDefault();
 		deleteObj($(this));
+	});
+	$(".send_mail").click(function(e){
+		e.preventDefault();
+		sendMail($(this));
 	});
 	// $(".modifyobj").click(function(e){
 		// e.preventDefault();

@@ -125,19 +125,24 @@ def canvas_tim_telecom(request):
     table = tables.CanvasTable(objs, order_by=(ordering,))
     
     if request.is_ajax():
-        data = {"reporttable": table, 
+#        template = "statistiche/reporttable_snippet.html"
+        data = {"table": table, 
                 "totals": totals, 
-                "period": (period[0].strftime("%d/%m/%Y"), period[1].strftime("%d/%m/%Y"))}
-        return render_to_response("statistiche/reporttable_snippet.html", data,
+                "period": (period[0].strftime("%d/%m/%Y"), 
+                           period[1].strftime("%d/%m/%Y"))}
+        return render_to_response(template, 
+                                  data,
                                   context_instance=RequestContext(request))   
     
     filterform = forms.CanvasFilterForm()
     
-    data = {"reporttable": table, 
+    data = {"table": table, 
             "totals": totals,
             "filterform": filterform,
-            "period": (period[0].strftime("%d/%m/%Y"), period[1].strftime("%d/%m/%Y"))}
-    return render_to_response(template, data,
+            "period": (period[0].strftime("%d/%m/%Y"), 
+                       period[1].strftime("%d/%m/%Y"))}
+    return render_to_response(template, 
+                              data,
                               context_instance=RequestContext(request))    
     
 def canvas_edison(request):
@@ -223,17 +228,22 @@ def canvas_edison(request):
     table = tables.CanvasEdisonTable(objs, order_by=(ordering,))
     
     if request.is_ajax():
-        data = {"reporttable": table, 
+#        template = "statistiche/reporttable_snippet.html"
+        data = {"table": table, 
                 "totals": totals, 
-                "period": (period[0].strftime("%d/%m/%Y"), period[1].strftime("%d/%m/%Y"))}
-        return render_to_response("statistiche/reporttable_snippet.html", data,
+                "period": (period[0].strftime("%d/%m/%Y"), 
+                           period[1].strftime("%d/%m/%Y"))}
+        return render_to_response(template, 
+                                  data,
                                   context_instance=RequestContext(request))    
     
     filterform = forms.CanvasFilterForm()
     
-    data = {"canvastable": table, 
+    data = {"table": table, 
             "filterform": filterform,
-            "period": (period[0].strftime("%d/%m/%Y"), period[1].strftime("%d/%m/%Y"))}
-    return render_to_response(template, data,
+            "period": (period[0].strftime("%d/%m/%Y"), 
+                       period[1].strftime("%d/%m/%Y"))}
+    return render_to_response(template, 
+                              data,
                               context_instance=RequestContext(request))       
     

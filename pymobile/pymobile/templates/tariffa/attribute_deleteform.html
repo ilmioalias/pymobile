@@ -9,7 +9,7 @@
 {% endblock %}
 
 {% block content %}
-<form action="{% url del_tariffa %}" method="POST">
+<form action="{% url del_attribute attributo %}" method="POST">
 	{% csrf_token %}
 	{% if attributo == "tipologia" %}
 	<span>Sei sicuro di voler eliminare le seguenti tipologie:</span>
@@ -28,7 +28,6 @@
 		</li>
 	{% endfor %}
 	</ul>
-<!-- 	<input type="hidden" name="id_obj" value="{{ obj.id }}" /><br /> -->
 	<input type="submit" value="Continua" />
 	<button onclick="window.close()">Annulla</button>
 </form>
