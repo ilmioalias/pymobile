@@ -33,8 +33,8 @@ class NullColumn(tables.Column):
 class DipendenteTable(tables.Table):
     TMP_OP='''
         {% load tags %}
-        <a id="view_id_{{ record.pk }}" href="{% url view_dipendente record.pk %}">Visualizza</a>
-        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_dipendente %}?id={{ record.pk }}">Elimina</a>
+        <a id="view_id_{{ record.pk }}" href="{% url view_dipendente record.pk %}">visualizza</a>
+        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_dipendente %}?id={{ record.pk }}">elimina</a>
     '''    
 #    TMP_PRO='''
 #        {{ record.provvigione }}{% if record.ruolo == "agt" %}% (x contratto){% else %}€ (x appuntamento){% endif %}
@@ -103,8 +103,8 @@ class RetribuzioneTable(tables.Table):
 class ClienteTable(tables.Table):
     TMP_OP='''
         {% load tags %}
-        <a id="view_id_{{ record.pk }}" href="{% url view_cliente record.pk %}">Visualizza</a>
-        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_cliente %}?id={{ record.pk }}">Elimina</a>
+        <a id="view_id_{{ record.pk }}" href="{% url view_cliente record.pk %}">visualizza</a>
+        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_cliente %}?id={{ record.pk }}">elimina</a>
     '''
     
     blindato = BooleanColumn()    
@@ -125,7 +125,7 @@ class TipologiaTariffaTable(tables.Table):
     TMP_OP='''
         {% load tags %}
         <a id="mod_id_{{ record.pk }}" class="modifyrow" href="{% url mod_attribute "tipologia" record.pk %}">Modifica</a>
-        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_attribute "tipologia" %}?id={{ record.pk }}">Elimina</a>
+        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_attribute "tipologia" %}?id={{ record.pk }}">elimina</a>
     '''
     
     selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
@@ -145,7 +145,7 @@ class FasciaTariffaTable(tables.Table):
     TMP_OP='''
         {% load tags %}
         <a id="mod_id_{{ record.pk }}" class="modifyrow" href="{% url mod_attribute "fascia" record.pk %}">Modifica</a>
-        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_attribute "fascia" %}?id={{ record.pk }}">Elimina</a>
+        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_attribute "fascia" %}?id={{ record.pk }}">elimina</a>
     '''
 
     selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
@@ -165,7 +165,7 @@ class ServizioTariffaTable(tables.Table):
     TMP_OP='''
         {% load tags %}
         <a id="mod_id_{{ record.pk }}" class="modifyrow" href="{% url mod_attribute "servizio" record.pk %}">Modifica</a>
-        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_attribute "servizio" %}?id={{ record.pk }}">Elimina</a>
+        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_attribute "servizio" %}?id={{ record.pk }}">elimina</a>
     '''
 
     selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
@@ -184,8 +184,8 @@ class ServizioTariffaTable(tables.Table):
 class TariffaTable(tables.Table):
     TMP_OP='''
         {% load tags %}
-        <a id="view_id_{{ record.pk }}" href="{% url view_tariffa record.pk %}">Visualizza</a>
-        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_tariffa %}?id={{ record.pk }}">Elimina</a>
+        <a id="view_id_{{ record.pk }}" href="{% url view_tariffa record.pk %}">visualizza</a>
+        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_tariffa %}?id={{ record.pk }}">elimina</a>
     '''
     
     tipo = NullColumn()
@@ -208,8 +208,8 @@ class TariffaTable(tables.Table):
 class AppuntamentoTable(tables.Table):
     TMP_OP='''
         {% load tags %}
-        <a id="view_id_{{ record.pk }}" href="{% url view_appuntamento record.pk %}">Visualizza</a>
-        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_appuntamento %}?id={{ record.pk }}">Elimina</a>
+        <a id="view_id_{{ record.pk }}" href="{% url view_appuntamento record.pk %}">visualizza</a>
+        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_appuntamento %}?id={{ record.pk }}">elimina</a>
     '''
     
     TMP_REF='''
@@ -264,8 +264,8 @@ class ContrattoTable(tables.Table):
     '''
     TMP_OP='''
         {% load tags %}
-        <a id="view_id_{{ record.pk }}" href="{% url view_contratto record.pk %}">Visualizza</a>
-        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_contratto %}?id={{ record.pk }}">Elimina</a>
+        <a id="view_id_{{ record.pk }}" href="{% url view_contratto record.pk %}">visualizza</a>
+        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_contratto %}?id={{ record.pk }}">elimina</a>
     '''
     
     cliente = tables.LinkColumn("view_cliente", args=[A("cliente.pk")],)
@@ -385,8 +385,8 @@ class OutTable(tables.Table):
 class ObiettivoTable(tables.Table):
     TMP_OP='''
         {% load tags %}
-        <a id="view_id_{{ record.pk }}" href="{% url view_obiettivo_trimestrale record.pk %}">Visualizza</a>
-        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_obiettivo_trimestrale %}?id={{ record.pk }}">Elimina</a>
+        <a id="view_id_{{ record.pk }}" href="{% url view_obiettivo_trimestrale record.pk %}">visualizza</a>
+        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_obiettivo_trimestrale %}?id={{ record.pk }}">elimina</a>
     '''
     
     data_fine = NullColumn()

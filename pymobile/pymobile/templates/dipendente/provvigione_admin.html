@@ -22,13 +22,20 @@
 		<a href=".">provvigione</a>
 	</fieldset>
 </div>
-<div id="modeltable_div">
+<div class="actions">
+	<fieldset>
+	<legend>Azioni</legend>
+		<a class="addrow" href="{% url add_retribuzione dipendente.pk %}">aggiungi retribuzione</a> |
+		<a class="addrow" href="{% url add_vartmp dipendente.pk %}">aggiungi variazione temporanea</a>
+	</fieldset>
+</div>
+<div id="modeltable_div"><!-- 
 	<a class="addrow" href="{% url add_retribuzione dipendente.pk %}">Aggiungi Retribuzione</a><br />
-	<a class="addrow" href="{% url add_vartmp dipendente.pk %}">Aggiungi Variazione Temporanea</a>
-	{% include "dipendente/provvigione_table_snippet.html" %}
+	<a class="addrow" href="{% url add_vartmp dipendente.pk %}">Aggiungi Variazione Temporanea</a> -->
+	{% include "dipendente/provvigione_table_snippet.html" %}<!-- 
 	<br />
 	<a class="addrow" href="{% url add_retribuzione dipendente.pk %}">Aggiungi Retribuzione</a><br />
-	<a class="addrow" href="{% url add_vartmp dipendente.pk %}">Aggiungi Variazione Temporanea</a>
+	<a class="addrow" href="{% url add_vartmp dipendente.pk %}">Aggiungi Variazione Temporanea</a> -->
 </div>
 {% endblock %}
 

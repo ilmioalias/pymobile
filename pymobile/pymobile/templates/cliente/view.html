@@ -20,12 +20,21 @@
 		<a href="./">{{ object }}</a>
 	</fieldset>
 </div>
+<div class="actions">
+	<fieldset>
+	<legend>Azioni</legend>
+		<a href="{% url init_appuntamento %}?fcliente=={{ object.id }}">visualizza appuntamenti</a> |
+		<a href="{% url init_contratto %}?fcliente=={{ object.id }}">visualizza contratti</a> |
+		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_cliente object.id %}">modifica</a> |
+		<a id="del_{{ object.id }}" class="deleteobj" href="{% url del_cliente %}?id={{ object.id }}">elimina</a>
+	</fieldset>
+</div><!-- 
 <div class="div_menu">
 	<ul id="menu_list">
 		<li><a href="{% url init_appuntamento %}?fcliente=={{ object.id }}">Visualizza Appuntamenti</a></li>
 		<li><a href="{% url init_contratto %}?fcliente=={{ object.id }}">Visualizza Contratti</a></li>	
 	</ul>
-</div>
+</div> -->
 <div class="div_detail">
 	<fieldset>
 	<legend>Dati Cliente</legend>
@@ -57,12 +66,12 @@
 			<tr><td>Nota</td><td>{{ object.nota }}</td></tr>
 			{% endif %}
 		</table>
-	</fieldset>
+	</fieldset><!-- 
 	<div class="op_detail">
 		<ul id="op_list">
 			<li><a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_cliente object.id %}">Modifica</a></li>
 			<li><a id="del_{{ object.id }}" class="deleteobj" href="{% url del_cliente %}?id={{ object.id }}">Cancella</a></li>
 		</ul>
-	</div>
+	</div> -->
 </div>
 {% endblock %}

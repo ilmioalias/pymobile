@@ -20,27 +20,30 @@
 		<a href=".">amministrazione tariffe</a>
 	</fieldset>
 </div>
-<div>
+<div class="actions">
 	<fieldset>
 	<legend>Azioni</legend>
+		<a class="addrow" href="{% url add_tariffa %}">aggiungi tariffa</a> |
 		<a href="{% url init_attribute "tipologia" %}">gestisci tipologie</a> |
 		<a href="{% url init_attribute "fascia" %}">gestisci fascie</a> |
 		<a href="{% url init_attribute "servizio" %}">gestisci servizi</a>
 	</fieldset>
 </div>
 <div id="modeltable_div">
-	<p class="modeltable_name"><b>Tabella delle Tariffe</b></p>
-	{% load django_tables2 %}
-	{% render_table modeltable %}
-	
-	<div class="modeltable_actions_div">
-		<img src="{{ STATIC_URL }}/img/freccia_sel.png" />
-		Se selezionati: <select class="modeltable_actions">
-							<option value="delete">Elimina</option>
-						</select>
-						<button class="modeltable_actions_ok">Ok</button>
-	</div>	
-	<a class="addrow" href="{% url add_tariffa %}">Aggiungi</a>
+	<fieldset>
+	<legend>Tabella delle tariffe</legend> 
+		{% load django_tables2 %}
+		{% render_table modeltable %}
+		
+		<div class="modeltable_actions_div">
+			<img src="{{ STATIC_URL }}/img/freccia_sel.png" />
+			Se selezionati: 
+			<select class="modeltable_actions">
+				<option value="delete">elimina</option>
+			</select>
+			<button class="modeltable_actions_ok">ok</button>
+		</div>	
+	</fieldset>
 </div>
 {% endblock %}
 

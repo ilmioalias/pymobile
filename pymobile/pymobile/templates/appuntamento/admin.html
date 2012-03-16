@@ -20,33 +20,41 @@
 		<a href=".">amministrazione appuntamenti</a>
 	</fieldset>
 </div>
+<div class="actions">
+	<fieldset>
+	<legend>Azioni</legend>
+		<a class="addrow" href="{% url add_appuntamento %}">aggiungi appuntamento</a>
+	</fieldset>
+</div>
 <div id="modeltable_div">
-	<p class="modeltable_name"><b>Tabella dei Appuntamenti</b></p>
-	{% load django_tables2 %}
-	{% render_table modeltable %}
-	
-	<div class="modeltable_actions_div">
-		<img src="{{ STATIC_URL }}/img/freccia_sel.png" />
-		Se selezionati: <select class="modeltable_actions">
-							<option value="delete">Elimina</option>
-							<option value="assign">Assegna</option>
-						</select>
-						{% if agenti %}
-						<span class="assign"  style="display: none;">
-							<select id="id_assign">
-								{% for agente in agenti %}
-									<option value="{{ agente.id }}">{{ agente }}</option>
-								{% endfor %}		
-							</select>
-						</span>
-						{% else %}
-						<span class="assign" style="display: none;">
-							Nessun Agente presente nel database
-						</span>	
-						{% endif %}
-						<button class="modeltable_actions_ok">Ok</button>
-	</div>	
-	<a class="addrow" href="{% url add_appuntamento %}">Aggiungi</a>
+	<fieldset>
+	<legend>Tabella degli appuntamenti</legend> 
+		{% load django_tables2 %}
+		{% render_table modeltable %}
+		
+		<div class="modeltable_actions_div">
+			<img src="{{ STATIC_URL }}/img/freccia_sel.png" />
+			<span>se selezionati:</span> 
+			<select class="modeltable_actions">
+				<option value="delete">elimina</option>
+				<option value="assign">assegna</option>
+			</select>
+			{% if agenti %}
+			<span class="assign"  style="display: none;">
+				<select id="id_assign">
+					{% for agente in agenti %}
+						<option value="{{ agente.id }}">{{ agente }}</option>
+					{% endfor %}		
+				</select>
+			</span>
+			{% else %}
+			<span class="assign" style="display: none;">
+				Nessun Agente presente nel database
+			</span>	
+			{% endif %}
+			<button class="modeltable_actions_ok">ok</button>
+		</div>
+	</fieldset>	
 </div>
 {% endblock %}
 

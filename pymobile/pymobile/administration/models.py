@@ -158,8 +158,8 @@ class Cliente(models.Model):
     TIPI = (("bus", "business"), ("pri", "privato"))
     
     denominazione= models.CharField(max_length=45, 
-                                    help_text="denominazione dell'impresa commerciale",
-                                    verbose_name="denominazione",
+                                    help_text="ragione sociale dell'impresa commerciale",
+                                    verbose_name="Ragione sociale",
                                     blank=True)
     cognome = models.CharField(max_length=45, blank=True, 
                                verbose_name="cognome")

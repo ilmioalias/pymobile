@@ -20,12 +20,19 @@
 		<a href="./">{{ object }}</a>
 	</fieldset>
 </div>
-<div class="div_menu">
+<div class="actions">
+	<fieldset>
+	<legend>Azioni</legend>
+		<a href="{% url init_contratto %}?fpiano_tariffario=={{ object.id }}">visualizza contratti</a> |
+		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_tariffa object.id %}">modifica</a> |
+		<a id="del_{{ object.id }}" class="deleteobj" href="{% url del_tariffa %}?id={{ object.id }}">elimina</a>
+	</fieldset>
+</div>
+<!-- <div class="div_menu">
 	<ul id="menu_list">
 		<li><a href="{% url init_contratto %}?fpiano_tariffario=={{ object.id }}">Visualizza Contratti</a></li>
 	</ul>
-</div>
-<div class="div_detail">
+</div> --><div class="div_detail">
 	<fieldset>
 	<legend>Dati Tariffa</legend>
 		<table class="table_detail">
@@ -43,12 +50,12 @@
 			<tr><td>Attivo</td><td>{% if object.attivo %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" />{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
 			<tr><td>Punteggio</td><td>{{ object.punteggio }}</td></tr>
 		</table>
-	</fieldset>
+	</fieldset><!-- 
 	<div class="op_detail">
 		<ul id="op_list">
 			<li><a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_tariffa object.id %}">Modifica</a></li>
 			<li><a id="del_{{ object.id }}" class="deleteobj" href="{% url del_tariffa %}?id={{ object.id }}">Cancella</a></li>
 		</ul>
-	</div>
+	</div> -->
 </div>
 {% endblock %}
