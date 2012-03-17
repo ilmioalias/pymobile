@@ -14,13 +14,36 @@
 
 {% block content %}
 <div class="navigation">
-	<a href="../">home</a> &gt;
-	<a href="../">statistiche</a> &gt;
-	<a href="../">finanze</a> &gt;
-	<a href=".">entrate/uscite</a>
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../">home</a> &gt;
+		<a href="{% url init_statistiche %}">statistiche</a> &gt;
+		<a href=".">economia: entrate/uscite</a>
+	</fieldset>
 </div>
 <div id="reporttable_div">
-	{% include "statistiche/entrate_uscite_table_snippet.html" %}
+	<fieldset>
+	<legend>Tabelle entrate/uscite <i>(da {{ period.0 }} a {{ period.1 }})</i></legend> 
+		{% load django_tables2 %}<!-- 
+		<p><b>Periodo</b>: da <b>{{ period.0 }}</b> a <b>{{ period.1 }}</b></p> --><!-- 
+		<p>Tabella Totali</p> -->
+		<fieldset>
+		<legend>Tabelle dei totali</legend>
+			{% render_table table %}
+		</fieldset>
+		<!-- 
+		<p>Tabella delle Entrate</p> -->
+		<fieldset>
+		<legend>Tabelle delle entrate</legend>
+			{% render_table table_in %}
+		</fieldset>
+		<!-- 
+		<p>Tabella delle Uscite</p> -->
+		<fieldset>
+		<legend>Tabelle delle uscite</legend>
+			{% render_table table_out %}
+		</fieldset>
+	</fieldset>
 </div>
 {% endblock %}
 

@@ -12,6 +12,8 @@
  	<script type="text/javascript" src="{{ STATIC_URL }}/js/jquery-ui-1.8.17.custom.min.js"></script>
 	<script type="text/javascript" src="{{ STATIC_URL }}/js/anytime.js"></script> 
    	<script type="text/javascript" src="{{ STATIC_URL }}/js/combobox.js"></script>
+   	<script type="text/javascript" src="{{ STATIC_URL }}/js/messages.js"></script>
+
    		
   	{% block extrahead %}{% endblock %}
 </head>
@@ -29,13 +31,23 @@
 				<li><a href="{% url init_tariffa %}">Amministrazione Tariffe</a></li>
 				<li><a href="{% url init_appuntamento %}">Amministrazione Appuntamenti</a></li>
 				<li><a href="{% url init_contratto %}">Amministrazione Contratti</a></li>
-				<li><a href="{% url canvas_tim_telecom %}">Statistiche</a></li>	
+				<li><a href="{% url init_statistiche %}">Statistiche</a></li>	
 			</ul>
 			</fieldset>
 		</div>
 		{% block extraleft_bar %}{% endblock %}
 	</div>
   	<div id="content">
+  		{% if messages %}
+		<div class="messages">
+			<fieldset>
+			<legend>Messaggi</legend>
+		    	{% for message in messages %}
+		    	<p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+		    	{% endfor %}
+		    </fieldset>
+		</div>
+		{% endif %}
   		{% block content %}{% endblock %}
 	</div>
 </body>

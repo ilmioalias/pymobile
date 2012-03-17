@@ -1,4 +1,4 @@
-{% extends "popup_base.html" %}      
+{% extends "base.html" %}      
 
 {% block extrahead %}
 <title>PYMOBILE | Dipendenti</title>
@@ -7,58 +7,73 @@
 
 {% block header %} 
 <h2>Amministrazione Dipendenti | 
-	{% if tipo == "ret" %}{{ action }} variazione della retribuzione di {{ dipendente }}{% endif %}
-	{% if tipo == "tmp" %}{{ action }} variazione temporanea della retribuzione di {{ dipendente }}{% endif %}
+	{% if tipo == "ret" %}{% if action == "mod" %}Modifica{% else %}Aggiungi{% endif %} variazione della retribuzione di {{ dipendente }}{% endif %}
+	{% if tipo == "tmp" %}{% if action == "mod" %}Modifica{% else %}Aggiungi{% endif %} variazione temporanea della retribuzione di {{ dipendente }}{% endif %}
 </h2>
 {% endblock %}
 
 {% block content %}
-	<div class="modelform_div">
- 		<input type="hidden" id="earliest" name="earliest" value="{{ data_inizio }}" />
-		<input type="hidden" id="latest" name="latest" value="{{ data_fine }}" />
-		<form class="modelform" action="." method="post">
-			<div class="modelform_fieldset_div">
-				<fieldset class="modelform_fieldset">
-				<legend>Dati Provvigione</legend>
-					{% csrf_token %}
-					{% for hidden_field in modelform.hidden_fields %}
-					   {{ hidden_field }}
-					{% endfor %}					
-					<table>
-						{% if modelform.non_field_errors %}
-						<tbody>
+<div class="navigation">
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../../../">home</a> &gt; 
+		<a href="{% url init_dipendente %}">amministrazione dipendenti</a> &gt;
+		<a href="{% url view_dipendente dipendente.pk %}">{{ dipendente }}</a> &gt;
+		<a href="{% url init_provvigione dipendente.pk %}">provvigione</a> &gt;
+		{% if tipo == "ret" %}
+		<a href=".">{% if action == "mod" %}modifica{% else %}aggiungi{% endif %} retribuzione di {{ dipendente }}</a>
+		{% endif %}
+		{% if tipo == "tmp" %}
+		<a href=".">{% if action == "mod" %}modifica{% else %}aggiungi{% endif %} variazione temporanea della retribuzione di {{ dipendente }}</a>
+		{% endif %}
+	</fieldset>
+</div>
+<div class="modelform_div">
+	<input type="hidden" id="earliest" name="earliest" value="{{ data_inizio }}" />
+	<input type="hidden" id="latest" name="latest" value="{{ data_fine }}" />
+	<form class="modelform" action="." method="post">
+		<div class="modelform_fieldset_div">
+			<fieldset class="modelform_fieldset">
+			<legend>Dati Provvigione</legend>
+				{% csrf_token %}
+				{% for hidden_field in modelform.hidden_fields %}
+				   {{ hidden_field }}
+				{% endfor %}					
+				<table>
+					{% if modelform.non_field_errors %}
+					<tbody>
+						<tr class="field_error">
+							<td colspan="2">{{ field.non_field_errors|first|safe }}</td>
+						</tr>					
+					</tbody>
+					{% endif %}					
+					{% for field in modelform.visible_fields %}
+					<tbody class="field">
+						{% if field.errors %}
 							<tr class="field_error">
-								<td colspan="2">{{ field.non_field_errors|first|safe }}</td>
-							</tr>					
-						</tbody>
-						{% endif %}					
-						{% for field in modelform.visible_fields %}
-						<tbody class="field">
-							{% if field.errors %}
-								<tr class="field_error">
-									<td></td><td>{{ field.errors|first|safe }}</td>
-								</tr>
-							{% endif %}
-							<tr class="{% if field.errors %}modelfield_error{% endif %}" >
-								<td>{{ field.label_tag }}</td>
-								<td>
-									{{ field }}
-								</td>
+								<td></td><td>{{ field.errors|first|safe }}</td>
 							</tr>
-							{% if field.help_text %}
-								<tr class="field_help">
-									<td></td><td>{{ field.help_text|safe }}</td>
-								</tr>
-							{% endif %}
-						</tbody>
-						{% endfor %}	
-					</table>
-				</fieldset>
-			</div>
-			<div class="submitrow">
-				<input type="submit" class="modelform_save" value="salva" />
-				<button onclick="window.close()">Annulla</button>
-			</div>
-		</form>
-	</div>
+						{% endif %}
+						<tr class="{% if field.errors %}modelfield_error{% endif %}" >
+							<td>{{ field.label_tag }}</td>
+							<td>
+								{{ field }}
+							</td>
+						</tr>
+						{% if field.help_text %}
+							<tr class="field_help">
+								<td></td><td>{{ field.help_text|safe }}</td>
+							</tr>
+						{% endif %}
+					</tbody>
+					{% endfor %}	
+				</table>
+			</fieldset>
+		</div>
+		<div class="submitrow">
+			<input type="submit" class="modelform_save" value="salva" />
+			<button onclick="window.close()">Annulla</button>
+		</div>
+	</form>
+</div>
 {% endblock %}

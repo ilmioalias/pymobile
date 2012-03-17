@@ -1,0 +1,47 @@
+{% extends "base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Statistiche</title>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/modeltable.js"></script> 
+{{ filterform.media }} 
+{% endblock %}
+
+{% block header %} 
+<h2>Gestione Statistiche</h2>
+{% endblock %}
+
+{% load tags %}
+
+{% block content %}
+<div class="navigation">
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../">home</a> &gt;
+		<a href=".">statistiche</a>
+	</fieldset>
+</div>
+<div class="actions">
+</div>
+<div>
+	<fieldset>
+	<legend>Men&ugrave;</legend>
+		<fieldset>
+		<legend>Classifiche</legend>
+			<a href="{% url canvas_tim_telecom %}">Canvas Tim-Telecom</a> <br />
+			<a href="{% url canvas_edison %}">Canvas Edison</a>	
+		</fieldset>
+		<fieldset>
+		<legend>Economia</legend>
+			<a href="{% url inout %}">Entrate/Uscite</a>
+		</fieldset>
+			<fieldset>
+		<legend>Obiettivi</legend>
+			<a href="{% url canvas_obiettivo_trimestrale %}">Situazione Obiettivi Trimestrali</a> <br />
+			<a href="{% url init_obiettivo_trimestrale %}">Gestione Obiettivi Trimestrali</a>	
+		</fieldset>
+	</fieldset>
+</div>
+{% endblock %}
+
+{% block extraleft_bar %}
+{% endblock %}

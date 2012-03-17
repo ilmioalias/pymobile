@@ -21,6 +21,12 @@
 		<a href=".">gestione {{ attributo }}</a>
 	</fieldset>
 </div>
+<div class="actions">
+	<fieldset>
+	<legend>Azioni</legend>
+		<a class="addrow" href="{% url add_attribute attributo %}">aggiungi {{ attributo }}</a>
+	</fieldset>
+</div>
 <div id="modeltable_div">
 	{% if attributo == "tipologia" %}
 	<p class="modeltable_name">Tabella delle Tipologie per le Tariffe</p>
@@ -35,12 +41,12 @@
 	{% render_table modeltable %}
 	<div class="modeltable_actions_div">
 		<img src="{{ STATIC_URL }}/img/freccia_sel.png" />
-		Se selezionati: <select class="modeltable_actions">
-							<option value="delete">Elimina</option>
-						</select>
-						<button class="modeltable_actions_ok">Ok</button>
+		Se selezionati: 
+		<select class="modeltable_actions">
+			<option value="delete">Elimina</option>
+		</select>
+		<button class="modeltable_actions_ok">Ok</button>
 	</div>	
-	<a class="addrow" href="{% url add_attribute attributo %}">Aggiungi</a>
 </div>
 {% endblock %}
 

@@ -15,24 +15,32 @@
 	<fieldset>
 	<legend>Sei qui</legend>
 		<a href="../../../">home</a> &gt; 
-		<a href="../../">statistiche</a> &gt;
-		<a href="{% url canvas_obiettivo_trimestrale %}">obiettivi trimestrali</a> &gt;
+		<a href="{% url init_statistiche %}">statistiche</a> &gt;
+		<a href="{% url canvas_obiettivo_trimestrale %}">obiettivi: obiettivi trimestrali</a> &gt;
 		<a href=".">amm. obiettivi trimestrali</a>
 	</fieldset>
 </div>
+<div class="actions">
+	<fieldset>
+	<legend>Azioni</legend>
+		<a class="addrow" href="{% url add_obiettivo_trimestrale %}">aggiungi obiettivo trimestrale</a>
+	</fieldset>
+</div>
 <div id="modeltable_div">
-	<p class="modeltable_name"><b>Tabella degli Obiettivi Trimestrali</b></p>
-	{% load django_tables2 %}
-	{% render_table modeltable %}
-	
+	<fieldset>
+	<legend>Tabella degli obiettivi trimestrali</legend><!--  
+	<p class="modeltable_name"><b>Tabella degli Obiettivi Trimestrali</b></p> -->
+		{% load django_tables2 %}
+		{% render_table modeltable %}
+	</fieldset>
 	<div class="modeltable_actions_div">
 		<img src="{{ STATIC_URL }}/img/freccia_sel.png" />
-		Se selezionati: <select class="modeltable_actions">
-							<option value="delete">Elimina</option>
-						</select>
-						<button class="modeltable_actions_ok">Ok</button>
+		Se selezionati: 
+		<select class="modeltable_actions">
+			<option value="delete">Elimina</option>
+		</select>
+		<button class="modeltable_actions_ok">Ok</button>
 	</div>	
-	<a class="addrow" href="{% url add_obiettivo_trimestrale %}">Aggiungi</a>
 </div>
 {% endblock %}
 

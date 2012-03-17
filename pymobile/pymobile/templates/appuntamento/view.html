@@ -20,13 +20,25 @@
 		<a href="./">appuntamento: {{ object }}</a>
 	</fieldset>
 </div>
+<div class="actions">
+	<fieldset>
+	<legend>Azioni</legend>
+		{% if object.agente %}
+		<a id="mail" class="send_mail" href="{% url send_mail_appuntamento object.id %}?agente={{ object.agente.id }}" title="invia email di notifica all'agente assegnato all'appuntamento">invia email</a> |
+		{% endif %}
+		<a id="del_{{ object.id }}" class="deleteobj" href="{% url del_appuntamento %}?id={{ object.id }}">modifica</a> |
+		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_appuntamento object.id %}">elimina</a>
+	</fieldset>
+</div><!-- 
 <div class="div_menu">
 	<ul id="menu_list">
 		<li>qualche azione</li>
 		<li>qualche azione</li>
-		<li>qualche azione</li>	
+		{% if object.agente %}
+		<li><a id="mail" class="send_mail" href="{% url send_mail_appuntamento object.id %}?agente={{ object.agente.id }}">invia mail all'agente assegnato</a></li>
+		{% endif %}	
 	</ul>
-</div>
+</div> -->
 <div class="div_detail">
 	<fieldset>
 	<legend>Dati Appuntamento</legend>
@@ -67,12 +79,12 @@
 			<tr><td>Nota sull'esito</td><td>{{ object.nota_esito }}</td></tr>
 			{% endif %}
 		</table>
-	</fieldset>
+	</fieldset><!-- 
 	<div class="op_detail">
 		<ul id="op_list">
 			<li><a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_appuntamento object.id %}">Modifica</a></li>
 			<li><a id="del_{{ object.id }}" class="deleteobj" href="{% url del_appuntamento %}?id={{ object.id }}">Cancella</a></li>
 		</ul>
-	</div>
+	</div> -->
 </div>
 {% endblock %}

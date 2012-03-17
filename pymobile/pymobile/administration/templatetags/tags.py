@@ -108,3 +108,12 @@ def get_punteggio(d, obiettivo):
         return d[key]["punteggio"]
     else:
         return ""
+    
+@register.filter(name="get_msg")
+def get_msg(d, obiettivo):
+    key = obiettivo.denominazione
+    if d.has_key(key):
+        return d[key]["msg"]
+    else:
+        return ""
+    

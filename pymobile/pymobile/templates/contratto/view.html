@@ -20,13 +20,21 @@
 		<a href="./">{{ object }}</a>
 	</fieldset>
 </div>
+<div class="actions">
+	<fieldset>
+	<legend>Azioni</legend>
+		<a href="#">Ottieni Copia Contratto</a>
+		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_contratto object.id %}">modifica</a> |
+		<a id="del_{{ object.id }}" class="deleteobj" href="{% url del_contratto %}?id={{ object.id }}">elimina</a>
+	</fieldset>
+</div><!-- 
 <div class="div_menu">
 	<ul id="menu_list">
 		<li><a href="#">Ottieni Copia Contratto</a></li>
 		<li>qualche azione</li>
 		<li>qualche azione</li>		
 	</ul>
-</div>
+</div> -->
 <div class="div_detail">
 	<fieldset>
 	<legend>Dati Contratto</legend>
@@ -72,11 +80,10 @@
 			{% endif %}
 		</table>
 	</fieldset>
-	<div class="op_detail">
+<!-- 	<div class="op_detail">
 		<ul id="op_list">
 			<li><a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_contratto object.id %}">Modifica</a></li>
 			<li><a id="del_{{ object.id }}" class="deleteobj" href="{% url del_contratto %}?id={{ object.id }}">Cancella</a></li>
 		</ul>
-	</div>
-</div>
+	</div> --></div>
 {% endblock %}

@@ -17,17 +17,17 @@
 	<legend>Sei qui</legend>
 		<a href="../../../../">home</a> &gt;
 		<a href="../../../">statistiche</a> &gt;
-		<a href="../../">obiettivi trimestrali</a> &gt; 
+		<a href="{% url canvas_obiettivo_trimestrale %}">obiettivi trimestrali</a> &gt; 
 		<a href="{% url init_obiettivo_trimestrale %}">amm. obiettivi trimestrali</a> &gt;
 		<a href=".">{{ object }}</a>
 	</fieldset>
 </div>
-<div class="div_menu">
-	<ul id="menu_list">
-		<li><a href="#">Qualche Azione</a></li>
-		<li><a href="#">Qualche Azione</a></li>
-		<li><a href="#">Qualche Azione</a></li>
-	</ul>
+<div class="actions">
+	<fieldset>
+	<legend>Azioni</legend>
+		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_obiettivo_trimestrale object.id %}">modifica</a> |
+		<a id="del_{{ object.id }}" class="deleteobj" href="{% url del_obiettivo_trimestrale %}?id={{ object.id }}">elimina</a>
+	</fieldset>
 </div>
 <div class="div_detail">
 	<fieldset>
@@ -45,12 +45,12 @@
 				{% endif %}
 			</tr>
 		</table>
-	</fieldset>
+	</fieldset><!-- 
 	<div class="op_detail">
 		<ul id="op_list">
 			<li><a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_obiettivo_trimestrale object.id %}">Modifica</a></li>
 			<li><a id="del_{{ object.id }}" class="deleteobj" href="{% url del_obiettivo_trimestrale %}?id={{ object.id }}">Cancella</a></li>
 		</ul>
-	</div>
+	</div> -->
 </div>
 {% endblock %}

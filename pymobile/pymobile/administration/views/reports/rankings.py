@@ -30,10 +30,6 @@ def canvas_tim_telecom(request):
     else:
         agenti = models.Dipendente.objects.filter(contratto__pk__in=contratti).distinct().iterator()
              
-    ordering = None
-    if request.method == "GET" and request.GET.has_key("sort"):
-        ordering = request.GET["sort"]
-    
     objs = []
     
     if contratti.exists(): 
@@ -122,22 +118,29 @@ def canvas_tim_telecom(request):
         punti_telecom += obj["punti_telecom"]
     totals = [sim, dati_opz, nip_ull, adsl, punti_tim, punti_telecom, punti_tim + punti_telecom]
     
-    table = tables.CanvasTable(objs, order_by=(ordering,))
+    table = tables.CanvasTable(objs)
+    table.paginate(page=request.GET.get("page", 1))
+    table.order_by = request.GET.get("sort")
     
     if request.is_ajax():
-        data = {"reporttable": table, 
+#        template = "statistiche/reporttable_snippet.html"
+        data = {"table": table, 
                 "totals": totals, 
-                "period": (period[0].strftime("%d/%m/%Y"), period[1].strftime("%d/%m/%Y"))}
-        return render_to_response("statistiche/reporttable_snippet.html", data,
+                "period": (period[0].strftime("%d/%m/%Y"), 
+                           period[1].strftime("%d/%m/%Y"))}
+        return render_to_response(template, 
+                                  data,
                                   context_instance=RequestContext(request))   
     
     filterform = forms.CanvasFilterForm()
     
-    data = {"reporttable": table, 
+    data = {"table": table, 
             "totals": totals,
             "filterform": filterform,
-            "period": (period[0].strftime("%d/%m/%Y"), period[1].strftime("%d/%m/%Y"))}
-    return render_to_response(template, data,
+            "period": (period[0].strftime("%d/%m/%Y"), 
+                       period[1].strftime("%d/%m/%Y"))}
+    return render_to_response(template, 
+                              data,
                               context_instance=RequestContext(request))    
     
 def canvas_edison(request):
@@ -159,10 +162,6 @@ def canvas_edison(request):
         agenti = models.Dipendente.objects.filter(contratto__pk__in=contratti).filter(pk__in=agenti_ids).distinct().iterator()
     else:
         agenti = models.Dipendente.objects.filter(contratto__pk__in=contratti).distinct().iterator()
-    
-    ordering = None
-    if request.method == "GET" and request.GET.has_key("sort"):
-        ordering = request.GET["sort"]
     
     objs = []
     
@@ -220,20 +219,27 @@ def canvas_edison(request):
         pri_gas += obj["pri_gas"]
     totals = [bus_en, pri_en, bus_gas, pri_gas, bus_en + pri_en + bus_gas + pri_gas]
  
-    table = tables.CanvasEdisonTable(objs, order_by=(ordering,))
+    table = tables.CanvasTable(objs)
+    table.paginate(page=request.GET.get("page", 1))
+    table.order_by = request.GET.get("sort")
     
     if request.is_ajax():
-        data = {"reporttable": table, 
+#        template = "statistiche/reporttable_snippet.html"
+        data = {"table": table, 
                 "totals": totals, 
-                "period": (period[0].strftime("%d/%m/%Y"), period[1].strftime("%d/%m/%Y"))}
-        return render_to_response("statistiche/reporttable_snippet.html", data,
+                "period": (period[0].strftime("%d/%m/%Y"), 
+                           period[1].strftime("%d/%m/%Y"))}
+        return render_to_response(template, 
+                                  data,
                                   context_instance=RequestContext(request))    
     
     filterform = forms.CanvasFilterForm()
     
-    data = {"canvastable": table, 
+    data = {"table": table, 
             "filterform": filterform,
-            "period": (period[0].strftime("%d/%m/%Y"), period[1].strftime("%d/%m/%Y"))}
-    return render_to_response(template, data,
+            "period": (period[0].strftime("%d/%m/%Y"), 
+                       period[1].strftime("%d/%m/%Y"))}
+    return render_to_response(template, 
+                              data,
                               context_instance=RequestContext(request))       
     

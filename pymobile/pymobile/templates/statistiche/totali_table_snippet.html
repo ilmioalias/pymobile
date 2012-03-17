@@ -1,0 +1,12 @@
+{% extends "django_tables2/table.html" %}
+
+{% block table.tfoot %}
+<tfoot id="totals_row">
+	<tr>
+		<td><b>Totali</b></td>
+		{% for tot in totals %}
+		<td>{{ tot }}</td>
+		{% endfor %}
+	</tr>
+</tfoot>   
+{% endblock %}

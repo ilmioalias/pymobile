@@ -3,19 +3,14 @@
 from django.http import HttpResponse          
 from django.shortcuts import render_to_response, HttpResponseRedirect, get_object_or_404
 from django.template import RequestContext
-#from django.template.loader import render_to_string
-from django.db.models import Q
-#from django.utils import simplejson
 from django.core.urlresolvers import reverse
-#from django.db.models.loading import get_model
-#from django.views.generic.simple import redirect_to
-#from django.forms.models import inlineformset_factory
-import operator
+from django.contrib import messages
+
 import pymobile.administration.models as models
 import pymobile.administration.forms as forms
 import pymobile.administration.tables as tables
 import pymobile.administration.utils as u
-from datetime import datetime, date, timedelta
+from datetime import datetime, timedelta
 from copy import deepcopy
 
 # Create your views here.
@@ -81,16 +76,12 @@ def add_object(request):
             if formset.is_valid():
                 form.save()
                 formset.save()        
-            
+                
+                messages.add_message(request, messages.SUCCESS, 'Dipendente aggiunto')
                 if request.POST.has_key("add_another"):              
                     return HttpResponseRedirect(reverse("add_dipendente")) 
                 else:
                     return HttpResponseRedirect(reverse("init_dipendente"))
-#                    url = reverse("init_dipendente")
-#                    return HttpResponse('''
-#                                    <script type='text/javascript'>
-#                                        opener.redirectAfter(window, '{}');
-#                                    </script>'''.format(url))   
         else:
             formset = forms.RetribuzioneFormset(post_query)
     else:
@@ -118,16 +109,12 @@ def mod_object(request, object_id):
         if form.is_valid():
             form.save()
             
+            messages.add_message(request, messages.SUCCESS, 'Dipendente modificato')
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_dipendente")) 
             else:
                 return HttpResponseRedirect(reverse("view_dipendente", 
                                                     args=[object_id]))
-#                url = reverse("view_dipendente", args=[object_id])
-#                return HttpResponse('''
-#                                <script type='text/javascript'>
-#                                    opener.redirectAfter(window, '{}');
-#                                </script>'''.format(url))                    
     else:
         obj = get_object_or_404(models.Dipendente, pk=object_id) 
         form = forms.DipendenteForm(instance=obj)
@@ -147,8 +134,12 @@ def del_object(request):
             # cancelliamo
             ids = query_post.getlist("id")
             models.Dipendente.objects.filter(id__in=ids).delete()
-            url = reverse("init_dipendente")
             
+            if len(ids) == 1:
+                messages.add_message(request, messages.SUCCESS, 'Dipendente eliminato')
+            elif len(ids) > 1:
+                messages.add_message(request, messages.SUCCESS, 'Dipendenti eliminati')
+            url = reverse("init_dipendente")
             return HttpResponse('''
                 <script type='text/javascript'>
                     opener.redirectAfter(window, '{}');
@@ -280,7 +271,7 @@ def init_provvigione(request, object_id):
 
 def add_retribuzione(request, object_id):
     template = TMP_PROV_CONTRATTO_FORM
-    action = "Aggiungi"
+    action = "add"
     
     dipendente_id = object_id 
     dipendente = get_object_or_404(models.Dipendente, pk=dipendente_id)
@@ -301,13 +292,9 @@ def add_retribuzione(request, object_id):
         
         if form.is_valid():
             form.save()
-        
-            url = reverse("init_provvigione", args=[dipendente_id])
-            return HttpResponse('''
-                            <script type='text/javascript'>
-                                opener.redirectAfter(window, '{}');
-                            </script>'''.format(url)) 
-    
+            
+            messages.add_message(request, messages.SUCCESS, 'Retribuzione aggiunta')
+            return HttpResponse(reverse("init_provvigione", args=[dipendente_id]))
     else:
         # recuperiamo le provvigioni iniziali, corrispondono a quelle della retribuzione precedente
         last_retribuzione = models.RetribuzioneDipendente.objects.filter(dipendente=dipendente,
@@ -329,7 +316,7 @@ def add_retribuzione(request, object_id):
 
 def add_vartmp(request, object_id):
     template = TMP_PROV_BONUS_FORM
-    action = "Aggiungi"
+    action = "add"
     
     dipendente_id = object_id 
     dipendente = get_object_or_404(models.Dipendente, pk=dipendente_id)
@@ -409,6 +396,7 @@ def add_vartmp(request, object_id):
                     vartmp_mod_f.update(data_inizio=t)
                 vartmp_new.save()
                 
+                messages.add_message(request, messages.SUCCESS, 'Variazione temporanea aggiunta')
                 url = reverse("init_provvigione", args=[dipendente_id])
                 return HttpResponse('''
                                 <script type='text/javascript'>
@@ -436,7 +424,7 @@ def add_vartmp(request, object_id):
 
 def mod_retribuzione(request, object_id, provvigione_id):
     template = TMP_PROV_CONTRATTO_FORM
-    action = "Modifica"
+    action = "mod"
     
     dipendente_id = object_id
     dipendente = get_object_or_404(models.Dipendente, pk=dipendente_id)
@@ -490,6 +478,7 @@ def mod_retribuzione(request, object_id, provvigione_id):
                         vartmp_mod.update(data_inizio=retr_new.data_inizio)
                     retr_new.save()
                     
+                    messages.add_message(request, messages.SUCCESS, 'Retribuzione modificata')
                     url = reverse("init_provvigione", args=[dipendente_id])
                     return HttpResponse('''
                                     <script type='text/javascript'>
@@ -497,7 +486,7 @@ def mod_retribuzione(request, object_id, provvigione_id):
                                     </script>'''.format(url))                                     
             else:
                 form.save()
-                    
+                 
                 url = reverse("init_provvigione", args=[dipendente_id])
                 return HttpResponse('''
                                 <script type='text/javascript'>
@@ -506,7 +495,6 @@ def mod_retribuzione(request, object_id, provvigione_id):
     else:
         form = forms.RetribuzioneForm(instance=obj)  
         
-    print(obj.principale)
     if obj.principale:
         data_inizio = ""
     else:
@@ -524,7 +512,7 @@ def mod_retribuzione(request, object_id, provvigione_id):
 
 def mod_vartmp(request, object_id, provvigione_id):
     template = TMP_PROV_BONUS_FORM
-    action = "Modifica"
+    action = "mod"
     
     dipendente_id = object_id
     dipendente = get_object_or_404(models.Dipendente, pk=dipendente_id)
@@ -593,7 +581,8 @@ def mod_vartmp(request, object_id, provvigione_id):
                     t = vartmp_new.data_fine + timedelta(1)
                     vartmp_mod_f.update(data_inizio=t)
                 vartmp_new.save()
-            
+                
+                messages.add_message(request, messages.SUCCESS, 'variazione temporanea modificata')
                 url = reverse("init_provvigione", args=[dipendente_id])
                 return HttpResponse('''
                                 <script type='text/javascript'>
@@ -628,6 +617,10 @@ def del_retribuzione(request, object_id):
             ids = query_post.getlist("id")
             models.RetribuzioneDipendente.objects.filter(id__in=ids).delete()
             
+            if len(ids) == 1:
+                messages.add_message(request, messages.SUCCESS, 'Retribuzione eliminata')
+            elif len(ids) > 1:
+                messages.add_message(request, messages.SUCCESS, 'Retribuzioni eliminate')
             url = reverse("init_provvigione", args=[dipendente_id])
             return HttpResponse('''
                 <script type='text/javascript'>
@@ -657,6 +650,10 @@ def del_vartmp(request, object_id):
             ids = query_post.getlist("id")
             models.RetribuzioneDipendente.objects.filter(id__in=ids).delete()
             
+            if len(ids) == 1:
+                messages.add_message(request, messages.SUCCESS, 'Variazione temporanea eliminata')
+            elif len(ids) > 1:
+                messages.add_message(request, messages.SUCCESS, 'Variazioni temporanee eliminate')
             url = reverse("init_provvigione", args=[dipendente_id])
             return HttpResponse('''
                 <script type='text/javascript'>

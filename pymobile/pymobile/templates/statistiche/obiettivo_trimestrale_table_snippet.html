@@ -1,70 +1,70 @@
 {% spaceless %}
 {% load tags %}
 <div class="table-container">
-<p><b>Periodo</b>: da <b>{{ period.0 }}</b> a <b>{{ period.1 }}</b></p>
-<table{% if table_in.attrs %} {{ table_in.attrs.as_html }}{% endif %}>
-    <thead>
-        <tr>
-        	<th>Anno</th>
-        	<th>mese</th>
-        	{% for obiettivo in obiettivi %}
-        	<th>
-        		<a href="{% url view_obiettivo_trimestrale obiettivo.pk %}">{{ obiettivo.denominazione }}</a><br />
-        		<i>Da raggiungere: {{ obiettivo.punteggio }}</i>
-        	</th>
-        	{% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in rows %}
-        <tr>
-        	{% if row.anno %}
-        	<td class="anno">
-        		<b>{{ row.anno }}</b>
-    		</td>
-    		{% else %}
-    		<td></td>
-    		{% endif %}
-    		{% if row.mese.0 or row.mese.1 %}
-        	<td class="{% if row.mese.0 %}mese {% endif %}{% if row.mese.1 %}oggi{% endif %}">
-        		{% if row.mese.0 %}
-        		<b>{{ row.mese.0 }}</b><br />
-        		{% endif %}
-        		{% if row.mese.1 %}
-        		<i>oggi ({{ row.mese.1 }})</i><br />
-        		{% endif %}
-    		</td>
-    		{% else %}
-    		<td></td>
-    		{% endif %}
-    		{% for obiettivo in obiettivi %}
-    			{% if row|get_inviati:obiettivo %}
-				<td>
-					<i>({{ row|get_data:obiettivo }})</i>  <br />
-					Inviati: <a href="{% url init_contratto %}?fdata_inviato=={{ row|get_data:obiettivo }}&finviato=!0">{{ row|get_inviati:obiettivo }}</a>, 
-					Punteggio: {{ row|get_punteggio:obiettivo }}
-				</td>
-				{% else %}
-				<td></td>
-				{% endif %}
-			{% endfor %}
-        </tr>
-        {% empty %}
-        <tr><td colspan="4">Tabella Vuota</td></tr>
-        {% endfor %}
-    </tbody>
-    <tfoot id="totals_row">
-    	<tr>
-    		<td></td>
-    		<td><b>Totali</b></td>
-    		{% for obiettivo in obiettivi %}
-    		<td>
-    			Inviati: {{ totali|get_inviati:obiettivo }}<br />
-    			Punteggio: {{ totali|get_punteggio:obiettivo }}
-    		</td>
-    		{% endfor %}
-    	</tr>
-    </tfoot>
-</table>
+	<table>
+	    <thead>
+	        <tr>
+	        	<th>Anno</th>
+	        	<th>mese</th>
+	        	{% for obiettivo in obiettivi %}
+	        	<th>
+	        		<a href="{% url view_obiettivo_trimestrale obiettivo.pk %}">{{ obiettivo.denominazione }}</a><br />
+	        		<i>Da raggiungere: {{ obiettivo.punteggio }} punti</i>
+	        	</th>
+	        	{% endfor %}
+	        </tr>
+	    </thead>
+	    <tbody>
+	        {% for row in rows %}
+	        <tr>
+	        	{% if row.anno %}
+	        	<td class="anno">
+	        		<b>{{ row.anno }}</b>
+	    		</td>
+	    		{% else %}
+	    		<td></td>
+	    		{% endif %}
+	    		{% if row.mese.0 or row.mese.1 %}
+	        	<td class="{% if row.mese.0 %}mese {% endif %}{% if row.mese.1 %}oggi{% endif %}">
+	        		{% if row.mese.0 %}
+	        		<b>{{ row.mese.0 }}</b><br />
+	        		{% endif %}
+	        		{% if row.mese.1 %}
+	        		<i>oggi ({{ row.mese.1 }})</i><br />
+	        		{% endif %}
+	    		</td>
+	    		{% else %}
+	    		<td></td>
+	    		{% endif %}
+	    		{% for obiettivo in obiettivi %}
+	    			{% if row|get_inviati:obiettivo %}
+					<td>
+						<i>({{ row|get_data:obiettivo }})</i>  <br />
+						Inviati: <a href="{% url init_contratto %}?fdata_inviato=={{ row|get_data:obiettivo }}&finviato=!0">{{ row|get_inviati:obiettivo }}</a>, 
+						Punteggio: {{ row|get_punteggio:obiettivo }}
+					</td>
+					{% else %}
+					<td></td>
+					{% endif %}
+				{% endfor %}
+	        </tr>
+	        {% empty %}
+	        <tr><td colspan="4">Tabella Vuota</td></tr>
+	        {% endfor %}
+	    </tbody>
+	    <tfoot id="totals_row">
+	    	<tr>
+	    		<td></td>
+	    		<td><b>Totali</b></td>
+	    		{% for obiettivo in obiettivi %}
+	    		<td>
+	    			Inviati: {{ totali|get_inviati:obiettivo }}<br />
+	    			Punteggio: {{ totali|get_punteggio:obiettivo }} <br />
+	    			<b><i>{{ totali|get_msg:obiettivo }}</i></b>
+	    		</td>
+	    		{% endfor %}
+	    	</tr>
+	    </tfoot>
+	</table>
 </div>
 {% endspaceless %}

@@ -3,20 +3,15 @@
 from django.http import HttpResponse          
 from django.shortcuts import render_to_response, HttpResponseRedirect, get_object_or_404
 from django.template import RequestContext
-#from django.template.loader import render_to_string
-from django.db.models import Q, SET_NULL
-#from django.utils import simplejson
 from django.core.urlresolvers import reverse
-#from django.db.models.loading import get_model
-#from django.views.generic.simple import redirect_to
-#from django.forms.models import inlineformset_factory
-from django.utils import simplejson
+from django.core.mail import send_mail
+from django.contrib import messages
 
-import operator
 import pymobile.administration.models as models
 import pymobile.administration.forms as forms
 import pymobile.administration.tables as tables
 import pymobile.administration.utils as u
+import datetime
 
 # Create your views here.
 
@@ -34,7 +29,13 @@ TMP_REFDELFORM="appuntamento/referente_deleteform.html"
 def init(request):
     template = TMP_ADMIN
     objs = models.Appuntamento.objects.all()
-    agenti = models.Dipendente.objects.filter(ruolo="agt")
+    # determiniamo gli agenti per l'assegnazione, devono essere solo quelli attivi 
+    # il giorno successivo
+    day = datetime.datetime.today().date() + datetime.timedelta(1)
+    agenti = models.Dipendente.objects.filter(ruolo="agt", 
+                                              data_assunzione__lte=day)\
+                                      .exclude(data_licenziamento__lt=day)
+    
     initial = {}
     pag = 1
     ordering = None
@@ -76,16 +77,12 @@ def add_object(request):
         
         if form.is_valid():
             form.save()
-        
+            
+            messages.add_message(request, messages.SUCCESS, 'Appuntamento aggiunto')
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_appuntamento")) 
             else:
                 return HttpResponseRedirect(reverse("init_appuntamento"))
-#                url = reverse("init_appuntamento")
-#                return HttpResponse('''
-#                                <script type='text/javascript'>
-#                                    opener.redirectAfter(window, '{}');
-#                                </script>'''.format(url))
     else:
         form = forms.AppuntamentoForm()    
 
@@ -106,16 +103,12 @@ def mod_object(request, object_id):
         if form.is_valid():
             form.save()
             
+            messages.add_message(request, messages.SUCCESS, 'Appuntamento modificato')
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_appuntamento")) 
             else:
                 return HttpResponseRedirect(reverse("view_appuntamento", 
                                                     args=[object_id]))
-#                url = reverse("view_appuntamento", args=[object_id])
-#                return HttpResponse('''
-#                                <script type='text/javascript'>
-#                                    opener.redirectAfter(window, '{}');
-#                                </script>'''.format(url))           
     else:
         obj = get_object_or_404(models.Appuntamento, pk=object_id) 
         form = forms.AppuntamentoForm(instance=obj)
@@ -135,8 +128,12 @@ def del_object(request):
             # cancelliamo
             ids = query_post.getlist("id")
             models.Appuntamento.objects.filter(id__in=ids).delete()
-            url = reverse("init_appuntamento")
             
+            if len(ids) > 1:
+                messages.add_message(request, messages.SUCCESS, 'Appuntamenti eliminati')
+            elif len(ids) == 1:
+                messages.add_message(request, messages.SUCCESS, 'Appuntamento eliminato')
+            url = reverse("init_appuntamento")
             return HttpResponse('''
                 <script type='text/javascript'>
                     opener.redirectAfter(window, '{}');
@@ -161,10 +158,35 @@ def assign_object(request):
             # assegnamo
             ids = query_post.getlist("id")
             agente_id = query_post["agente"]
+            agente = get_object_or_404(models.Dipendente, id=agente_id)
             
             models.Appuntamento.objects.filter(id__in=ids).update(agente=agente_id)
-            url = reverse("init_appuntamento")
             
+            if request.POST.has_key("send_mail"):
+                # inviamo l'email
+                to_email = agente.email
+                from_email = "agenzia"
+                subject = "Prossimi appuntamenti"
+                msg = "Appuntamenti assegnati:\n"
+                appuntamenti = models.Appuntamento.objects.filter(id__in=ids)
+                for appuntamento in appuntamenti:
+                    msg += "\t- {}\n".format(appuntamento)
+                msg += "\nBuon Lavoro."
+                send_mail(subject, 
+                          msg,
+                          from_email,
+                          [to_email,], 
+                          fail_silently=False,)              
+                
+                messages.add_message(request, messages.SUCCESS, 'Agente assegnato ed EMail inviata')
+                url = reverse("init_appuntamento")
+                return HttpResponse('''
+                    <script type='text/javascript'>
+                        opener.redirectAfter(window, '{}');
+                    </script>'''.format(url))
+            
+            messages.add_message(request, messages.SUCCESS, 'Agente assegnato')
+            url = reverse("init_appuntamento")
             return HttpResponse('''
                 <script type='text/javascript'>
                     opener.redirectAfter(window, '{}');
@@ -175,7 +197,7 @@ def assign_object(request):
     if query_get.has_key("id") and query_get.has_key("agente"):
         ids = query_get.getlist("id")
         agente_id = query_get["agente"]
-        agente = models.Dipendente.objects.get(id=agente_id)    
+        agente = get_object_or_404(models.Dipendente, id=agente_id)
         objs = models.Appuntamento.objects.filter(id__in=ids)
         
         data = {"objs": objs, "agente": agente}
@@ -250,13 +272,9 @@ def mod_referente(request, object_id, referente_id):
         if form.is_valid():
             form.save()
             
+            messages.add_message(request, messages.SUCCESS, 'Referente modificato')
             return HttpResponseRedirect(reverse("view_referente", 
                                                 args=[appuntamento_id, referente_id]))
-#            url = reverse("view_referente", args=[appuntamento_id, referente_id])
-#            return HttpResponse('''
-#                            <script type='text/javascript'>
-#                                opener.redirectAfter(window, '{}');
-#                            </script>'''.format(url))    
     else:
         referente = get_object_or_404(models.Referente, pk=referente_id) 
         form = forms.ReferenteForm(instance=referente)
@@ -280,6 +298,7 @@ def del_referente(request, object_id):
             referente_id = query_post["id"]
             models.Referente.objects.get(pk=referente_id).delete()
             
+            messages.add_message(request, messages.SUCCESS, 'Referente eliminato')
             url = reverse("view_appuntamento", args=[appuntamento_id])
             return HttpResponse('''
                 <script type='text/javascript'>
@@ -287,31 +306,74 @@ def del_referente(request, object_id):
                 </script>'''.format(url))
     
     query_get = request.GET.copy()
-    referente_id = query_get["id"]      
-    ref = models.Referente.objects.get(pk=referente_id)
+    referente_id = query_get["id"]
+    ref = get_object_or_404(models.Referente, pk=referente_id)      
     
     data = {"appuntamento": app, "obj": ref}
     return render_to_response(template,
                               data,
                               context_instance=RequestContext(request))
 
-def filter_lookup(request):
-    res = []
+def send_mail_to_agente(request, object_id):
+    template = "appuntamento/send_mailform.html"
     
-    if request.GET:
-        query = request.GET.copy()
-
-        if query.has_key("cliente"):   
-            v = query["cliente"]
+    appuntamento_id = object_id
+    appuntamento = get_object_or_404(models.Appuntamento, pk=appuntamento_id)
+    
+    if request.method == "POST":
+        query_post = request.POST.copy()
+        
+        if query_post.has_key("agente"):
+            # cancelliamo
+            agente_id = query_post.get("agente")
+            agente = get_object_or_404(models.Dipendente, id=agente_id)
             
-            search = Q(denominazione__icontains=v) | \
-                       Q(cognome__icontains=v) | \
-                       Q(nome__icontains=v) | \
-                       Q(partiva_codfisc__icontains=v)
-
-            objs = models.Cliente.objects.filter(search)[:15]
-            if objs:
-                res = [str(obj) for obj in objs]
+            # inviamo l'email
+            to_email = agente.email
+            from_email = "agenzia"
+            subject = "Prossimi appuntamenti"
+            msg = "Appuntamenti assegnati:\n"
+            msg += "\t- {}\n".format(appuntamento)
+            msg += "\nBuon Lavoro."
+            send_mail(subject, 
+                      msg,
+                      from_email,
+                      [to_email,], 
+                      fail_silently=False,)
             
-    json = simplejson.dumps(res)
-    return HttpResponse(json, mimetype='application/json')   
+            messages.add_message(request, messages.SUCCESS, 'EMail inviata')
+            url = reverse("view_appuntamento", args=[appuntamento_id])
+            return HttpResponse('''
+                <script type='text/javascript'>
+                    opener.redirectAfter(window, '{}');
+                </script>'''.format(url))
+    
+    query_get = request.GET.copy()
+    agente_id = query_get.get("agente")
+    agente = get_object_or_404(models.Dipendente, id=agente_id)      
+    
+    data = {"appuntamento": appuntamento, "agente": agente}
+    return render_to_response(template,
+                              data,
+                              context_instance=RequestContext(request))
+
+#def filter_lookup(request):
+#    res = []
+#    
+#    if request.GET:
+#        query = request.GET.copy()
+#
+#        if query.has_key("cliente"):   
+#            v = query["cliente"]
+#            
+#            search = Q(denominazione__icontains=v) | \
+#                       Q(cognome__icontains=v) | \
+#                       Q(nome__icontains=v) | \
+#                       Q(partiva_codfisc__icontains=v)
+#
+#            objs = models.Cliente.objects.filter(search)[:15]
+#            if objs:
+#                res = [str(obj) for obj in objs]
+#            
+#    json = simplejson.dumps(res)
+#    return HttpResponse(json, mimetype='application/json')   

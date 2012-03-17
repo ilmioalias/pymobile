@@ -1,4 +1,4 @@
-{% extends "popup_base.html" %}      
+{% extends "base.html" %}      
 
 {% block extrahead %}
 <title>PYMOBILE | Tariffa</title>
@@ -6,11 +6,25 @@
 {% endblock %}
 
 {% block header %}
-<h2>Amministrazione Tariffe | {{ action }} {{ attributo|capfirst }}</h2>
+<h2>Amministrazione Tariffe | {% if action == "add" %}Aggiungi{% else %}Modifica{% endif %} {{ attributo|capfirst }}</h2>
 {% endblock %}
 
 {% block content %}
 {% load tags %}
+<div class="navigation">
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../../../">home</a> &gt;
+		<a href="{% url init_tariffa %}">amministrazione tariffe</a> &gt;
+		<a href="{% url init_attribute attributo %}">amministrazione {{ attributo }}</a> &gt;
+		{% if action == "add" %}
+		<a href=".">aggiungi {{ attributo }}</a>
+		{% endif %}
+		{% if action == "mod" %}
+		<a href=".">modifica {{ attributo }}</a>
+		{% endif %} 
+	</fieldset>
+</div>
 <div class="modelform_div">
 	<form class="modelform" action="." method="post">
 		<div class="modelform_fieldset_div">

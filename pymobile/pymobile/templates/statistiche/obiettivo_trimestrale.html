@@ -14,12 +14,20 @@
 
 {% block content %}
 <div class="navigation">
-	<a href="../">home</a> &gt;
-	<a href="../">statistiche</a> &gt;
-	<a href=".">obiettivi trimestrali</a>
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../">home</a> &gt;
+		<a href="{% url init_statistiche %}">statistiche</a> &gt;
+		<a href=".">obiettivi: obiettivi trimestrali</a>
+	</fieldset>
 </div>
 <div id="reporttable_div">
-	{% include "statistiche/obiettivo_trimestrale_table_snippet.html" %}
+	<fieldset>
+	<legend>Tabella degli obiettivi trimestrali <i>(da {{ period.0 }} a {{ period.1 }})</i></legend><!-- 
+	<p><b>Periodo</b>: da <b>{{ period.0 }}</b> a <b>{{ period.1 }}</b></p>
+	<p>Tabella Obiettivi Trimestrali</p> -->
+		{% include "statistiche/obiettivo_trimestrale_table_snippet.html" %}
+	</fieldset>
 </div>
 {% endblock %}
 

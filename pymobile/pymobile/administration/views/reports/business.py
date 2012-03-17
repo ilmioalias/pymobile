@@ -29,8 +29,7 @@ def inout(request):
                                                 data_stipula__lte=period[1])\
                                                 .order_by("data_stipula")\
                                                 .select_related("piano_tariffario")
-                                                
-    
+                                                  
     # ricaviamo contratti solo degli agenti selezionati 
     if request.method == "GET" and request.GET.has_key("fagente"):
         agenti_ids = u.get_agenti_ids(request.GET)
@@ -42,18 +41,23 @@ def inout(request):
         if tel_ids:
             contratti = contratti.filter(telefonista__in=tel_ids)    
     
+    objs = []
     objs_in = []
     objs_out = []
     
+    n_stipulati = 0
+    n_completi = 0
+    n_inviati = 0
+    n_caricati = 0
+    n_attivati = 0
+    in_tot = 0
+    out_tot = 0
+    out_tot_prov_agt = 0
+    out_tot_prov_bonus_agt = 0
+    out_tot_prov_tel = 0
+    out_tot_prov_bonus_tel = 0
+    
     if contratti.exists():
-        n_stipulati = 0
-        n_attivati = 0
-        in_tot = 0
-        out_tot = 0
-        out_tot_prov_agt = 0
-        out_tot_prov_bonus_agt = 0
-        out_tot_prov_tel = 0
-        out_tot_prov_bonus_tel = 0
         
         dates = contratti.values("data_stipula").distinct()
         for date in dates:
@@ -131,13 +135,21 @@ def inout(request):
                     n_attivati += 1
                 if contratto.completo:
                     c += 1
+                    n_completi += 1
                 if contratto.inviato:
                     i += 1
+                    n_inviati += 1
                 if contratto.caricato:
                     cr += 1
+                    n_caricati += 1
                 
             # inseriamo i dati per la tabella delle entrate
             t = str(n) + "/" + str(c) + "/" + str(i) + "/" + str(cr) + "/" + str(a)
+            obj = {"data": date["data_stipula"],
+                    "n_stipulati": t,
+                    "entrate": "{0:.2f}".format(Decimal(in_tot_day)),
+                    "uscite": "{0:.2f}".format(Decimal(out_tot_day)),
+                    "totali": "{0:.2f}".format(Decimal(in_tot_day - out_tot_day))}
             obj_in = {"data": date["data_stipula"], 
                       "n_stipulati": t, 
                       "entrate": "{0:.2f}".format(Decimal(in_tot_day))}
@@ -148,6 +160,7 @@ def inout(request):
                        "prov_bonus_agt": "{0:.2f}".format(Decimal(out_tot_prov_bonus_agt_day)),
                        "prov_tel": "{0:.2f}".format(Decimal(out_tot_prov_tel_day)),
                        "prov_bonus_tel": "{0:.2f}".format(Decimal(out_tot_prov_bonus_tel_day)),}
+            objs.append(obj)
             objs_in.append(obj_in)
             objs_out.append(obj_out)
             
@@ -159,9 +172,13 @@ def inout(request):
             out_tot_prov_tel += out_tot_prov_tel_day
             out_tot_prov_bonus_tel += out_tot_prov_bonus_tel_day
     
-    totals_in = ["{}/{}".format(n_stipulati, n_attivati), 
+    totals = ["{}/{}/{}/{}/{}".format(n_stipulati, n_completi, n_inviati, n_caricati, n_attivati), 
+             "{0:.2f}".format(Decimal(in_tot)),
+             "{0:.2f}".format(Decimal(out_tot)),
+             "{0:.2f}".format(Decimal(in_tot - out_tot)),]
+    totals_in = ["{}/{}/{}/{}/{}".format(n_stipulati, n_completi, n_inviati, n_caricati, n_attivati), 
                  "{0:.2f}".format(Decimal(in_tot)),]
-    totals_out = ["{}/{}".format(n_stipulati, n_attivati),
+    totals_out = ["{}/{}/{}/{}/{}".format(n_stipulati, n_completi, n_inviati, n_caricati, n_attivati),
                   "{0:.2f}".format(Decimal(out_tot_prov_agt)),
                   "{0:.2f}".format(Decimal(out_tot_prov_bonus_agt)),
                   "{0:.2f}".format(Decimal(out_tot_prov_tel)),
@@ -169,17 +186,22 @@ def inout(request):
                   "{0:.2f}".format(Decimal(out_tot)),]
     
     # creiamo le tabelle 
-    table_in = tables.InTable(objs_in, prefix="in")
+    table = tables.InOutTotalsTable(objs)
+    table.paginate(page=request.GET.get("page", 1))
+    table.order_by = request.GET.get("sort")    
+    table_in = tables.InTable(objs_in, prefix="in-")
     table_in.paginate(page=request.GET.get("in-page", 1))
     table_in.order_by = request.GET.get("in-sort")
-    table_out = tables.OutTable(objs_out, prefix="out")
+    table_out = tables.OutTable(objs_out, prefix="out-")
     table_out.paginate(page=request.GET.get("out-page", 1))
     table_out.order_by = request.GET.get("out-sort")
     
     if request.is_ajax():
-        template = "statistiche/entrate_uscite_table_snippet.html"
-        data = {"table_in": table_in,
+#        template = "statistiche/entrate_uscite_table_snippet.html"
+        data = {"table": table,
+                "table_in": table_in,
                 "table_out": table_out,
+                "totals": totals,
                 "totals_in": totals_in,
                 "totals_out": totals_out,
                 "period": (period[0], period[1])}
@@ -189,8 +211,10 @@ def inout(request):
     
     filterform = forms.InOutFilterForm()
     
-    data = {"table_in": table_in,
+    data = {"table": table,
+            "table_in": table_in,
             "table_out": table_out,
+            "totals": totals,
             "totals_in": totals_in,
             "totals_out": totals_out,
             "filterform": filterform,
@@ -211,6 +235,7 @@ def calc_provvigione(dipendente, cliente, tariffa, date):
         retribuzione = models.RetribuzioneDipendente.objects.filter(variazione=False,
                                                                     dipendente=dipendente,
                                                                     data_inizio__lte=date)\
+<<<<<<< HEAD
                                                                     .order_by("-data_inizio")[0]
         if not retribuzione:
             # vuol dire che nella data scelta il dipendente non viene pagato
@@ -218,6 +243,17 @@ def calc_provvigione(dipendente, cliente, tariffa, date):
     else:
         retribuzione = retribuzione[0]
                                                                    
+=======
+                                                                    .order_by("-data_inizio")
+    
+        if not retribuzione.exists():
+            # vuol dire che nella data scelta il dipendente non viene pagato
+            return (0, 0)
+    
+    # prendiamo il primo elemento, perché filter ritorna una lista
+    retribuzione = retribuzione[0]
+                                                                        
+>>>>>>> d5c20819ae2c5874e621d411412fe643d7a4b966
     provvigione_contratto = float(retribuzione.provvigione_contratto)
     provvigione_bonus = retribuzione.provvigione_bonus
     sac = float(tariffa.sac)
