@@ -228,6 +228,7 @@ def calc_provvigione(dipendente, cliente, tariffa, date):
                                                                 dipendente=dipendente, 
                                                                 data_inizio__lte=date,
                                                                 data_fine__gte=date)
+    
     if not retribuzione.exists():
         retribuzione = models.RetribuzioneDipendente.objects.filter(variazione=False,
                                                                     dipendente=dipendente,
@@ -240,7 +241,7 @@ def calc_provvigione(dipendente, cliente, tariffa, date):
     
     # prendiamo il primo elemento, perché filter ritorna una lista
     retribuzione = retribuzione[0]
-                                                                        
+    
     provvigione_contratto = float(retribuzione.provvigione_contratto)
     provvigione_bonus = retribuzione.provvigione_bonus
     sac = float(tariffa.sac)
