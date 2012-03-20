@@ -15,8 +15,10 @@
 <div class="navigation">
 	<fieldset>
 	<legend>Sei qui</legend>
+		{% if user|get_group == "amministratore" %}
 		<a href="../../">home</a> &gt; 
 		<a href="{% url init_cliente %}">amministrazione clienti</a> &gt;
+		{% endif %}
 		<a href="./">{{ object }}</a>
 	</fieldset>
 </div>
