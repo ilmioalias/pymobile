@@ -8,9 +8,10 @@ from decimal import Decimal, getcontext
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def inout(request):
     #TODO: controllare che effettivamente i calcoli siano giusti
     getcontext().prec = 2

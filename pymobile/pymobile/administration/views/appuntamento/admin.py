@@ -6,7 +6,7 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 import pymobile.administration.models as models
 import pymobile.administration.forms as forms
@@ -30,7 +30,13 @@ TMP_REFDELFORM="appuntamento/referente_deleteform.html"
 @login_required
 def init(request):
     template = TMP_ADMIN
-    objs = models.Appuntamento.objects.all()
+    if u.is_telefonista(request.user):
+        user = request.user
+        profile = user.dipendente
+        objs = models.Appuntamento.objects.filter(agente__isnull=True,
+                                                  telefonista=profile,)
+    else:    
+        objs = models.Appuntamento.objects.all()
     # determiniamo gli agenti per l'assegnazione, devono essere solo quelli attivi 
     # il giorno successivo
     day = datetime.datetime.today().date() + datetime.timedelta(1)
@@ -86,7 +92,12 @@ def add_object(request):
             else:
                 return HttpResponseRedirect(reverse("init_appuntamento"))
     else:
-        form = forms.AppuntamentoForm()    
+        if u.is_telefonista(request.user):
+            user = request.user
+            profile = user.dipendente
+            form = forms.AppuntamentoForm(telefonista=profile)
+        else:
+            form = forms.AppuntamentoForm()    
 
     data = {"modelform": form, "action": action,}                
     return render_to_response(template, 
@@ -153,6 +164,7 @@ def del_object(request):
                               context_instance=RequestContext(request))
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def assign_object(request):
     template = TMP_ASSIGN
     
@@ -324,6 +336,7 @@ def del_referente(request, object_id):
                               context_instance=RequestContext(request))
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def send_mail_to_agente(request, object_id):
     template = "appuntamento/send_mailform.html"
     

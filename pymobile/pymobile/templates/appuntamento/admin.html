@@ -37,20 +37,24 @@
 			<span>se selezionati:</span> 
 			<select class="modeltable_actions">
 				<option value="delete">elimina</option>
+				{% if user|get_group == "amministratore" %}
 				<option value="assign">assegna</option>
+				{% endif %}
 			</select>
-			{% if agenti %}
-			<span class="assign"  style="display: none;">
-				<select id="id_assign">
-					{% for agente in agenti %}
-						<option value="{{ agente.id }}">{{ agente }}</option>
-					{% endfor %}		
-				</select>
-			</span>
-			{% else %}
-			<span class="assign" style="display: none;">
-				Nessun Agente presente nel database
-			</span>	
+			{% if user|get_group == "amministratore" %}
+				{% if agenti %}
+				<span class="assign"  style="display: none;">
+					<select id="id_assign">
+						{% for agente in agenti %}
+							<option value="{{ agente.id }}">{{ agente }}</option>
+						{% endfor %}		
+					</select>
+				</span>
+				{% else %}
+				<span class="assign" style="display: none;">
+					Nessun Agente presente nel database
+				</span>	
+				{% endif %}
 			{% endif %}
 			<button class="modeltable_actions_ok">ok</button>
 		</div>

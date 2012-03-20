@@ -153,7 +153,6 @@ class AccountModPasswordForm(forms.Form):
     
     def clean(self):
         cdata = self.cleaned_data
-        print(cdata)
         password_new = cdata.get("password_new")
         password_confirm = cdata.get("password_confirm")
         
@@ -556,7 +555,22 @@ class ServizioTariffaFilterForm(forms.ModelForm):
     class Meta:
         model = models.ServizioTariffa
 
-class AppuntamentoForm(forms.ModelForm):           
+class AppuntamentoForm(forms.ModelForm):
+    telefonista = forms.ModelChoiceField(queryset=models.Dipendente.objects.all(),
+                                         widget=forms.Select(attrs={"class": "fk", }),)
+    
+    def __init__(self, *args, **kwargs):
+        # questo hack ci serve nel caso in cui sia connesso un telefonista,
+        # ovvimante può aggiungere appuntamenti relativi solo a se stesso
+        telefonista = None
+        if kwargs.has_key("telefonista"):
+            telefonista = kwargs["telefonista"]
+            del kwargs["telefonista"]
+        forms.ModelForm.__init__(self, *args, **kwargs)
+        if telefonista:
+            self.fields["telefonista"].queryset = models.Dipendente.objects.filter(pk=telefonista.pk)
+            self.initial["telefonista"] = telefonista
+             
     def clean(self):
         cdata = self.cleaned_data
         agente = cdata.get("agente")
@@ -575,7 +589,6 @@ class AppuntamentoForm(forms.ModelForm):
                     "dell'agente assegnato"
                 self.errors["assegnato"] = self.error_class([msg])
         
-        print(cdata)
         return cdata
     
     class Media:
@@ -583,11 +596,44 @@ class AppuntamentoForm(forms.ModelForm):
 
     class Meta:
         model = models.Appuntamento
-        widgets = {"telefonista": forms.Select(attrs={"class": "fk", }),
+        widgets = {#"telefonista": forms.Select(attrs={"class": "fk", }),
                    "cliente": forms.Select(attrs={"class": "fk", }),
                    "referente": forms.Select(attrs={"class": "fk", }),
                    "agente": forms.Select(attrs={"class": "fk", }),
                    "data": forms.DateTimeInput(format="%d/%m/%Y %H:%M", attrs={"class": "datetime",}),}       
+
+class AppuntamentoTelefonistaForm(forms.ModelForm):           
+    def clean(self):
+        cdata = self.cleaned_data
+        agente = cdata.get("agente")
+        data = cdata.get("data")
+        if agente and data:
+            data_assunzione = agente.data_assunzione
+            data_licenziamento = agente.data_licenziamento
+            if data_assunzione and data_assunzione > data.date():
+                # creiamo il msg di errore per il campo "data"
+                msg = "La data dell'appuntamento è precedente alla data di assunzione "\
+                    "dell'agente assegnato"
+                self.errors["agente"] = self.error_class([msg])
+            if data_licenziamento and data_licenziamento < data.date():
+                # creiamo il msg di errore per il campo "data"
+                msg = "La data dell'appuntamento è successiva alla data di licenziamento "\
+                    "dell'agente assegnato"
+                self.errors["assegnato"] = self.error_class([msg])
+        
+        return cdata
+    
+    class Media:
+        js = ("js/modelform.js",)
+
+    class Meta:
+        model = models.Appuntamento
+        widgets = {"telefonista": forms.HiddenInput(),
+                   "cliente": forms.Select(attrs={"class": "fk", }),
+                   "referente": forms.Select(attrs={"class": "fk", }),
+                   "agente": forms.Select(attrs={"class": "fk", }),
+                   "data": forms.DateTimeInput(format="%d/%m/%Y %H:%M", attrs={"class": "datetime",}),}       
+
 
 class AppuntamentoFilterForm(forms.ModelForm):    
     # FIXME: aggiungere tasto mail dopo assegnazione

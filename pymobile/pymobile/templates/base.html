@@ -17,7 +17,8 @@
    		
   	{% block extrahead %}{% endblock %}
 </head>
-<body> 
+<body>
+	{% load tags %}
   	<header id="header">
   		{%block header %}{% endblock %}
 	</header>
@@ -25,7 +26,7 @@
 		<div id="login_info">
 			<fieldset>
 			<legend>Autenticazione</legend>
-				Benvenuto, <b>{{ user }}</b><br />
+				Ciao, <b>{{ user }}</b><br />
 				<a href="{% url logout %}">logout</a>
 			</fieldset>
 		</div>
@@ -33,14 +34,21 @@
 			<fieldset>
 			<legend>Navigazione</legend>
 			<ul>
+				<li><a href="#">Home</a></li>
+				{% if user|get_group == "amministratore" %}
 				<li><a href="{% url init_account %}">Amministrazione Account</a></li>
 				<li><a href="{% url init_dipendente %}">Amministrazione Dipendenti</a></li>
 				<li><a href="{% url init_cliente %}">Amministrazione Clienti</a></li>
 				<li><a href="{% url init_tariffa %}">Amministrazione Tariffe</a></li>
+				{% endif %}
 				<li><a href="{% url init_appuntamento %}">Amministrazione Appuntamenti</a></li>
+				{% if user|get_group == "amministratore" %}
 				<li><a href="{% url init_contratto %}">Amministrazione Contratti</a></li>
+				{% endif %}
 				<li><a href="{% url init_statistiche %}">Statistiche</a></li>
+				{% if user|get_group == "amministratore" %}				
 				<li><a href="#">Opzioni</a></li>
+				{% endif %}
 			</ul>
 			</fieldset>
 		</div>

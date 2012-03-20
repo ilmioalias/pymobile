@@ -5,7 +5,7 @@ from django.shortcuts import render_to_response, HttpResponseRedirect, get_objec
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 import pymobile.administration.models as models
 import pymobile.administration.forms as forms
@@ -20,6 +20,7 @@ TMP_DEL="cliente/deleteform.html"
 TMP_VIEW="cliente/view.html"
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def init(request):
     template = TMP_ADMIN
     objs = models.Cliente.objects.all()
@@ -82,13 +83,29 @@ def add_object(request):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
 def mod_object(request, object_id):
+    obj = get_object_or_404(models.Cliente, pk=object_id)
+    
+    if u.is_telefonista(request.user):
+        # se l'utente connesso è un telefonista può modificare solamente clienti
+        # relativi a suoi appuntamenti non ancora assegnati
+        user = request.user
+        profile = user.dipendente
+        print(models.Appuntamento.objects.filter(cliente=obj).exclude(telefonista=profile))
+        print(models.Appuntamento.objects.filter(agente__isnull=False, cliente=obj).exists())
+        if (models.Appuntamento.objects.filter(cliente=obj).exclude(telefonista=profile).exists() |
+            models.Appuntamento.objects.filter(agente__isnull=False, cliente=obj).exists()):
+            messages.add_message(request, messages.ERROR, "Non è possibile modificare il cliente:"\
+                                 " contattare l'amministratore")
+            return HttpResponseRedirect(reverse("view_cliente", args=[object_id,]))
+    
     template = TMP_FORM
     action = "mod"
     
     if request.method == "POST":
         post_query = request.POST.copy()
-        obj = get_object_or_404(models.Cliente, pk=object_id)
         form = forms.ClienteForm(post_query, instance=obj)
     
         if form.is_valid():
@@ -98,13 +115,12 @@ def mod_object(request, object_id):
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_cliente")) 
             else:
-                url = reverse("view_cliente", args=[object_id])
+                url = reverse("view_cliente", args=[object_id,])
                 return HttpResponse('''
                                 <script type='text/javascript'>
                                     opener.redirectAfter(window, '{}');
                                 </script>'''.format(url))                 
-    else:
-        obj = get_object_or_404(models.Cliente, pk=object_id) 
+    else: 
         form = forms.ClienteForm(instance=obj)
     
     data = {"modelform": form, "action": action, "cliente": obj,}
@@ -113,6 +129,7 @@ def mod_object(request, object_id):
                               context_instance=RequestContext(request))
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def del_object(request):
     template = TMP_DEL
     

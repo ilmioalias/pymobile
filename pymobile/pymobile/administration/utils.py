@@ -283,4 +283,10 @@ def get_form(form_name):
             if isinstance(v, dfm.ModelFormMetaclass):
                 return v
     raise LookupError("Non esiste il form con nome '{}'".format(form_name))
+
+def is_telefonista(user):
+    if user:
+        if user.groups.filter(name="telefonista").count() > 0:
+            return True
+    return False
     

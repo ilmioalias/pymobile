@@ -9,7 +9,7 @@ import pymobile.administration.forms as forms
 from django.shortcuts import render_to_response, HttpResponseRedirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 from datetime import date, timedelta
 
@@ -25,6 +25,7 @@ TMP_FORM="statistiche/obiettivo_trimestrale_modelform.html"
 TMP_DEL="statistiche/obiettivo_trimestrale_deleteform.html"
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def canvas_obiettivo_trimestrale(request):
     template = TMP_CANVAS
     
@@ -178,6 +179,7 @@ def check_tariffa(obiettivo, tariffa):
     return result
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def init_obiettivo_trimestrale(request):
     template = TMP_ADMIN
     # determiniamo solo gli obiettivi attivi
@@ -211,6 +213,7 @@ def init_obiettivo_trimestrale(request):
                               context_instance=RequestContext(request))
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def add_obiettivo_trimestrale(request):  
     template = TMP_FORM
     action = "add"
@@ -235,6 +238,7 @@ def add_obiettivo_trimestrale(request):
                               context_instance=RequestContext(request))
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def mod_obiettivo_trimestrale(request, object_id):
     template = TMP_FORM
     action = "mod"
@@ -262,6 +266,7 @@ def mod_obiettivo_trimestrale(request, object_id):
                               context_instance=RequestContext(request))
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def del_obiettivo_trimestrale(request):
     template = TMP_DEL
     

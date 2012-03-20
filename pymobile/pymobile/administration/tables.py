@@ -227,8 +227,8 @@ class AppuntamentoTable(tables.Table):
         </table>
     '''
         
-    cliente = tables.LinkColumn("view_cliente", args=[A("pk")],)
-    telefonista = tables.LinkColumn("view_dipendente", args=[A("pk")])
+    cliente = tables.LinkColumn("view_cliente", args=[A("cliente.pk")],)
+    telefonista = tables.LinkColumn("view_dipendente", args=[A("telefonista.pk")])
     agente = tables.TemplateColumn(TMP_AGT)
     referente = tables.TemplateColumn(TMP_REF)
     richiamare = BooleanColumn()

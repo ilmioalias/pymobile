@@ -6,7 +6,7 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.forms.models import inlineformset_factory
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 import pymobile.administration.models as models
 import pymobile.administration.forms as forms
@@ -21,6 +21,7 @@ TMP_DEL="contratto/deleteform.html"
 TMP_VIEW="contratto/view.html"
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def init(request):
     template = TMP_ADMIN
     objs = models.Contratto.objects.all()
@@ -54,6 +55,7 @@ def init(request):
                               context_instance=RequestContext(request))
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def add_object(request):  
     template = TMP_FORM
     action = "add"
@@ -93,6 +95,7 @@ def add_object(request):
                               context_instance=RequestContext(request))
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def mod_object(request, object_id):
     template = TMP_FORM
     action = "mod"
@@ -136,6 +139,7 @@ def mod_object(request, object_id):
                               context_instance=RequestContext(request))
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def del_object(request):
     template = TMP_DEL
     
@@ -167,6 +171,7 @@ def del_object(request):
                               context_instance=RequestContext(request))
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def add_child_object(request, field_name):
     action = "Aggiungi" 
     

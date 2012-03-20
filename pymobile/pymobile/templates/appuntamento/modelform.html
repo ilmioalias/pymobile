@@ -42,34 +42,67 @@
 						</tr>					
 					</tbody>
 					{% endif %}				
-					{% for field in modelform.visible_fields %}
-					<tbody class="field">
-						{% if field.errors %}
-							<tr class="field_error">
-								<td></td><td>{{ field.errors|first }}</td>
+					{% if user|get_group == "telefonista" %}
+						{% for field in modelform.visible_fields %}
+							{% if field.label != "Agente assegnato" and field.label != "Nota dell'esito" %}
+							<tbody class="field">
+								{% if field.errors %}
+									<tr class="field_error">
+										<td></td><td>{{ field.errors|first }}</td>
+									</tr>
+								{% endif %}
+								<tr class="{% if field.errors %}field_error{% endif %}" >
+									<td>{{ field.label_tag }}</td>
+									<td>
+										{{ field }}
+										{% if field|isdate %}
+											<input type="button" class="dateclear" value="svuota" />
+							    		{% endif %}
+									    {% if field|isfk %}
+									    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_fk field.html_name %}">
+									    		<img src="{{ STATIC_URL }}/img/add.png" />
+								    		</a>
+							    		{% endif %}
+									</td>
+								</tr>
+								{% if field.help_text %}
+									<tr class="field_help">
+										<td></td><td>{{ field.help_text }}</td>
+									</tr>
+								{% endif %}
+							</tbody>
+							{% endif %}
+						{% endfor %}
+					{% else %}
+						{% for field in modelform.visible_fields %}
+						<tbody class="field">
+							{% if field.errors %}
+								<tr class="field_error">
+									<td></td><td>{{ field.errors|first }}</td>
+								</tr>
+							{% endif %}
+							<tr class="{% if field.errors %}field_error{% endif %}" >
+								<td>{{ field.label_tag }}</td>
+								<td>
+									{{ field }}
+									{% if field|isdate %}
+										<input type="button" class="dateclear" value="svuota" />
+						    		{% endif %}
+								    {% if field|isfk %}
+								    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_fk field.html_name %}">
+								    		<img src="{{ STATIC_URL }}/img/add.png" />
+							    		</a>
+						    		{% endif %}
+								</td>
 							</tr>
-						{% endif %}
-						<tr class="{% if field.errors %}field_error{% endif %}" >
-							<td>{{ field.label_tag }}</td>
-							<td>
-								{{ field }}
-								{% if field|isdate %}
-									<input type="button" class="dateclear" value="svuota" />
-					    		{% endif %}
-							    {% if field|isfk %}
-							    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_fk field.html_name %}">
-							    		<img src="{{ STATIC_URL }}/img/add.png" />
-						    		</a>
-					    		{% endif %}
-							</td>
-						</tr>
-						{% if field.help_text %}
-							<tr class="field_help">
-								<td></td><td>{{ field.help_text }}</td>
-							</tr>
-						{% endif %}
-					</tbody>
-					{% endfor %}				
+							{% if field.help_text %}
+								<tr class="field_help">
+									<td></td><td>{{ field.help_text }}</td>
+								</tr>
+							{% endif %}
+						</tbody>
+						{% endfor %}
+					{% endif %}				
 				</table>
 			</fieldset>
 		</div>

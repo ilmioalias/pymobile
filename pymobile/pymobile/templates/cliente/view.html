@@ -24,9 +24,13 @@
 	<fieldset>
 	<legend>Azioni</legend>
 		<a href="{% url init_appuntamento %}?fcliente=={{ object.id }}">visualizza appuntamenti</a> |
+		{% if user|get_group == "amministratore" %}
 		<a href="{% url init_contratto %}?fcliente=={{ object.id }}">visualizza contratti</a> |
-		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_cliente object.id %}">modifica</a> |
-		<a id="del_{{ object.id }}" class="deleteobj" href="{% url del_cliente %}?id={{ object.id }}">elimina</a>
+		{% endif %}
+		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_cliente object.id %}">modifica</a> 
+		{% if user|get_group == "amministratore" %}
+		| <a id="del_{{ object.id }}" class="deleteobj" href="{% url del_cliente %}?id={{ object.id }}">elimina</a>
+		{% endif %}
 	</fieldset>
 </div><!-- 
 <div class="div_menu">

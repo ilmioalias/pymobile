@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib import auth
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 import pymobile.administration.forms as forms
 import pymobile.administration.tables as tables
@@ -25,8 +25,7 @@ def login_user(request):
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
-        next_page = request.POST.get("next")
-        print(next_page)
+#        next_page = request.POST.get("next")
         user = auth.authenticate(username=username, password=password)
         if user is not None:
             if user.is_active:
@@ -35,7 +34,11 @@ def login_user(request):
                 messages.add_message(request, messages.SUCCESS, 'Benvenuto {}'.format(user))
                 # Redirect to a success page.
                 # FIXME: qui deve eessere ridirezionato verso una home page
-                url = reverse("init_dipendente")
+                # FIXME: usare "next_page"?!
+                if u.is_telefonista(user):
+                    url = reverse("init_appuntamento")
+                else:
+                    url = reverse("init_dipendente")
                 return HttpResponseRedirect(url)
             else:
                 # Return a 'disabled account' error message
@@ -57,6 +60,7 @@ def logout_user(request):
     return HttpResponseRedirect(reverse("login"))
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def init(request):
     template = TMP_ADMIN
     objs = User.objects.filter(is_superuser=False)
@@ -92,6 +96,7 @@ def init(request):
                               context_instance=RequestContext(request))        
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def add_object(request):  
     template = TMP_FORM
     action = "add"
@@ -117,6 +122,7 @@ def add_object(request):
                               context_instance=RequestContext(request))
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def mod_object(request, object_id):
     template = TMP_FORM
     action = "mod"
@@ -154,6 +160,7 @@ def mod_object(request, object_id):
                               context_instance=RequestContext(request))
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def del_object(request):
     template = TMP_DEL
     
@@ -185,6 +192,7 @@ def del_object(request):
                               context_instance=RequestContext(request))
 
 @login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
 def mod_password(request, object_id):
     template = "account/mod_password.html"
     

@@ -10,7 +10,7 @@ from django import template
 from pymobile.administration import models
 import calendar
 import locale
-from django.utils.datetime_safe import datetime
+
 locale.setlocale(locale.LC_ALL, "it_IT.utf8")
 
 register = template.Library()
@@ -117,11 +117,10 @@ def get_msg(d, obiettivo):
     else:
         return ""
 
-#@register.filter(name="from_account_get_profile")
-#def from_account_get_profile(account):
-#    profile = account.get_profile()
-#    if d.has_key(key):
-#        return d[key]["msg"]
-#    else:
-#        return ""
+@register.filter(name="get_group")
+def get_group(user):
+    if user:
+        return user.groups.all()[0].name
+    else:
+        return ""
     
