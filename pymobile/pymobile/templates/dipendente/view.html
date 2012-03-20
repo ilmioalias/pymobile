@@ -24,7 +24,7 @@
 	<fieldset>
 	<legend>Azioni</legend>
 		{% if object.ruolo == "tel" %}
-			<a href="#">gestisci account</a> |
+			<a href="{% url view_account object.account.pk %}">gestisci account</a> |
 			<a href="{% url init_appuntamento %}?ftelefonista=={{ object.id }}">visualizza appuntamenti</a> |
 		{% endif %}
 		{% if object.ruolo == "agt" %}
@@ -39,24 +39,7 @@
 		<a id="del_{{ object.id }}" class="deleteobj" href="{% url del_dipendente %}?id={{ object.id }}">elimina</a>
 	</fieldset>
 </div>
-<!-- <div class="div_menu">
-	<ul id="menu_list">
-		{% if object.ruolo == "tel" %}
-			<li><a href="#">Gestisci Account</a></li>
-			<li><a href="{% url init_appuntamento %}?ftelefonista=={{ object.id }}">Visualizza Appuntamenti</a></li>
-		{% endif %}
-		{% if object.ruolo == "agt" %}
-			<li><a href="{% url init_appuntamento %}?fagente=={{ object.id }}">Visualizza Appuntamenti</a></li>
-			<li><a href="{% url init_contratto %}?fagente=={{ object.id }}">Visualizza Contratti</a></li>
-		{% endif %}
-		{% if object.ruolo == "adm" %}
-			<li><a href="#">Gestisci Account</a></li>
-		{% endif %}
-		{% if object.ruolo != "adm" %}
-			<li><a href="provvigione/">Gestisci Provvigione</a></li>
-		{% endif %}		
-	</ul>
-</div> --><div class="div_detail">
+<div class="div_detail">
 	<fieldset>
 	<legend>Dati Dipendente</legend>
 		<table class="table_detail">

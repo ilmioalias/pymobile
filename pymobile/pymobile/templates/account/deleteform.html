@@ -1,0 +1,28 @@
+{% extends "popup_base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Account</title> 
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Account	| Elimina Account</h2>
+{% endblock %}
+
+{% block content %}
+<form action="{% url del_account %}" method="POST">
+	{% csrf_token %}
+	<p class="warning">Attenzione: in generale è preferibile disattivare l'account</p>
+	<span>Sei sicuro di voler eliminare i seguenti account</span>
+	<ul>
+	{% for obj in objs %}
+		<li>
+			<b>{{ obj }}</b>
+			<input type="hidden" name="id" value="{{ obj.id }}" />
+		</li>
+	{% endfor %}
+	</ul>
+<!-- 	<input type="hidden" name="id_obj" value="{{ obj.id }}" /><br /> -->
+	<input type="submit" value="Continua" />
+	<button onclick="window.close()">Annulla</button>
+</form>
+{% endblock %}

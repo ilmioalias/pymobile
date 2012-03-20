@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 
 import operator
-#from django.http import HttpResponse 
 import pymobile.administration.utils as u
 import pymobile.administration.models as models
 import pymobile.administration.tables as tables
 import pymobile.administration.forms as forms
+
 from django.shortcuts import render_to_response
 from django.db.models import Sum
 from django.template import RequestContext
-#from datetime import datetime
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def canvas_tim_telecom(request):
     template = "statistiche/canvas_tim_telecom.html"
     
@@ -142,7 +143,8 @@ def canvas_tim_telecom(request):
     return render_to_response(template, 
                               data,
                               context_instance=RequestContext(request))    
-    
+
+@login_required    
 def canvas_edison(request):
     template = "statistiche/canvas_edison.html"
     

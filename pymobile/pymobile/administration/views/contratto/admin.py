@@ -6,6 +6,7 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.forms.models import inlineformset_factory
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 import pymobile.administration.models as models
 import pymobile.administration.forms as forms
@@ -19,6 +20,7 @@ TMP_FORM="contratto/modelform.html"
 TMP_DEL="contratto/deleteform.html"
 TMP_VIEW="contratto/view.html"
 
+@login_required
 def init(request):
     template = TMP_ADMIN
     objs = models.Contratto.objects.all()
@@ -51,6 +53,7 @@ def init(request):
     return render_to_response(template, data,
                               context_instance=RequestContext(request))
 
+@login_required
 def add_object(request):  
     template = TMP_FORM
     action = "add"
@@ -78,11 +81,6 @@ def add_object(request):
                     return HttpResponseRedirect(reverse("add_contratto")) 
                 else:
                     return HttpResponseRedirect(reverse("init_contratto"))
-#                    url = reverse("init_contratto")
-#                    return HttpResponse('''
-#                                    <script type='text/javascript'>
-#                                        opener.redirectAfter(window, '{}');
-#                                    </script>'''.format(url)) 
         else:
             formset = PianoTariffarioFormset(post_query)
     else:
@@ -94,6 +92,7 @@ def add_object(request):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def mod_object(request, object_id):
     template = TMP_FORM
     action = "mod"
@@ -124,11 +123,6 @@ def mod_object(request, object_id):
                 else:
                     return HttpResponseRedirect(reverse("view_contratto", 
                                                         args=[object_id,]))
-#                    url = reverse("view_contratto", args=[object_id,])
-#                    return HttpResponse('''
-#                                    <script type='text/javascript'>
-#                                        opener.redirectAfter(window, '{}');
-#                                    </script>'''.format(url))   
         else:
             formset = PianoTariffarioFormset(post_query, instance=obj)
     else:
@@ -141,6 +135,7 @@ def mod_object(request, object_id):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def del_object(request):
     template = TMP_DEL
     
@@ -171,7 +166,7 @@ def del_object(request):
                               data,
                               context_instance=RequestContext(request))
 
-
+@login_required
 def add_child_object(request, field_name):
     action = "Aggiungi" 
     

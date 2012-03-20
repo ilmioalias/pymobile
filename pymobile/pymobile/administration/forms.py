@@ -2,20 +2,176 @@
 
 #FIXME: controllare tutti i field da localizzare
 
-import pymobile.administration.models as models
 from django import forms
+from django.contrib.auth.models import User, Group
 from django.forms.models import inlineformset_factory
 from django.utils.datetime_safe import datetime
-#from datetime import datetime
-#import calendar
-#import operator
-#from django.db.models import Q
-#from django.db.models.loading import get_model
-#from django.forms.models import BaseInlineFormSet
+
+import pymobile.administration.models as models
 
 #-------------------------------------------------------------------------------
 # AMMINISTRAZIONE
 
+class AccountForm(forms.ModelForm):
+    profile = forms.ModelChoiceField(queryset=models.Dipendente.objects.filter(ruolo="tel",
+                                                                               account__isnull=True,), 
+                                     widget=forms.Select(attrs={"class": "tel"}),
+                                     required=False,
+                                     label="Profilo", 
+                                     help_text="profilo del telefonista collegato all'account")
+    groups = forms.ModelChoiceField(queryset=Group.objects.exclude(name="guest"), 
+                                    initial="amministratore",
+                                    label="Gruppo",)
+    password_confirm = forms.CharField(widget=forms.PasswordInput(), 
+                                       label="Conferma password", required=False)
+    
+    def __init__(self, *args, **kwargs):
+        forms.ModelForm.__init__(self, *args, **kwargs)
+        
+        # hack per inserire nel queryset di profile nel caso di modifca anche 
+        # il telefonista corrente 
+        if kwargs.has_key("instance"): 
+            instance = kwargs["instance"]
+            group = instance.groups.all()[0]
+            if group.name == "telefonista":
+                # devo usare il seguente stratagemma perché l'operatore "or" funziona 
+                # solo su queryset 
+                profile_cur = models.Dipendente.objects.filter(id=instance.dipendente.id)
+                
+                self.fields["profile"].queryset = self.fields["profile"].queryset | profile_cur
+                self.initial["profile"] = profile_cur[0]
+                
+    def clean(self):
+        cdata = self.cleaned_data
+        group = cdata.get("groups")
+        profile = cdata.get("profile")
+        nome = cdata.get("first_name")
+        cognome = cdata.get("last_name")
+        email = cdata.get("email")
+
+        if group:
+            if group.name == "telefonista":
+                if not profile:
+                    # creiamo il msg di errore per il campo "data_inizo"
+                    msg = "è necessario selezionare un profilo telefonista collegato "\
+                        "all'account che si sta creando"
+                    self.errors["profile"] = self.error_class([msg])
+                # nel caso in cui siano stati inseriti dati superflei cancelliamoli
+                if nome:
+                    cdata["nome"] = ""
+                if cognome:
+                    cdata["cognome"] = ""
+                if email:
+                    cdata["email"] = ""
+            elif group.name == "amministratore":
+                if not nome:
+                    # creiamo il msg di errore per il campo "data_inizo"
+                    msg = "è necessario indicare il nome"
+                    self.errors["first_name"] = self.error_class([msg])
+                if not cognome:
+                    # creiamo il msg di errore per il campo "data_inizo"
+                    msg = "è necessario indicare il cognome "
+                    self.errors["last_name"] = self.error_class([msg])
+                if not email:
+                    # creiamo il msg di errore per il campo "data_inizo"
+                    msg = "è necessario inserire un indirizzo email"
+                    self.errors["email"] = self.error_class([msg])
+                if profile:
+                    cdata["profile"] = ""
+            else:
+                raise forms.ValidationError("Gruppo non valido")
+            
+            # questo è un hack perché django si aspettta una sequenza di gruppi
+            cdata["groups"] = [group,]
+        
+        if not self.instance.pk:
+            password = cdata.get("password")
+            password_confirm = cdata.get("password_confirm")
+            if password:
+                if password != password_confirm:
+                    # creiamo il msg di errore per il campo "data_inizo"
+                    msg = "la password e la conferma della password non coincidono"
+                    self.errors["password"] = self.error_class([msg])
+                    self.errors["password_confirm"] = self.error_class([msg])
+            
+        return cdata
+    
+    def save(self, commit=True):
+        cdata = self.cleaned_data
+        group = cdata.get("groups")
+        profile = cdata.get("profile")
+        password = cdata.get("password")
+        
+        instance = forms.ModelForm.save(self, commit=False)
+        instance.set_password(password)
+        
+        if commit:
+            instance.save()
+            # save_m2m ci serve per salvare il gruppo che è una chiave manytomany 
+            self.save_m2m()
+            
+            if group[0]:
+                if group[0].name == "telefonista" and profile:
+                    # colleghiamo il profilo del dipendente teloefonista all'account
+                    profile.account = instance
+                    profile.save()      
+            
+        return instance
+            
+    class Media:
+        js = ("js/modelform.js", "js/modelform_account.js")
+    
+    class Meta:
+        model = User
+        exclude = ("is_staff", "is_superuser", "user_permissions", "last_login", "date_joined",)
+        widgets = {"first_name": forms.TextInput(attrs={"class": "admin"}),
+                   "last_name": forms.TextInput(attrs={"class": "admin"}),
+                   "email": forms.TextInput(attrs={"class": "admin"}),
+                   "password": forms.PasswordInput(),}
+        fields = ("username", "last_name", "first_name", "email", "groups", 
+                  "is_active", "profile", "password", "password_confirm",)
+
+class AccountFilterForm(forms.ModelForm):
+    # "initial" contiene i valori degli id dei gruppi
+    groups = forms.ModelChoiceField(queryset=Group.objects.exclude(name="guest"), 
+                                    initial=[1, 2, 3],
+                                    label="Gruppo",
+                                    widget=forms.CheckboxSelectMultiple(),)
+    
+    class Meta:
+        model = User
+        exclude = ("last_login", "date_joined", "password", "is_staff", "is_superuser", "user_permissions",)
+
+class AccountModPasswordForm(forms.Form):
+    account_id = forms.CharField(widget=forms.HiddenInput())
+    password_new = forms.CharField(widget=forms.PasswordInput(), 
+                                   label="Nuova password",
+                                   help_text="inserisci la nuova password")
+    password_confirm = forms.CharField(widget=forms.PasswordInput(), 
+                                   label="Conferma password",
+                                   help_text="conferma la nuova password")
+    
+    def clean(self):
+        cdata = self.cleaned_data
+        print(cdata)
+        password_new = cdata.get("password_new")
+        password_confirm = cdata.get("password_confirm")
+        
+        if password_new and password_confirm:
+            if password_new != password_confirm:
+                raise forms.ValidationError("la nuova password e la corfema non coincidono")
+        
+        return cdata
+    
+    def save(self):
+        cdata = self.cleaned_data
+        account_id = cdata.get("account_id")
+        password_new = cdata.get("password_new")
+        if account_id and password_new:
+            account = User.objects.get(pk=account_id)
+            account.set_password(password_new)
+            account.save()
+    
 class DipendenteForm(forms.ModelForm):     
     def clean(self):
         cdata = self.cleaned_data
@@ -34,101 +190,9 @@ class DipendenteForm(forms.ModelForm):
     
     class Meta:
         model = models.Dipendente
+        exclude = ("account",)
         widgets = {"data_assunzione": forms.DateInput(format="%d/%m/%Y", attrs={"class": "date",}),
                    "data_licenziamento": forms.DateInput(format="%d/%m/%Y", attrs={"class": "date",}),}
-
-#-------------------------------------------------------------------------------
-#FIXME: ho separato queste due funzioni per evitare gli import ciclici, da ragionarci
-# su
-#def values_from_provvigione_bonus_field(provvigione_bonus):
-#    provvigione_bonus = provvigione_bonus.strip()
-#    if not provvigione_bonus:
-#        return []
-#    
-#    values = []
-#    vs = provvigione_bonus.split(";")
-#    for var in vs:
-#        if var:
-#            d = {}
-#            opts = var.split(",")
-#            for opt in opts:
-#                item = opt.split(":")
-#            
-#                if len(item) == 2:
-#                    k = item[0].strip()
-#                    v = item[1].strip()
-#                    d[k] = v             
-#            values.append(d)
-#            
-#    return values    
-#
-#def get_provvigione_bonus_cleaned(values):
-#    if not values:
-#        return
-#    
-#    provvigione_bonus = ""
-#    for d in values:
-#        if d:
-#            for k, v in d.iteritems():
-#                provvigione_bonus += str(k) + ":" + str(v) + ","
-#            provvigione_bonus = provvigione_bonus[:-1] + ";"
-#
-#    return provvigione_bonus  
-
-#-------------------------------------------------------------------------------
-
-#def check_values(values):
-#    if not values:
-#        raise forms.ValidationError("provvigione bonus non valida")
-#    
-#    for d in values:
-#        if not "provvigione" in d:
-#            provvigione_bonus = get_provvigione_bonus_cleaned([d])
-#            raise forms.ValidationError("in <b>{}</b> non è stata indicata la chiave "\
-#                                        "obbligatoria <b>provvigione</b>".format(provvigione_bonus))                
-#        
-#        if len(d) < 2:
-#            raise forms.ValidationError("in <b>{}</b> oltre alla chiave obbligatoria "\
-#                                        "<b>provvigione</b> devi indicare un'altra chiave".format(provvigione_bonus))
-#        
-#        for k, v in d.iteritems():
-#            # controlliamo le chiavi e i loro valori
-#            if k == "provvigione":
-#                v = d["provvigione"]
-#                try:
-#                    v = float(v)
-#                    if v < 0:
-#                        raise forms.ValidationError("il valore <b>{}</b> della chiave <b>provvigione</b> deve essere un numero maggiore o uguale di 0".format(v))                                             
-#                except:
-#                    raise forms.ValidationError("il valore <b>{}</b> della chiave <b>provvigione</b> deve un numero maggiore o uguale di 0".format(v))                         
-#                d["provvigione"] = v                    
-#            elif k == "gestore":
-#                if not models.Gestore.objects.filter(denominazione=v).exists():
-#                    raise forms.ValidationError("il gestore <b>{}</b> non esiste nel DATABASE".format(v))
-#            elif k == "profilo":
-#                if not models.Tariffa.objects.filter(profilo=v).exists():
-#                    raise forms.ValidationError("la tariffa <b>{}</b> non esiste nel DATABASE".format(v))
-#            elif k == "tipo":
-#                if not models.TipologiaTariffa.objects.filter(denominazione=v).exists():
-#                    raise forms.ValidationError("il tipo di tariffa <b>{}</b> non esiste nel DATABASE".format(v))
-#            elif k == "fascia":
-#                if not models.FasciaTariffa.objects.filter(denominazione=v).exists():
-#                    raise forms.ValidationError("la fascia <b>{}</b> non esiste nel DATABASE".format(v))   
-#            elif k == "servizio":
-#                if not models.ServizioTariffa.objects.filter(denominazione=v).exists():
-#                    raise forms.ValidationError("il servizio <b>{}</b> non esiste nel DATABASE".format(v))
-#            elif k == "blindato":
-#                try:
-#                    v = int(v)
-#                except : 
-#                    raise forms.ValidationError("il valore <b>{}</b> della chiave <b>blindato</b> deve essere un intero maggiore o uguale di 0".format(v))                                                 
-#                if v < 0:
-#                    raise forms.ValidationError("il valore <b>{}</b> della chiave <b>blindato</b> deve essere un intero maggiore o uguale di 0".format(v))
-#                d[k] = v
-#            else:
-#                raise forms.ValidationError("la chiave <b>{}</b> non è ammessa".format(k))                                                                     
-#        
-#    return True
         
 class TelefonistaForm(DipendenteForm):
     
@@ -155,7 +219,7 @@ class DipendenteFilterForm(forms.ModelForm):
     
     class Meta:
         model = models.Dipendente
-        exclude = ("provvigione_contratto", "provvigione_speciale", "fisso", 
+        exclude = ("account", "provvigione_contratto", "provvigione_speciale", "fisso", 
                    "data_assunzione", "data_licenziamento", )  
         
 class RetribuzioneBaseForm(forms.ModelForm):
@@ -936,7 +1000,9 @@ class ObiettivoForm(forms.ModelForm):
         
         if commit:
             instance.save()       
-    
+        
+        return instance
+            
     class Media:
         js = ("js/modelform.js",)    
 

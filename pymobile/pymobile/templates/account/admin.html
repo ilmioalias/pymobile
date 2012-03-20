@@ -1,0 +1,68 @@
+{% extends "base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Account</title>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/modeltable.js"></script> 
+{{ filterform.media }} 
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Account</h2>
+{% endblock %}
+
+{% load tags %}
+
+{% block content %}
+<div class="navigation">
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../">home</a> &gt;
+		<a href=".">amministrazione account</a>
+	</fieldset>
+</div>
+<div class="actions">
+	<fieldset>
+	<legend>Azioni</legend>
+		<a class="addrow" href="{% url add_account %}">aggiungi account</a>
+	</fieldset>
+</div>
+<div id="modeltable_div">
+	<fieldset>
+	<legend>Tabella degli account</legend> 
+		{% load django_tables2 %}
+		{% render_table modeltable %}
+		
+		<div class="modeltable_actions_div">
+			<img src="{{ STATIC_URL }}/img/freccia_sel.png" />
+			Se selezionati: 
+			<select class="modeltable_actions">
+				<option value="delete">elimina</option>
+				<option value="disable">disattiva</option>
+			</select>
+			<button class="modeltable_actions_ok">ok</button>
+		</div>	
+	</fieldset>
+</div>
+{% endblock %}
+
+{% block extraleft_bar %}
+<div id="filter_modeltable_div">
+	<form id="filter_modeltable_form" action=".">
+		<fieldset class="filter_modeltable_fieldset">
+		<legend>Filtro</legend>
+			<table>				
+				{% for field in filterform.visible_fields %}
+				<tbody>
+					<tr><td><b>{{ field.label_tag }}</b></td><td>{{ field }}</td></tr><!-- 
+					{% if field.help_text %}
+					<tr class="field_help"><td></td><td>{{ field.help_text }}</td></tr>
+					{% endif %} -->
+				</tbody>
+				{% endfor %}
+			</table>
+		</fieldset>
+		<input type="submit" id="filter_modeltable_search" value="cerca" />
+		<input type="reset" id="filter_modeltable_reset" value="reset" />
+	</form>
+</div>	
+{% endblock %}

@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 
-#import operator
-#from django.http import HttpResponse 
 import pymobile.administration.utils as u
 import pymobile.administration.models as models
 import pymobile.administration.tables as tables
 import pymobile.administration.forms as forms
-from django.shortcuts import render_to_response
-#from django.db.models import Sum
-from django.template import RequestContext
 from decimal import Decimal, getcontext
-#from datetime import datetime
-#from django.db.models import Q
 
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.contrib.auth.decorators import login_required
+
+@login_required
 def inout(request):
     #TODO: controllare che effettivamente i calcoli siano giusti
     getcontext().prec = 2

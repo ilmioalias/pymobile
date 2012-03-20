@@ -6,6 +6,7 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.core.mail import send_mail
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 import pymobile.administration.models as models
 import pymobile.administration.forms as forms
@@ -26,6 +27,7 @@ TMP_REFFORM="appuntamento/referente_modelform.html"
 TMP_REFMODFORM="appuntamento/referente_mod_modelform.html"
 TMP_REFDELFORM="appuntamento/referente_deleteform.html"
 
+@login_required
 def init(request):
     template = TMP_ADMIN
     objs = models.Appuntamento.objects.all()
@@ -66,7 +68,7 @@ def init(request):
     return render_to_response(template, data,
                               context_instance=RequestContext(request))        
 
-
+@login_required
 def add_object(request):  
     template = TMP_FORM
     action = "add"
@@ -91,6 +93,7 @@ def add_object(request):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def mod_object(request, object_id):
     template = TMP_FORM
     action = "mod"
@@ -118,6 +121,7 @@ def mod_object(request, object_id):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def del_object(request):
     template = TMP_DEL
     
@@ -148,6 +152,7 @@ def del_object(request):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def assign_object(request):
     template = TMP_ASSIGN
     
@@ -205,6 +210,7 @@ def assign_object(request):
                                   data,
                                   context_instance=RequestContext(request))
 
+@login_required
 def add_child_object(request, field_name):
     action = "add" 
     
@@ -245,6 +251,7 @@ def add_child_object(request, field_name):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def view_referente(request, object_id, referente_id):
     template = TMP_REF
     
@@ -257,6 +264,7 @@ def view_referente(request, object_id, referente_id):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def mod_referente(request, object_id, referente_id):
     template = TMP_REFMODFORM
     action = "mod"
@@ -284,6 +292,7 @@ def mod_referente(request, object_id, referente_id):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def del_referente(request, object_id):
     template = TMP_REFDELFORM
     
@@ -314,6 +323,7 @@ def del_referente(request, object_id):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def send_mail_to_agente(request, object_id):
     template = "appuntamento/send_mailform.html"
     

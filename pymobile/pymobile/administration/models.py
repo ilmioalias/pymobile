@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
-#from django.db.models.loading import get_model
-#import hashlib
-#from django.contrib.contenttypes.models import ContentType
-#from django.contrib.contenttypes import generic
+from django.contrib.auth.models import User
 from django.db.models import Q, SET_NULL
+
 import datetime
 import operator
-#import calendar
 
 # Create your models here.
 
@@ -16,6 +13,7 @@ class Dipendente(models.Model):
     #FIXME: gestione fisso, come provvigioni?
     RUOLI = (("agt", "agente"), ("tel", "telefonista"))
     
+    account = models.OneToOneField(User, null=True, blank=True, on_delete=SET_NULL)
     cognome = models.CharField(max_length=45, 
                                help_text="cognome del dipendente",
                                verbose_name="Cognome")    
@@ -48,7 +46,8 @@ class Dipendente(models.Model):
         if prev_all.exists():
             for prev in prev_all:
                 if not prev.data_licenziamento:
-                    raise ValidationError("un dipendente con la stessa email è attualmente assunto")
+                    raise ValidationError("un dipendente con la stessa email è "\
+                                          "attualmente assunto")
                                                                  
         models.Model.clean(self)
     
@@ -250,11 +249,15 @@ class Tariffa(models.Model):
     punteggio = models.DecimalField(max_digits=5, decimal_places=2, 
                                     help_text="punteggio interno all'azienda",
                                     verbose_name="punteggio aziendale")
-    tipo = models.ForeignKey(TipologiaTariffa, blank=True, null=True, verbose_name="tipo", on_delete=SET_NULL)
-    fascia = models.ForeignKey(FasciaTariffa, blank=True, null=True, verbose_name="fascia", on_delete=SET_NULL)
-    servizio = models.ForeignKey(ServizioTariffa, blank=True, null=True, verbose_name="servizio", on_delete=SET_NULL)
+    tipo = models.ForeignKey(TipologiaTariffa, blank=True, null=True, 
+                             verbose_name="tipo", on_delete=SET_NULL)
+    fascia = models.ForeignKey(FasciaTariffa, blank=True, null=True, 
+                               verbose_name="fascia", on_delete=SET_NULL)
+    servizio = models.ForeignKey(ServizioTariffa, blank=True, null=True, 
+                                 verbose_name="servizio", on_delete=SET_NULL)
     sac = models.DecimalField(max_digits=5, decimal_places=2, default=0, 
-                              help_text="provvigione 'una tantum' erogata per il contratto stipulato",
+                              help_text="provvigione 'una tantum' erogata per il "\
+                              "contratto stipulato",
                               verbose_name="provvigione per contratto/S.A.C.") 
     creazione = models.DateTimeField(auto_now_add=True)
     modifica = models.DateTimeField(auto_now=True) 

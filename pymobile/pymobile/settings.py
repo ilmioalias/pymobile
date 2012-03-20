@@ -166,3 +166,7 @@ LOGGING = {
 # EMail Settings
 EMAIL_HOST = "localhost"
 EMAIL_PORT = 1025
+
+# Authentication
+AUTH_PROFILE_MODULE = 'administration.Dipendente'
+LOGIN_URL="/pymobile/"

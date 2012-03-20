@@ -6,6 +6,7 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.db.models.loading import get_model
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 import pymobile.administration.models as models
 import pymobile.administration.forms as forms
@@ -19,6 +20,7 @@ TMP_FORM="tariffa/modelform.html"
 TMP_DEL="tariffa/deleteform.html"
 TMP_VIEW="tariffa/view.html"
 
+@login_required
 def init(request):
     template = TMP_ADMIN
     objs = models.Tariffa.objects.all()
@@ -52,6 +54,7 @@ def init(request):
     return render_to_response(template, data,
                               context_instance=RequestContext(request))
 
+@login_required
 def add_object(request):  
     template = TMP_FORM
     action = "add"
@@ -76,6 +79,7 @@ def add_object(request):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def mod_object(request, object_id):
     template = TMP_FORM
     action = "mod"
@@ -103,6 +107,7 @@ def mod_object(request, object_id):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def del_object(request):
     template = TMP_DEL
     
@@ -133,7 +138,7 @@ def del_object(request):
                               data,
                               context_instance=RequestContext(request))
 
-
+@login_required
 def add_child_object(request, field_name):
     action = "Aggiungi" 
     
@@ -179,6 +184,7 @@ def add_child_object(request, field_name):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def init_attribute(request, attribute):
     template = "tariffa/attribute_admin.html"
     model = get_model("administration", attribute + "tariffa")
@@ -213,6 +219,7 @@ def init_attribute(request, attribute):
     return render_to_response(template, data,
                               context_instance=RequestContext(request))
 
+@login_required
 def add_attribute(request, attribute):  
     template = "tariffa/attribute_modelform.html"
     action = "add"
@@ -241,6 +248,7 @@ def add_attribute(request, attribute):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def mod_attribute(request, attribute, object_id):
     template = "tariffa/attribute_modelform.html"
     action = "mod"
@@ -272,6 +280,7 @@ def mod_attribute(request, attribute, object_id):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def del_attribute(request, attribute):
     template = "tariffa/attribute_deleteform.html"
     model = get_model("administration", attribute + "tariffa")

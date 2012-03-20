@@ -116,4 +116,12 @@ def get_msg(d, obiettivo):
         return d[key]["msg"]
     else:
         return ""
+
+#@register.filter(name="from_account_get_profile")
+#def from_account_get_profile(account):
+#    profile = account.get_profile()
+#    if d.has_key(key):
+#        return d[key]["msg"]
+#    else:
+#        return ""
     

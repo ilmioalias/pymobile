@@ -38,7 +38,7 @@
 					{% if modelform.non_field_errors %}
 					<tbody>
 						<tr class="field_error">
-							<td colspan="2">{{ field.non_field_errors|first }}</td>
+							<td colspan="2">{{ modelform.non_field_errors|first }}</td>
 						</tr>					
 					</tbody>
 					{% endif %}					
@@ -70,13 +70,6 @@
 						{% endif %}
 					</tbody>
 					{% endfor %}
-					{% if modelform.non_field_errors %}
-					<tbody>
-						<tr class="field_error">
-							<td colspan="2">{{ field.non_field_errors|first }}</td>
-						</tr>					
-					</tbody>
-					{% endif %}	
 				</table>
 			</fieldset>
 			{% if action == "add" %}
@@ -85,44 +78,51 @@
 				<!-- Retribuzione Formset -->
 				{{ modelformset.management_form }}
 				{% for form in modelformset %}
-				{{ form.id }}
-				{% for hidden_field in form.hidden_fields %}
-				   {{ hidden_field }}
-				{% endfor %}				
-				<table class="retribuzione_table">			
-				{% for field in form.visible_fields %}
-				<tbody class="field">
-					{% if field.errors %}
-						<tr class="field_error">
-							<td></td><td>{{ field.errors|first|safe }}</td>
-						</tr>
-					{% endif %}
-					<tr class="{% if field.errors %}modelfield_error{% endif %}" >
-						<td>{{ field.label_tag }}</td>
-						<td>
-							{{ field }}
-							{% if field.label == "Fisso" %}
-							&euro;
+					{{ form.id }}
+					{% for hidden_field in form.hidden_fields %}
+					   {{ hidden_field }}
+					{% endfor %}				
+					<table class="retribuzione_table">
+						{% if form.non_field_errors %}
+						<tbody>
+							<tr class="field_error">
+								<td colspan="2">{{ form.non_field_errors|first }}</td>
+							</tr>					
+						</tbody>
+						{% endif %}			
+						{% for field in form.visible_fields %}
+						<tbody class="field">
+							{% if field.errors %}
+								<tr class="field_error">
+									<td></td><td>{{ field.errors|first|safe }}</td>
+								</tr>
 							{% endif %}
-							{% if field|isdate %}
-								<input type="button" class="dateclear" value="svuota" />
-				    		{% endif %}
-						    {% if field|isfk %}
-						    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_fk field.html_name %}">
-						    		<img src="{{ STATIC_URL }}/img/add.png" />
-					    		</a>
-				    		{% endif %}
-						</td>
-					</tr>
-					{% if field.help_text %}
-						<tr class="field_help">
-							<td></td><td>{{ field.help_text|safe }}</td>
-						</tr>
-					{% endif %}
-				</tbody>
-				{% endfor %}
-				{% endfor %}
-				</table>	
+							<tr class="{% if field.errors %}modelfield_error{% endif %}" >
+								<td>{{ field.label_tag }}</td>
+								<td>
+									{{ field }}
+									{% if field.label == "Fisso" %}
+									&euro;
+									{% endif %}
+									{% if field|isdate %}
+										<input type="button" class="dateclear" value="svuota" />
+						    		{% endif %}
+								    {% if field|isfk %}
+								    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_fk field.html_name %}">
+								    		<img src="{{ STATIC_URL }}/img/add.png" />
+							    		</a>
+						    		{% endif %}
+								</td>
+							</tr>
+							{% if field.help_text %}
+								<tr class="field_help">
+									<td></td><td>{{ field.help_text|safe }}</td>
+								</tr>
+							{% endif %}
+						</tbody>
+						{% endfor %}
+					</table>
+				{% endfor %}	
 			</fieldset>
 			{% endif %}
 		</div>

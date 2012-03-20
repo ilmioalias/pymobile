@@ -5,9 +5,12 @@ import pymobile.administration.utils as u
 import pymobile.administration.models as models
 import pymobile.administration.tables as tables
 import pymobile.administration.forms as forms
+
 from django.shortcuts import render_to_response, HttpResponseRedirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
+from django.contrib.auth.decorators import login_required
+
 from datetime import date, timedelta
 
 # sistemiamo il locale al locale di default della macchina 
@@ -21,6 +24,7 @@ TMP_TABLE="statistiche/obiettivo_trimestrale_table_snippet.html"
 TMP_FORM="statistiche/obiettivo_trimestrale_modelform.html"
 TMP_DEL="statistiche/obiettivo_trimestrale_deleteform.html"
 
+@login_required
 def canvas_obiettivo_trimestrale(request):
     template = TMP_CANVAS
     
@@ -172,7 +176,8 @@ def check_tariffa(obiettivo, tariffa):
                     break
         
     return result
-   
+
+@login_required
 def init_obiettivo_trimestrale(request):
     template = TMP_ADMIN
     # determiniamo solo gli obiettivi attivi
@@ -205,6 +210,7 @@ def init_obiettivo_trimestrale(request):
     return render_to_response(template, data,
                               context_instance=RequestContext(request))
 
+@login_required
 def add_obiettivo_trimestrale(request):  
     template = TMP_FORM
     action = "add"
@@ -228,6 +234,7 @@ def add_obiettivo_trimestrale(request):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def mod_obiettivo_trimestrale(request, object_id):
     template = TMP_FORM
     action = "mod"
@@ -254,6 +261,7 @@ def mod_obiettivo_trimestrale(request, object_id):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def del_obiettivo_trimestrale(request):
     template = TMP_DEL
     

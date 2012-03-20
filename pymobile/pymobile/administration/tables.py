@@ -1,17 +1,12 @@
 # -*- coding: utf-8 -*-
 
-'''
-Created on 27/nov/2011
-
-@author: luigi
-'''
-
 import django_tables2 as tables
 from django_tables2.utils import A
-import pymobile.administration.models as models
+from django.contrib.auth.models import User
 from django.utils.safestring import mark_safe
 from django.conf import settings
 
+import pymobile.administration.models as models
 
 #-------------------------------------------------------------------------------
 # AMMINISTRAIONE
@@ -30,20 +25,57 @@ class NullColumn(tables.Column):
         else:
             return mark_safe("")   
 
+class AccountTable(tables.Table):
+    TMP_OP='''
+        {% load tags %}
+        <a id="view_id_{{ record.pk }}" href="{% url view_account record.pk %}">visualizza</a>
+        <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_account %}?id={{ record.pk }}">elimina</a>
+    '''
+    TMP_GROUPS='''
+        {{ record.groups.all.0 }}
+    '''
+    TMP_TEL='''
+        {% if record.groups.all.0.name == "telefonista" %}
+        <a href="{% url view_dipendente record.dipendente.pk %}">{{ record.dipendente }}</a>
+        {% endif %}
+    '''
+    
+    groups = tables.TemplateColumn(TMP_GROUPS, verbose_name="Gruppo")
+    profile = tables.TemplateColumn(TMP_TEL, orderable=False, verbose_name="Profilo")
+    is_active = BooleanColumn()
+    selection = tables.CheckBoxColumn(accessor=A('pk'),
+                                      attrs=tables.Attrs({"class": "selection"}), 
+                                      orderable=False,)
+    operazioni = tables.TemplateColumn(TMP_OP, orderable=False)
+    
+    class Meta:
+        model = User
+        exclude = ("id", "password", "is_staff", "is_superuser",)
+        sequence = ("selection", "username", "first_name", "last_name", "email", 
+                    "groups", "...")
+        empty_text = "Nessun Account"
+        attrs = {"class": "modeltable",}
+    
 class DipendenteTable(tables.Table):
     TMP_OP='''
         {% load tags %}
         <a id="view_id_{{ record.pk }}" href="{% url view_dipendente record.pk %}">visualizza</a>
         <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_dipendente %}?id={{ record.pk }}">elimina</a>
+    '''
+    TMP_ACCOUNT='''
+        {% if record.account %}
+        <a id="view_account_{{ record.pk }}" href="{% url view_account record.account.pk %}">{{ record.account }}</a>
+        {% endif %}
     '''    
 #    TMP_PRO='''
 #        {{ record.provvigione }}{% if record.ruolo == "agt" %}% (x contratto){% else %}€ (x appuntamento){% endif %}
 #    '''
     
 #    attivo = BooleanColumn()  
-    selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
-                                      header_attrs={"class": "selection_header"},
-                                      orderable=False,)
+    account = tables.TemplateColumn(TMP_ACCOUNT, orderable=False,)
+    selection = tables.CheckBoxColumn(accessor=A('pk'),
+                                      attrs=tables.Attrs({"class": "selection"}), 
+                                      orderable=False,)    
     data_licenziamento = NullColumn()
     operazioni = tables.TemplateColumn(TMP_OP, orderable=False)
     
@@ -54,44 +86,8 @@ class DipendenteTable(tables.Table):
         empty_text = "Nessun Dipendente"
         sequence = ("selection", "...")
         order_by = ("cognome", "nome")
+        attrs = {"class": "modeltable",}
 
-#class RetribuzioneTable(tables.Table):
-#    TMP_DATA='''
-#        {% if record.data_fine != record.data_inizio %}{{ record.data_fine }}</br></br></br>{% endif %}{{ record.data_inizio }} 
-#    '''
-#    
-#    TMP_FISSO='''
-#        {% if record.fisso %}{{ record.fisso }}&euro;{% endif %}
-#    '''
-#
-#    TMP_PROV='''
-#        {% if record.provvigione_contratto %}
-#        {{ record.fisso }}&euro;{% endif %}
-#    '''
-#        
-#    TMP_OP='''
-#        {% if record.tipo == "operazioni" %}
-#            <a class="addrow" href="{% url add_vartmp record.dipendente_id %}?data_inizio={{ record.d_inizio }}{% if record.d_fine %}&data_fine={{ record.d_fine }}{% endif %}">aggiungi variazione temporanea</a></br>
-#            <a class="addrow" href="{% url add_retribuzione record.dipendente_id %}?data_inizio={{ record.d_inizio }}{% if record.d_fine %}&data_fine={{ record.d_fine }}{% endif %}">aggiungi variazione retribuzione</a>
-#        {% else %}
-#            {% if record.variazione %}
-#                <a class="modifyrow" href="{% url mod_vartmp record.dipendente_id record.id %}">modifica</a>
-#                <a class="deleterow" href="{% url del_vartmp record.dipendente_id %}?id={{ record.id }}">elimina</a>
-#            {% else %}
-#                <a class="modifyrow" href="{% url mod_retribuzione record.dipendente_id record.id %}">modifica</a>
-#                <a class="deleterow" href="{% url del_retribuzione record.dipendente_id %}?id={{ record.id }}">elimina</a>
-#            {% endif %}
-#        {% endif %}         
-#    '''
-#    
-#    data = tables.TemplateColumn(TMP_DATA, orderable=False, verbose_name="Periodi")
-#    fisso = tables.TemplateColumn(TMP_FISSO, orderable=False)
-#    provvigione_contratto = tables.Column(orderable=False, verbose_name="Prov. x contratto")
-#    provvigione_bonus = tables.Column(orderable=False, verbose_name="Prov. bonus")
-#    operazioni = tables.TemplateColumn(TMP_OP, orderable=False)
-#    
-#    class Meta:
-#        empty_text = "Tabella vuota" 
 
 class RetribuzioneTable(tables.Table):
     retribuzione = tables.Column(orderable=False, verbose_name="Retribuzioni")
@@ -108,14 +104,14 @@ class ClienteTable(tables.Table):
     '''
     
     blindato = BooleanColumn()    
-    selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
-                                      header_attrs={"class": "selection_header"},
+    selection = tables.CheckBoxColumn(accessor=A('pk'),
+                                      attrs=tables.Attrs({"class": "selection"}), 
                                       orderable=False,)
     operazioni = tables.TemplateColumn(TMP_OP, orderable=False)
     
     class Meta:
         model = models.Cliente
-        attrs = {"id": "modeltable"}
+        attrs = {"class": "modeltable",}
         exclude = ("id", "creazione", "modifica", "nota", "indirizzo", "telefono", "cellulare", "fax",)
         empty_text = "Nessun Cliente"
         sequence = ("selection", "...")
@@ -128,14 +124,14 @@ class TipologiaTariffaTable(tables.Table):
         <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_attribute "tipologia" %}?id={{ record.pk }}">elimina</a>
     '''
     
-    selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
-                                      header_attrs={"class": "selection_header"},
+    selection = tables.CheckBoxColumn(accessor=A('pk'),
+                                      attrs=tables.Attrs({"class": "selection"}), 
                                       orderable=False,)
     operazioni = tables.TemplateColumn(TMP_OP, orderable=False)
     
     class Meta:
         model = models.TipologiaTariffa
-        attrs = {"id": "modeltable"}
+        attrs = {"class": "modeltable",}
         exclude = ("id",)
         empty_text = "Nessuna Tipologia"
         sequence = ("selection", "...")
@@ -148,14 +144,14 @@ class FasciaTariffaTable(tables.Table):
         <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_attribute "fascia" %}?id={{ record.pk }}">elimina</a>
     '''
 
-    selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
-                                      header_attrs={"class": "selection_header"},
+    selection = tables.CheckBoxColumn(accessor=A('pk'),
+                                      attrs=tables.Attrs({"class": "selection"}), 
                                       orderable=False,)
     operazioni = tables.TemplateColumn(TMP_OP, orderable=False)
     
     class Meta:
         model = models.TipologiaTariffa
-        attrs = {"id": "modeltable"}
+        attrs = {"class": "modeltable",}
         exclude = ("id",)
         empty_text = "Nessuna Tipologia"
         sequence = ("selection", "...")
@@ -168,14 +164,14 @@ class ServizioTariffaTable(tables.Table):
         <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_attribute "servizio" %}?id={{ record.pk }}">elimina</a>
     '''
 
-    selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
-                                      header_attrs={"class": "selection_header"},
+    selection = tables.CheckBoxColumn(accessor=A('pk'),
+                                      attrs=tables.Attrs({"class": "selection"}), 
                                       orderable=False,)
     operazioni = tables.TemplateColumn(TMP_OP, orderable=False)
     
     class Meta:
         model = models.TipologiaTariffa
-        attrs = {"id": "modeltable"}
+        attrs = {"class": "modeltable",}
         exclude = ("id",)
         empty_text = "Nessuna Tipologia"
         sequence = ("selection", "...")
@@ -192,14 +188,14 @@ class TariffaTable(tables.Table):
     fascia = NullColumn()
     servizio = NullColumn()
     attivo = BooleanColumn()
-    selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
-                                      header_attrs={"class": "selection_header"},
+    selection = tables.CheckBoxColumn(accessor=A('pk'),
+                                      attrs=tables.Attrs({"class": "selection"}), 
                                       orderable=False,)
     operazioni = tables.TemplateColumn(TMP_OP, orderable=False)
     
     class Meta:
         model = models.Tariffa
-        attrs = {"id": "modeltable"}
+        attrs = {"class": "modeltable",}
         exclude = ("id", "creazione", "modifica",)
         empty_text = "Nessuna Tariffa"
         sequence = ("selection", "gestore", "profilo", "tipo", "fascia", "servizio","...",)
@@ -237,14 +233,14 @@ class AppuntamentoTable(tables.Table):
     referente = tables.TemplateColumn(TMP_REF)
     richiamare = BooleanColumn()
     contratto = tables.TemplateColumn(TMP_CONTRATTO, orderable=False)
-    selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
-                                      header_attrs={"class": "selection_header"},
+    selection = tables.CheckBoxColumn(accessor=A('pk'),
+                                      attrs=tables.Attrs({"class": "selection"}), 
                                       orderable=False,)
     operazioni = tables.TemplateColumn(TMP_OP, orderable=False)
     
     class Meta:
         model = models.Appuntamento
-        attrs = {"id": "modeltable"}
+        attrs = {"class": "modeltable",}
         exclude = ("id", "creazione", "modifica", "num_sim", "gestore_mob",
                    "gestore_fisso", "nota", "data_assegnazione", "nota_esito")
         sequence = ("selection", "data", "cliente", "...")
@@ -275,14 +271,14 @@ class ContrattoTable(tables.Table):
     inviato = BooleanColumn()
     caricato = BooleanColumn()
     attivato = BooleanColumn()
-    selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
-                                      header_attrs={"class": "selection_header"},
+    selection = tables.CheckBoxColumn(accessor=A('pk'),
+                                      attrs=tables.Attrs({"class": "selection"}), 
                                       orderable=False,)
     operazioni = tables.TemplateColumn(TMP_OP, orderable=False)
     
     class Meta:
         model = models.Contratto
-        attrs = {"id": "modeltable"}
+        attrs = {"class": "modeltable",}
         exclude = ("id", "creazione", "modifica", "appuntamento", "pdf_contratto", "nota",
                    "data_rescissione", "data_completato", "data_inviato", "data_caricato", 
                    "data_attivato", "vas_telefonista", "vas_agente",)
@@ -391,12 +387,11 @@ class ObiettivoTable(tables.Table):
     
     data_fine = NullColumn()
     operazioni = tables.TemplateColumn(TMP_OP, orderable=False)
-    selection = tables.CheckBoxColumn(accessor=A('pk'), attrs={"class": "selection"}, 
-                                      header_attrs={"class": "selection_header"},
+    selection = tables.CheckBoxColumn(accessor=A('pk'),
+                                      attrs=tables.Attrs({"class": "selection"}), 
                                       orderable=False,)
     
     class Meta:
         model = models.Obiettivo
         sequence = ("selection", "...", )
         exclude = ("id", "creazione", "modifica",)
-        

@@ -1,0 +1,54 @@
+{% extends "base.html" %}      
+
+{% load tags %}
+
+{% block extrahead %}
+<title>PYMOBILE | Account</title>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/viewobj.js"></script>
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Account | {{ object }}</h2> 
+{% endblock %}
+
+{% block content %}
+<div class="navigation">
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../../">home</a> &gt; 
+		<a href="{% url init_account %}">amministrazione account</a> &gt;
+		<a href="./">{{ object }}</a>
+	</fieldset>
+</div>
+<div class="actions">
+	<fieldset>
+	<legend>Azioni</legend>
+		<a href="{% url mod_password object.id %}">modifica password</a> |
+		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_account object.id %}">modifica</a> |
+		<a id="del_{{ object.id }}" class="deleteobj" href="{% url del_account %}?id={{ object.id }}">elimina</a>
+	</fieldset>
+</div> 
+<div class="div_detail">
+	<fieldset>
+	<legend>Dati Account</legend>
+		<table class="table_detail">
+			<tr><td>Nome Utente</td><td>{{ object.username }}</td></tr>
+			<tr><td>Gruppo</td><td>{{ object.groups.all.0 }}</td></tr>
+			{% if object.groups.all.0.name == "amministratore" %}
+			<tr><td>Cognome</td><td>{{ object.last_name }}</td></tr>
+			<tr><td>Nome</td><td>{{ object.first_name }}</td></tr>
+			<tr><td>Email</td><td>{{ object.email }}</td></tr>
+			{% endif %}
+			{% if object.groups.all.0.name == "telefonista" %}	
+			<tr><td>Account Dipendente Collegato</td><td><a href="{% url view_dipendente object.dipendente.id %}">{{ object.dipendente }}</a></td></tr>
+			{% endif %}
+		</table>
+	</fieldset><!-- 
+	<div class="op_detail">
+		<ul id="op_list">
+			<li><a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_cliente object.id %}">Modifica</a></li>
+			<li><a id="del_{{ object.id }}" class="deleteobj" href="{% url del_cliente %}?id={{ object.id }}">Cancella</a></li>
+		</ul>
+	</div> -->
+</div>
+{% endblock %}

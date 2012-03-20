@@ -183,6 +183,7 @@ var initModelformClickHandler = function(){
         return this.id.match(/tariffa/);
     }).combobox();
     $("form.modelform select#id_appuntamento:visible").combobox();
+    $("form.modelform select#id_profile:visible").combobox();
     // FIXME: la funzione unload mi pare un poco invasiva
     // meglio spostare tutto in una nuova pagina invece che su un popup?
     // FIXME: sistemate assolutamente il reload della pagina quando il popup viene chiuso

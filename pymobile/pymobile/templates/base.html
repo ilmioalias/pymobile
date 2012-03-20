@@ -22,16 +22,25 @@
   		{%block header %}{% endblock %}
 	</header>
 	<div id="left_bar">
+		<div id="login_info">
+			<fieldset>
+			<legend>Autenticazione</legend>
+				Benvenuto, <b>{{ user }}</b><br />
+				<a href="{% url logout %}">logout</a>
+			</fieldset>
+		</div>
 		<div id="navigation_link">
 			<fieldset>
 			<legend>Navigazione</legend>
 			<ul>
+				<li><a href="{% url init_account %}">Amministrazione Account</a></li>
 				<li><a href="{% url init_dipendente %}">Amministrazione Dipendenti</a></li>
 				<li><a href="{% url init_cliente %}">Amministrazione Clienti</a></li>
 				<li><a href="{% url init_tariffa %}">Amministrazione Tariffe</a></li>
 				<li><a href="{% url init_appuntamento %}">Amministrazione Appuntamenti</a></li>
 				<li><a href="{% url init_contratto %}">Amministrazione Contratti</a></li>
-				<li><a href="{% url init_statistiche %}">Statistiche</a></li>	
+				<li><a href="{% url init_statistiche %}">Statistiche</a></li>
+				<li><a href="#">Opzioni</a></li>
 			</ul>
 			</fieldset>
 		</div>

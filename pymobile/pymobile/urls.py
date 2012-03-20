@@ -1,9 +1,12 @@
 from django.conf.urls.defaults import patterns, include, url
 from django.views.generic.list_detail import object_detail
-from pymobile.administration import models
-
+from django.contrib.auth.models import User
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
+from django.contrib.auth.views import login, logout
+
+from pymobile.administration import models
+
 
 admin.autodiscover()
 
@@ -18,14 +21,27 @@ urlpatterns = patterns('',
                         # Uncomment the next line to enable the admin:
                         url(r'^admin/', include(admin.site.urls)),)
 
-urlpatterns += patterns('django.views.generic.simple',
-                        url(r'^pymobile/$', 
-                            "direct_to_template", 
-                            {"template": "index.html"}, 
-                            name="login"),)
+#urlpatterns += patterns('django.views.generic.simple',
+#                        url(r'^pymobile/$', 
+#                            "direct_to_template", 
+#                            {"template": "index.html"}, 
+
+#------------------------------------------------------------------------------
+# LOGIN
+urlpatterns += patterns('pymobile.administration.views',
+                        url(r"^pymobile/$", 
+                            "account.admin.login_user",
+                            name="login"),
+                        url(r"^pymobile/logout/$", 
+                            "account.admin.logout_user",
+                            name="logout"),)
+
 
 #-------------------------------------------------------------------------------
 # AMMINISTRAZIONE
+# account
+INFO_ACC={"template_name": "account/view.html", 
+          "queryset": User.objects.all()}
 # tariffa
 INFO_TAR={"template_name": "tariffa/view.html", 
           "queryset": models.Tariffa.objects.all()}
@@ -41,6 +57,28 @@ INFO_APP={"template_name": "appuntamento/view.html",
 # contratto
 INFO_CON={"template_name": "contratto/view.html", 
           "queryset": models.Contratto.objects.all()}
+
+# account
+urlpatterns += patterns('pymobile.administration.views',
+                        url(r'^pymobile/account/$', 
+                            "account.admin.init", 
+                            name="init_account"),
+                        url(r'^pymobile/account/add/$', 
+                            "account.admin.add_object", 
+                            name="add_account"),
+                        url(r'^pymobile/account/mod/(?P<object_id>\d+)/$', 
+                            "account.admin.mod_object", 
+                            name="mod_account"),
+                        url(r'^pymobile/account/del/$', 
+                            "account.admin.del_object", 
+                            name="del_account"),
+                        url(r'^pymobile/account/(?P<object_id>\d+)/$', 
+                            object_detail, 
+                            INFO_ACC, 
+                            name="view_account"),
+                        url(r'^pymobile/account/(?P<object_id>\d+)/mod_password/$', 
+                            "account.admin.mod_password",
+                            name="mod_password"),)
 
 # dipendente
 urlpatterns += patterns('pymobile.administration.views',

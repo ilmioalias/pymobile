@@ -251,8 +251,8 @@ var redirectAfter = function(win, url){
 };
 
 var selectAllRow = function(j_obj){
-	var table = j_obj.closest("#modeltable");
-	table.find("tbody input.selection").each(function(){
+	var table = j_obj.closest(".modeltable");
+	table.find("tbody td.selection input").each(function(){
  		console.log($(this));
 		if (j_obj.attr("checked")){
 			$(this).attr("checked", true);	
@@ -278,12 +278,12 @@ var assignRows = function(rows, agt){
 };
 
 var tableClickHandlers = function(){
-	$("div.table-container").on("click", "thead input.selection_header", function(e){
+	$("div.table-container").on("click", "thead th.selection input", function(e){
 		selectAllRow($(this));
 	});
-	$("div.table-container").on("click", "tbody input.selection", function(e){
+	$("div.table-container").on("click", "tbody td.selection input", function(e){
 		if (!$(this).attr("checked")){
-			var header = $("div.table-container thead input.selection_header");
+			var header = $(this).closest("table.modeltable").find("thead th.selection input");
 			if (header.attr("checked")){
 				header.attr("checked", false);
 			};
@@ -302,7 +302,7 @@ var tableClickHandlers = function(){
 	$("button.modeltable_actions_ok").click(function(e){
 		e.preventDefault();
 		var action = $(this).siblings("select.modeltable_actions").find("option:selected").attr("value");
-		var rows = $("#modeltable td > input.selection:checked");
+		var rows = $("table.modeltable td.selection > input:checked");
 		if (rows.length > 0){
 			if (action == "delete") {
 				deleteRows(rows);		
@@ -314,7 +314,7 @@ var tableClickHandlers = function(){
 			};
 		};
 	});	
-	$("div.table-container").on("click", "th.sortable > a", function(e){
+	$("div.table-container").on("click", "th.orderable > a", function(e){
 		e.preventDefault();
 		sortTable($(this));
 	});	
@@ -330,11 +330,11 @@ var tableClickHandlers = function(){
 		e.preventDefault();
 		deleteRow($(this));
 	});
-	// $("div#modeltable_div").on("click", "a.addrow", function(e){
+	// $("div.modeltable_div").on("click", "a.addrow", function(e){
 		// e.preventDefault();
 		// addRow($(this));
 	// });
-	// $("div#modeltable_div").on("click", "a.modifyrow", function(e){
+	// $("div.modeltable_div").on("click", "a.modifyrow", function(e){
 		// e.preventDefault();
 		// modifyRow($(this));
 	// });		

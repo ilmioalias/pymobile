@@ -5,6 +5,7 @@ from django.shortcuts import render_to_response, HttpResponseRedirect, get_objec
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 import pymobile.administration.models as models
 import pymobile.administration.forms as forms
@@ -28,6 +29,7 @@ TMP_PROV_TABLE="dipendente/provvigione_table_snippet.html"
 TMP_PROV_VARTMP_CONF="dipendente/provvigione_variazione_conferma.html"
 TMP_PROV_RETR_CONF="dipendente/provvigione_retribuzione_conferma.html"
 
+@login_required
 def init(request):
     template = TMP_ADMIN
     objs = models.Dipendente.objects.all()
@@ -61,6 +63,7 @@ def init(request):
     return render_to_response(template, data,
                               context_instance=RequestContext(request))
 
+@login_required
 def add_object(request):  
     template = TMP_FORM
     action = "add"
@@ -68,11 +71,11 @@ def add_object(request):
     if request.method == "POST":
         post_query = request.POST.copy()
         form = forms.DipendenteForm(post_query)
+        print(form.is_valid())
         
         if form.is_valid():
             dipendente = form.save(commit=False)
             formset = forms.RetribuzioneFormset(post_query, instance=dipendente)
-            
             if formset.is_valid():
                 form.save()
                 formset.save()        
@@ -97,6 +100,7 @@ def add_object(request):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def mod_object(request, object_id):
     template = TMP_FORM
     action = "mod"
@@ -124,6 +128,7 @@ def mod_object(request, object_id):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def del_object(request):
     template = TMP_DEL
     
@@ -154,6 +159,7 @@ def del_object(request):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def init_provvigione(request, object_id):
     # FIXME: data licenziamento non è presa in considerazione
     # da correggere, non ora però
@@ -269,6 +275,7 @@ def init_provvigione(request, object_id):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def add_retribuzione(request, object_id):
     template = TMP_PROV_CONTRATTO_FORM
     action = "add"
@@ -314,6 +321,7 @@ def add_retribuzione(request, object_id):
                               data,
                               context_instance=RequestContext(request))    
 
+@login_required
 def add_vartmp(request, object_id):
     template = TMP_PROV_BONUS_FORM
     action = "add"
@@ -422,6 +430,7 @@ def add_vartmp(request, object_id):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def mod_retribuzione(request, object_id, provvigione_id):
     template = TMP_PROV_CONTRATTO_FORM
     action = "mod"
@@ -510,6 +519,7 @@ def mod_retribuzione(request, object_id, provvigione_id):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def mod_vartmp(request, object_id, provvigione_id):
     template = TMP_PROV_BONUS_FORM
     action = "mod"
@@ -603,6 +613,7 @@ def mod_vartmp(request, object_id, provvigione_id):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def del_retribuzione(request, object_id):
     template = TMP_PROV_CONTRATTO_DELFORM
     
@@ -636,6 +647,7 @@ def del_retribuzione(request, object_id):
                               data,
                               context_instance=RequestContext(request))
 
+@login_required
 def del_vartmp(request, object_id):
     template = TMP_PROV_BONUS_DELFORM
     
