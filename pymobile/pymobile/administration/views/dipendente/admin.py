@@ -13,6 +13,10 @@ import pymobile.administration.tables as tables
 import pymobile.administration.utils as u
 from datetime import datetime, timedelta
 from copy import deepcopy
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger("file")
 
 # Create your views here.
 
@@ -73,15 +77,16 @@ def add_object(request):
     if request.method == "POST":
         post_query = request.POST.copy()
         form = forms.DipendenteForm(post_query)
-        print(form.is_valid())
         
         if form.is_valid():
             dipendente = form.save(commit=False)
             formset = forms.RetribuzioneFormset(post_query, instance=dipendente)
             if formset.is_valid():
-                form.save()
+                new_obj = form.save()
                 formset.save()        
                 
+                logger.debug("{}: aggiunto il dipendente {} [id={}]"
+                             .format(request.user, new_obj, new_obj.id))
                 messages.add_message(request, messages.SUCCESS, 'Dipendente aggiunto')
                 if request.POST.has_key("add_another"):              
                     return HttpResponseRedirect(reverse("add_dipendente")) 
@@ -114,8 +119,10 @@ def mod_object(request, object_id):
         form = forms.DipendenteForm(post_query, instance=obj)
     
         if form.is_valid():
-            form.save()
+            new_obj = form.save()
             
+            logger.debug("{}: modificato il dipendente {} [id={}]"
+                         .format(request.user, new_obj, new_obj.id))
             messages.add_message(request, messages.SUCCESS, 'Dipendente modificato')
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_dipendente")) 
@@ -145,8 +152,12 @@ def del_object(request):
             models.Dipendente.objects.filter(id__in=ids).delete()
             
             if len(ids) == 1:
+                logger.debug("{}: eliminato il dipendente [id={}]"
+                             .format(request.user, ids))
                 messages.add_message(request, messages.SUCCESS, 'Dipendente eliminato')
             elif len(ids) > 1:
+                logger.debug("{}: eliminati i dipendenti [id={}]"
+                             .format(request.user, ids))
                 messages.add_message(request, messages.SUCCESS, 'Dipendenti eliminati')
             url = reverse("init_dipendente")
             return HttpResponse('''
@@ -158,6 +169,8 @@ def del_object(request):
     ids = query_get.getlist("id")      
     objs = models.Dipendente.objects.filter(id__in=ids)
     
+    logger.debug("{}: ha intenzione di eliminare i dipendenti {}"
+                 .format(request.user, [(str(obj), "id=" + str(obj.id)) for obj in objs]))      
     data = {"objs": objs}
     return render_to_response(template,
                               data,
@@ -304,8 +317,10 @@ def add_retribuzione(request, object_id):
         form = forms.RetribuzioneForm(post_query)
         
         if form.is_valid():
-            form.save()
+            new_obj = form.save()
             
+            logger.debug("{}: aggiunto la retribuzione {} [id={}] per il dipendente {}"
+                         .format(request.user, new_obj, new_obj.id, dipendente))
             messages.add_message(request, messages.SUCCESS, 'Retribuzione aggiunta')
             return HttpResponse(reverse("init_provvigione", args=[dipendente_id]))
     else:
@@ -411,6 +426,8 @@ def add_vartmp(request, object_id):
                     vartmp_mod_f.update(data_inizio=t)
                 vartmp_new.save()
                 
+                logger.debug("{}: aggiunto la variazione temporanea alla retribuzione {} [id={}] per il dipendente {}"
+                         .format(request.user, vartmp_new, vartmp_new.id, dipendente))
                 messages.add_message(request, messages.SUCCESS, 'Variazione temporanea aggiunta')
                 url = reverse("init_provvigione", args=[dipendente_id])
                 return HttpResponse('''
@@ -495,6 +512,8 @@ def mod_retribuzione(request, object_id, provvigione_id):
                         vartmp_mod.update(data_inizio=retr_new.data_inizio)
                     retr_new.save()
                     
+                    logger.debug("{}: modficata la retribuzione {} [id={}] per il dipendente {}"
+                                 .format(request.user, retr_new, retr_new.id, dipendente))
                     messages.add_message(request, messages.SUCCESS, 'Retribuzione modificata')
                     url = reverse("init_provvigione", args=[dipendente_id])
                     return HttpResponse('''
@@ -502,8 +521,10 @@ def mod_retribuzione(request, object_id, provvigione_id):
                                         opener.redirectAfter(window, '{}');
                                     </script>'''.format(url))                                     
             else:
-                form.save()
-                 
+                retr_new = form.save()
+                
+                logger.debug("{}: modficata la retribuzione {} [id={}] per il dipendente {}"
+                             .format(request.user, retr_new, retr_new.id, dipendente)) 
                 url = reverse("init_provvigione", args=[dipendente_id])
                 return HttpResponse('''
                                 <script type='text/javascript'>
@@ -601,6 +622,8 @@ def mod_vartmp(request, object_id, provvigione_id):
                     vartmp_mod_f.update(data_inizio=t)
                 vartmp_new.save()
                 
+                logger.debug("{}: modficata la variazione temporanea della retribuzione {} [id={}] per il dipendente {}"
+                             .format(request.user, vartmp_new, vartmp_new.id, dipendente))
                 messages.add_message(request, messages.SUCCESS, 'variazione temporanea modificata')
                 url = reverse("init_provvigione", args=[dipendente_id])
                 return HttpResponse('''
@@ -639,8 +662,12 @@ def del_retribuzione(request, object_id):
             models.RetribuzioneDipendente.objects.filter(id__in=ids).delete()
             
             if len(ids) == 1:
+                logger.debug("{}: eliminata la retribuzione [id={}]"
+                             .format(request.user, ids))
                 messages.add_message(request, messages.SUCCESS, 'Retribuzione eliminata')
             elif len(ids) > 1:
+                logger.debug("{}: eliminate le retribuzioni [id={}]"
+                             .format(request.user, ids))
                 messages.add_message(request, messages.SUCCESS, 'Retribuzioni eliminate')
             url = reverse("init_provvigione", args=[dipendente_id])
             return HttpResponse('''
@@ -651,6 +678,9 @@ def del_retribuzione(request, object_id):
     query_get = request.GET.copy()
     ids = query_get.getlist("id")      
     objs = models.RetribuzioneDipendente.objects.filter(id__in=ids)
+    
+    logger.debug("{}: ha intenzione di eliminare le retribuzioni {} [id={}] per il dipendente {}"
+                 .format(request.user, [(str(obj), "id=" + str(obj.id)) for obj in objs]))
     
     data = {"dipendente": dipendente, "objs": objs, "tipo": "ret",}
     return render_to_response(template,
@@ -674,8 +704,12 @@ def del_vartmp(request, object_id):
             models.RetribuzioneDipendente.objects.filter(id__in=ids).delete()
             
             if len(ids) == 1:
+                logger.debug("{}: eliminata la variazione temporanea della retribuzione [id={}]"
+                             .format(request.user, ids))
                 messages.add_message(request, messages.SUCCESS, 'Variazione temporanea eliminata')
             elif len(ids) > 1:
+                logger.debug("{}: eliminate le variazioni temporanee della retribuzione [id={}]"
+                             .format(request.user, ids))
                 messages.add_message(request, messages.SUCCESS, 'Variazioni temporanee eliminate')
             url = reverse("init_provvigione", args=[dipendente_id])
             return HttpResponse('''
@@ -686,6 +720,9 @@ def del_vartmp(request, object_id):
     query_get = request.GET.copy()
     ids = query_get.getlist("id")      
     objs = models.RetribuzioneDipendente.objects.filter(id__in=ids)
+
+    logger.debug("{}: ha intenzione di eliminare le varizioni temporanee della retribuzione {} [id={}] per il dipendente {}"
+                 .format(request.user, [(str(obj), "id=" + str(obj.id)) for obj in objs]))
     
     data = {"dipendente": dipendente, "objs": objs, "tipo": "tmp",}
     return render_to_response(template,

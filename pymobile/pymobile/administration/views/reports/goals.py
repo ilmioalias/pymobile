@@ -10,8 +10,13 @@ from django.shortcuts import render_to_response, HttpResponseRedirect, get_objec
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib import messages
 
 from datetime import date, timedelta
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger("file")
 
 # sistemiamo il locale al locale di default della macchina 
 import locale
@@ -223,8 +228,11 @@ def add_obiettivo_trimestrale(request):
         form = forms.ObiettivoForm(post_query)
         
         if form.is_valid():
-            form.save()
+            new_obj = form.save()
             
+            logger.debug("{}: aggiunto l'obiettivo trimestrale {} [id={}]"
+                         .format(request.user, new_obj, new_obj.id))
+            messages.add_message(request, messages.SUCCESS, 'Obiettivo trimestrale aggiunto')
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_obiettivo_trimestrale")) 
             else:
@@ -249,8 +257,11 @@ def mod_obiettivo_trimestrale(request, object_id):
         form = forms.ObiettivoForm(post_query, instance=obj)
     
         if form.is_valid():
-            form.save()
+            new_obj = form.save()
             
+            logger.debug("{}: modificato l'obiettivo trimestrale {} [id={}]"
+                         .format(request.user, new_obj, new_obj.id))
+            messages.add_message(request, messages.SUCCESS, 'Obiettivo trimestrale modificato')
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_obiettivo_trimestrale")) 
             else:
@@ -279,6 +290,14 @@ def del_obiettivo_trimestrale(request):
             models.Obiettivo.objects.filter(id__in=ids).delete()
             url = reverse("init_obiettivo_trimestrale")
             
+            if len(ids) == 1:
+                logger.debug("{}: eliminato l'obiettivo trimestrale [id={}]"
+                             .format(request.user, ids))
+                messages.add_message(request, messages.SUCCESS, 'Obiettivo trimestrale eliminato')
+            elif len(ids) > 1:
+                logger.debug("{}: eliminati gli obiettivi trimestrali [id={}]"
+                             .format(request.user, ids))
+                messages.add_message(request, messages.SUCCESS, 'Obiettivi trimestrali eliminati')
             return HttpResponse('''
                 <script type='text/javascript'>
                     opener.redirectAfter(window, '{}');
@@ -287,6 +306,9 @@ def del_obiettivo_trimestrale(request):
     query_get = request.GET.copy()
     ids = query_get.getlist("id")      
     objs = models.Obiettivo.objects.filter(id__in=ids)
+    
+    logger.debug("{}: ha intenzione di eliminare gli obiettivi trimestrali {}"
+                 .format(request.user, [(str(obj), "id=" + str(obj.id)) for obj in objs]))
     
     data = {"objs": objs}
     return render_to_response(template,

@@ -12,6 +12,10 @@ import pymobile.administration.models as models
 import pymobile.administration.forms as forms
 import pymobile.administration.tables as tables
 import pymobile.administration.utils as u
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger("file")
 
 # Create your views here.
 
@@ -66,8 +70,10 @@ def add_object(request):
         form = forms.TariffaForm(post_query)
         
         if form.is_valid():
-            form.save()
+            new_obj = form.save()
             
+            logger.debug("{}: aggiunta la tariffa {} [id={}]"
+                         .format(request.user, new_obj, new_obj.id))
             messages.add_message(request, messages.SUCCESS, 'Tariffa aggiunta')
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_tariffa")) 
@@ -93,8 +99,10 @@ def mod_object(request, object_id):
         form = forms.TariffaForm(post_query, instance=obj)
     
         if form.is_valid():
-            form.save()
-            
+            new_obj = form.save()
+
+            logger.debug("{}: modificato la tariffa {} [id={}]"
+                         .format(request.user, new_obj, new_obj.id))            
             messages.add_message(request, messages.SUCCESS, 'Tariffa modificata')
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_tariffa")) 
@@ -125,8 +133,12 @@ def del_object(request):
             url = reverse("init_tariffa")
             
             if len(ids) == 1:
+                logger.debug("{}: eliminato la tariffa [id={}]"
+                             .format(request.user, ids))
                 messages.add_message(request, messages.SUCCESS, 'Tariffa eliminata')
             elif len(ids) > 1:
+                logger.debug("{}: eliminati le tariffe [id={}]"
+                             .format(request.user, ids))
                 messages.add_message(request, messages.SUCCESS, 'Tariffe eliminate')
             return HttpResponse('''
                 <script type='text/javascript'>
@@ -136,7 +148,10 @@ def del_object(request):
     query_get = request.GET.copy()
     ids = query_get.getlist("id")      
     objs = models.Tariffa.objects.filter(id__in=ids)
-    
+
+    logger.debug("{}: ha intenzione di eliminare le tariffe {}"
+                 .format(request.user, [(str(obj), "id=" + str(obj.id)) for obj in objs]))
+       
     data = {"objs": objs}
     return render_to_response(template,
                               data,
@@ -172,6 +187,8 @@ def add_child_object(request, field_name):
         if form.is_valid():
             try:
                 new_obj = form.save()
+                logger.debug("{}: aggiunto l'attributo '{}' {} [id={}][chiave esterna di contratto]"
+                             .format(request.user, field_name, new_obj, new_obj.id))
             except form.ValidationError:
                 new_obj = None
                                 
@@ -236,14 +253,19 @@ def add_attribute(request, attribute):
         form = u.get_form(attribute + "tariffaform")(post_query)
         
         if form.is_valid():
-            form.save()
+            new_obj = form.save()
             
             if attribute == "servizio":
+                logger.debug("{}: aggiunto il servizio {} [id={}]"
+                             .format(request.user, new_obj, new_obj.id))
                 messages.add_message(request, messages.SUCCESS, '{} aggiunto'.format(attribute.title()))
             else:
+                logger.debug("{}: aggiunta la {} {} [id={}]"
+                             .format(request.user, attribute, new_obj, new_obj.id))
                 messages.add_message(request, messages.SUCCESS, '{} aggiunta'.format(attribute.title()))
             if request.POST.has_key("add_another"):              
-                return HttpResponseRedirect(reverse("add_tariffa")) 
+                return HttpResponseRedirect(reverse("add_attribute", 
+                                                    args=[attribute])) 
             else:
                 return HttpResponseRedirect(reverse("init_attribute", 
                                                     args=[attribute]))
@@ -268,14 +290,19 @@ def mod_attribute(request, attribute, object_id):
         form = u.get_form(attribute + "tariffaform")(post_query, instance=obj)
     
         if form.is_valid():
-            form.save()
+            new_obj = form.save()
 
             if attribute == "servizio":
+                logger.debug("{}: modificato il servizio {} [id={}]"
+                             .format(request.user, obj, obj.id))
                 messages.add_message(request, messages.SUCCESS, '{} modificato'.format(attribute.title()))
             else:
+                logger.debug("{}: modificata la {} {} [id={}]"
+                             .format(request.user, attribute, new_obj, new_obj.id))
                 messages.add_message(request, messages.SUCCESS, '{} modificata'.format(attribute.title()))            
             if request.POST.has_key("add_another"):              
-                return HttpResponseRedirect(reverse("add_tariffa")) 
+                return HttpResponseRedirect(reverse("add_attribute", 
+                                                    args=[attribute])) 
             else:
                 return HttpResponseRedirect(reverse("init_attribute", 
                                                     args=[attribute]))
@@ -302,6 +329,8 @@ def del_attribute(request, attribute):
             ids = query_post.getlist("id")
             model.objects.filter(id__in=ids).delete()
             
+            logger.debug("{}: eliminati gli attributi '{}' [id={}]"
+                         .format(request.user, attribute, ids))
             if attribute == "servizio" :
                 if len(ids) == 1:
                     messages.add_message(request, messages.SUCCESS, 'Servizio eliminato')
@@ -321,6 +350,9 @@ def del_attribute(request, attribute):
     query_get = request.GET.copy()
     ids = query_get.getlist("id")      
     objs = model.objects.filter(id__in=ids)
+    
+    logger.debug("{}: ha intenzione di eliminare gli attributi '{}' {}"
+                 .format(request.user, attribute, [(str(obj), "id=" + str(obj.id)) for obj in objs]))
     
     data = {"objs": objs, "attributo": attribute}
     return render_to_response(template,

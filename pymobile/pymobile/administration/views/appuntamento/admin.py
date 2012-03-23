@@ -13,6 +13,10 @@ import pymobile.administration.forms as forms
 import pymobile.administration.tables as tables
 import pymobile.administration.utils as u
 import datetime
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger("file")
 
 # Create your views here.
 
@@ -84,8 +88,9 @@ def add_object(request):
         form = forms.AppuntamentoForm(post_query)
         
         if form.is_valid():
-            form.save()
+            appuntamento = form.save()
             
+            logger.debug("{}: aggiunto l'appuntamento {}".format(request.user, appuntamento))
             messages.add_message(request, messages.SUCCESS, 'Appuntamento aggiunto')
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_appuntamento")) 
@@ -115,8 +120,9 @@ def mod_object(request, object_id):
         form = forms.AppuntamentoForm(post_query, instance=obj)
     
         if form.is_valid():
-            form.save()
+            appuntamento = form.save()
             
+            logger.debug("{}: modificato l'appuntamento {}".format(request.user, appuntamento))
             messages.add_message(request, messages.SUCCESS, 'Appuntamento modificato')
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_appuntamento")) 
@@ -158,6 +164,8 @@ def del_object(request):
     ids = query_get.getlist("id")      
     objs = models.Appuntamento.objects.filter(id__in=ids)
     
+    logger.debug("{}: ha intenzione di eliminare gli appuntamenti {}".format(request.user, [str(obj) for obj in objs]))
+    
     data = {"objs": objs}
     return render_to_response(template,
                               data,
@@ -195,6 +203,10 @@ def assign_object(request):
                           [to_email,], 
                           fail_silently=False,)              
                 
+                logger.debug("{}: assegnati gli appuntamenti {} e inviata mail all'agente {}"
+                             .format(request.user, 
+                                     [str(appuntamento) for appuntamento in appuntamenti],
+                                     agente))
                 messages.add_message(request, messages.SUCCESS, 'Agente assegnato ed EMail inviata')
                 url = reverse("init_appuntamento")
                 return HttpResponse('''
@@ -202,6 +214,10 @@ def assign_object(request):
                         opener.redirectAfter(window, '{}');
                     </script>'''.format(url))
             
+            logger.debug("{}: assegnati gli appuntamenti {} all'agente {}"
+                         .format(request.user, 
+                                 [str(appuntamento) for appuntamento in appuntamenti],
+                                 agente))
             messages.add_message(request, messages.SUCCESS, 'Agente assegnato')
             url = reverse("init_appuntamento")
             return HttpResponse('''
@@ -246,6 +262,12 @@ def add_child_object(request, field_name):
         if form.is_valid():
             try:
                 new_obj = form.save()
+                if field_name == "agente":
+                    logger.debug("{}: aggiunto l'agente {} [chiave esterna di appuntamento]"
+                                 .format(request.user, new_obj))
+                else:
+                    logger.debug("{}: aggiunto il {} {} [chiave esterna di appuntamento]"
+                                 .format(request.user, field_name, new_obj))
             except form.ValidationError:
                 new_obj = None
                                 
@@ -290,8 +312,10 @@ def mod_referente(request, object_id, referente_id):
         form = forms.ReferenteForm(post_query, instance=referente)
     
         if form.is_valid():
-            form.save()
+            referente = form.save()
             
+            logger.debug("{}: modificato il referente {} [chiave esterna di appuntamento]"
+                                 .format(request.user, referente))
             messages.add_message(request, messages.SUCCESS, 'Referente modificato')
             return HttpResponseRedirect(reverse("view_referente", 
                                                 args=[appuntamento_id, referente_id]))
@@ -319,6 +343,8 @@ def del_referente(request, object_id):
             referente_id = query_post["id"]
             models.Referente.objects.get(pk=referente_id).delete()
             
+            logger.debug("{}: eliminato il referente [chiave esterna di appuntamento]"
+                         .format(request.user))            
             messages.add_message(request, messages.SUCCESS, 'Referente eliminato')
             url = reverse("view_appuntamento", args=[appuntamento_id])
             return HttpResponse('''
@@ -328,9 +354,11 @@ def del_referente(request, object_id):
     
     query_get = request.GET.copy()
     referente_id = query_get["id"]
-    ref = get_object_or_404(models.Referente, pk=referente_id)      
+    referente = get_object_or_404(models.Referente, pk=referente_id)      
     
-    data = {"appuntamento": app, "obj": ref}
+    logger.debug("{}: ha intenzione di eliminare il referente {} [chiave esterna di appuntamento]"
+                                 .format(request.user, referente))
+    data = {"appuntamento": app, "obj": referente}
     return render_to_response(template,
                               data,
                               context_instance=RequestContext(request))
@@ -364,6 +392,10 @@ def send_mail_to_agente(request, object_id):
                       [to_email,], 
                       fail_silently=False,)
             
+            logger.debug("{}: email inviata all'agente {} relativa all'appuntamento {}"
+                         .format(request.user, 
+                                 agente, 
+                                 appuntamento,)) 
             messages.add_message(request, messages.SUCCESS, 'EMail inviata')
             url = reverse("view_appuntamento", args=[appuntamento_id])
             return HttpResponse('''

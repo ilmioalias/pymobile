@@ -12,6 +12,10 @@ import pymobile.administration.models as models
 import pymobile.administration.forms as forms
 import pymobile.administration.tables as tables
 import pymobile.administration.utils as u
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger("file")
 
 # Create your views here.
 
@@ -75,9 +79,11 @@ def add_object(request):
             formset = PianoTariffarioFormset(post_query, instance=contratto)
             
             if formset.is_valid():
-                form.save()
+                new_obj = form.save()
                 formset.save()
                 
+                logger.debug("{}: aggiunto il contratto {} [id={}]"
+                             .format(request.user, new_obj, new_obj.id))
                 messages.add_message(request, messages.SUCCESS, 'Contratto aggiunto')
                 if request.POST.has_key("add_another"):              
                     return HttpResponseRedirect(reverse("add_contratto")) 
@@ -117,9 +123,11 @@ def mod_object(request, object_id):
             formset = PianoTariffarioFormset(post_query, instance=contratto)
             
             if formset.is_valid():
-                form.save()
+                new_obj = form.save()
                 formset.save() 
                 
+                logger.debug("{}: modificato il contratto {} [id={}]"
+                             .format(request.user, new_obj, new_obj.id))
                 messages.add_message(request, messages.SUCCESS, 'Contratto modificato')
                 if request.POST.has_key("add_another"):              
                     return HttpResponseRedirect(reverse("add_contratto")) 
@@ -152,8 +160,12 @@ def del_object(request):
             models.Contratto.objects.filter(id__in=ids).delete()
             
             if len(ids) == 1:
+                logger.debug("{}: eliminato il contratto [id={}]"
+                             .format(request.user, ids))
                 messages.add_message(request, messages.SUCCESS, 'Contratto eliminato')
             elif len(ids) > 1:
+                logger.debug("{}: eliminato i contratti [id={}]"
+                             .format(request.user, ids))
                 messages.add_message(request, messages.SUCCESS, 'Contratti eliminati')
             url = reverse("init_contratto")
             return HttpResponse('''
@@ -164,6 +176,9 @@ def del_object(request):
     query_get = request.GET.copy()
     ids = query_get.getlist("id")      
     objs = models.Contratto.objects.filter(id__in=ids)
+    
+    logger.debug("{}: ha intenzione di eliminare i contratti {}"
+                 .format(request.user, [(str(obj), "id=" + str(obj.id)) for obj in objs]))
     
     data = {"objs": objs}
     return render_to_response(template,
@@ -193,6 +208,15 @@ def add_child_object(request, field_name):
         if form.is_valid():
             try:
                 new_obj = form.save()
+                if field_name == "agente":
+                    logger.debug("{}: aggiunto l'agente {} [id={}][chiave esterna di contratto]"
+                                 .format(request.user, new_obj, new_obj.id))
+                elif field_name == "cliente":
+                    logger.debug("{}: aggiunto il cliente {} [id={}][chiave esterna di contratto]"
+                                 .format(request.user, field_name, new_obj, new_obj.id))
+                elif field_name == "tariffa":
+                    logger.debug("{}: aggiunto la tariffa {} [id={}][chiave esterna di contratto]"
+                                 .format(request.user, field_name, new_obj, new_obj.id))
             except form.ValidationError:
                 new_obj = None
                                 

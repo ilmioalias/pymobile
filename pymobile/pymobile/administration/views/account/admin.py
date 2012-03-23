@@ -12,6 +12,10 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 import pymobile.administration.forms as forms
 import pymobile.administration.tables as tables
 import pymobile.administration.utils as u
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger("file")
 
 # Create your views here.
 
@@ -31,6 +35,7 @@ def login_user(request):
             if user.is_active:
                 auth.login(request, user)
                 
+                logger.debug("{}: autenticato".format(user))
                 messages.add_message(request, messages.SUCCESS, 'Benvenuto {}'.format(user))
                 # Redirect to a success page.
                 # FIXME: qui deve eessere ridirezionato verso una home page
@@ -41,6 +46,7 @@ def login_user(request):
                     url = reverse("init_dipendente")
                 return HttpResponseRedirect(url)
             else:
+                logger.debug("{}: ha tentato a autenticarsi [account non più attivo]".format(user))
                 # Return a 'disabled account' error message
                 messages.add_message(request, messages.ERROR, 'Account {} non più attivo'.format(user))
                 return HttpResponseRedirect(reverse("login"))
@@ -55,6 +61,7 @@ def login_user(request):
 @login_required     
 def logout_user(request):
     auth.logout(request)
+    logger.debug("{}: logout".format(request.user))
     # Redirect to a success page.
     messages.add_message(request, messages.SUCCESS, 'Logout effettuato')
     return HttpResponseRedirect(reverse("login"))
@@ -106,8 +113,10 @@ def add_object(request):
         form = forms.AccountForm(post_query)
         
         if form.is_valid():
-            form.save()
+            new_obj = form.save()
             
+            logger.debug("{}: aggiunto l'account {} [id={}]"
+                         .format(request.user, new_obj, new_obj.id))
             messages.add_message(request, messages.SUCCESS, 'Account aggiunto')
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_account")) 
@@ -133,8 +142,10 @@ def mod_object(request, object_id):
         form = forms.AccountForm(post_query, instance=obj)
         
         if form.is_valid():
-            form.save()
-            
+            new_obj = form.save()
+
+            logger.debug("{}: modificato l'account {} [id={}]"
+                         .format(request.user, new_obj, new_obj.id))            
             messages.add_message(request, messages.SUCCESS, 'Account modificato')
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_account")) 
@@ -173,8 +184,12 @@ def del_object(request):
             User.objects.filter(id__in=ids).delete()
             
             if len(ids) > 1:
-                messages.add_message(request, messages.SUCCESS, 'Appuntamenti eliminati')
+                logger.debug("{}: eliminato l'account [id={}]"
+                             .format(request.user, ids))
+                messages.add_message(request, messages.SUCCESS, 'Account eliminati')
             elif len(ids) == 1:
+                logger.debug("{}: eliminati gli account [id={}]"
+                             .format(request.user, ids))
                 messages.add_message(request, messages.SUCCESS, 'Account eliminato')
             url = reverse("init_account")
             return HttpResponse('''
@@ -185,6 +200,9 @@ def del_object(request):
     query_get = request.GET.copy()
     ids = query_get.getlist("id")      
     objs = User.objects.filter(id__in=ids)
+    
+    logger.debug("{}: ha intenzione di eliminare gli account {}"
+                 .format(request.user, [(str(obj), "id=" + str(obj.id)) for obj in objs]))
     
     data = {"objs": objs}
     return render_to_response(template,
@@ -204,6 +222,8 @@ def mod_password(request, object_id):
         if form.is_valid():
             form.save()
             
+            logger.debug("{}: modificato la password dell'account {} [id={}]"
+                         .format(request.user, obj, obj.id))
             messages.add_message(request, messages.SUCCESS, 'Password modificata')    
             return HttpResponseRedirect(reverse("view_account", 
                                                     args=[object_id]))

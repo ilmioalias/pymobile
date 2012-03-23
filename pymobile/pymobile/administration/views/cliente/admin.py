@@ -11,6 +11,10 @@ import pymobile.administration.models as models
 import pymobile.administration.forms as forms
 import pymobile.administration.tables as tables
 import pymobile.administration.utils as u
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger("file")
 
 # Create your views here.
 
@@ -64,8 +68,10 @@ def add_object(request):
         form = forms.ClienteForm(post_query)
         
         if form.is_valid():
-            form.save()
+            new_obj = form.save()
             
+            logger.debug("{}: aggiunto il cliente {} [id={}]"
+                         .format(request.user, new_obj, new_obj.id))
             messages.add_message(request, messages.SUCCESS, 'Cliente aggiunto')
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_cliente")) 
@@ -93,8 +99,6 @@ def mod_object(request, object_id):
         # relativi a suoi appuntamenti non ancora assegnati
         user = request.user
         profile = user.dipendente
-        print(models.Appuntamento.objects.filter(cliente=obj).exclude(telefonista=profile))
-        print(models.Appuntamento.objects.filter(agente__isnull=False, cliente=obj).exists())
         if (models.Appuntamento.objects.filter(cliente=obj).exclude(telefonista=profile).exists() |
             models.Appuntamento.objects.filter(agente__isnull=False, cliente=obj).exists()):
             messages.add_message(request, messages.ERROR, "Non è possibile modificare il cliente:"\
@@ -109,8 +113,10 @@ def mod_object(request, object_id):
         form = forms.ClienteForm(post_query, instance=obj)
     
         if form.is_valid():
-            form.save()
+            new_obj = form.save()
             
+            logger.debug("{}: modificato il cliente {} [id={}]"
+                         .format(request.user, new_obj, new_obj.id))
             messages.add_message(request, messages.SUCCESS, 'Cliente modificato')
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_cliente")) 
@@ -142,8 +148,12 @@ def del_object(request):
             models.Cliente.objects.filter(id__in=ids).delete()
             
             if len(ids) == 1:
+                logger.debug("{}: eliminato il cliente [id={}]"
+                             .format(request.user, ids))
                 messages.add_message(request, messages.SUCCESS, 'Cliente elimnato')
             elif len(ids) > 1:
+                logger.debug("{}: eliminati i clienti [id={}]"
+                             .format(request.user, ids))
                 messages.add_message(request, messages.SUCCESS, 'Clienti eliminati')
             url = reverse("init_cliente")
             return HttpResponse('''
@@ -155,6 +165,8 @@ def del_object(request):
     ids = query_get.getlist("id")      
     objs = models.Cliente.objects.filter(id__in=ids)
     
+    logger.debug("{}: ha intenzione di eliminare i clienti {}"
+                 .format(request.user, [(str(obj), "id=" + str(obj.id)) for obj in objs]))
     data = {"objs": objs}
     return render_to_response(template,
                               data,

@@ -7,6 +7,7 @@ TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
+    ("Luigi Curzi", "luigi_curzi@yahoo.it"),
 )
 
 MANAGERS = ADMINS
@@ -145,21 +146,43 @@ INSTALLED_APPS = (
 # the site admins on every HTTP 500 error.
 # See http://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
+
+# creiamo il file di log se non esiste
+logfile_path = PROJECT_ROOT_PATH + '/logs/debug.log'
+    
 LOGGING = {
     'version': 1,
-    'disable_existing_loggers': False,
+    'disable_existing_loggers': True,
+    'filemode': 'a+',
+    'formatters': {
+        'standard': {
+            'format': '%(asctime)s - %(message)s [%(filename)s > %(funcName)s > line: %(lineno)d]'
+        },
+    },
     'handlers': {
+        'file': {
+            'level':'DEBUG',
+            'class':'logging.handlers.TimedRotatingFileHandler',
+            'filename': logfile_path,
+            'when': "D", # un file al giorno
+            'backupCount': 14, # per due settimane 
+            'formatter':'standard',
+        },
         'mail_admins': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
     },
     'loggers': {
         'django.request': {
-            'handlers': ['mail_admins'],
+            'handlers': ['mail_admins',],
             'level': 'ERROR',
-            'propagate': True,
+            'propagate': False,
         },
+        'file': {
+            'handlers': ['file',],
+            'level': 'DEBUG',
+        }
     }
 }
 
