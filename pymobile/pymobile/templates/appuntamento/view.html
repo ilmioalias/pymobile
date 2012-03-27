@@ -26,8 +26,8 @@
 		{% if object.agente %}
 		<a id="mail" class="send_mail" href="{% url send_mail_appuntamento object.id %}?agente={{ object.agente.id }}" title="invia email di notifica all'agente assegnato all'appuntamento">invia email</a> |
 		{% endif %}
-		<a id="del_{{ object.id }}" class="deleteobj" href="{% url del_appuntamento %}?id={{ object.id }}">modifica</a> |
-		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_appuntamento object.id %}">elimina</a>
+		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_appuntamento object.id %}">modifica</a> |
+		<a id="del_{{ object.id }}" class="deleteobj" href="{% url del_appuntamento %}?id={{ object.id }}">elimina</a>
 	</fieldset>
 </div><!-- 
 <div class="div_menu">

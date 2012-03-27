@@ -60,8 +60,9 @@ def login_user(request):
 
 @login_required     
 def logout_user(request):
+    user = request.user
     auth.logout(request)
-    logger.debug("{}: logout".format(request.user))
+    logger.debug("{}: logout".format(user))
     # Redirect to a success page.
     messages.add_message(request, messages.SUCCESS, 'Logout effettuato')
     return HttpResponseRedirect(reverse("login"))
