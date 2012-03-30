@@ -158,7 +158,7 @@ def inout(request):
 #            out_tot_prov_bonus_agt_day = 0
 #            out_tot_prov_bonus_tel_day = 0
 
-            contratti_day = contratti.filter(data_stipula=date).iterator()
+            contratti_day = contratti.filter(data_stipula=date["data_stipula"]).iterator()
             
 #            n = 0
 #            a = 0
