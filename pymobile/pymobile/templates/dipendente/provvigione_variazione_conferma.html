@@ -1,4 +1,4 @@
-{% extends "popup_base.html" %}      
+{% extends "base.html" %}      
 
 {% block extrahead %}
 <title>PYMOBILE | Dipendenti</title>
@@ -11,6 +11,21 @@
 {% endblock %}
 
 {% block content %}
+<div class="navigation">
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../../../">home</a> &gt; 
+		<a href="{% url init_dipendente %}">amministrazione dipendenti</a> &gt;
+		<a href="{% url view_dipendente dipendente.pk %}">{{ dipendente }}</a> &gt;
+		<a href="{% url init_provvigione dipendente.pk %}">retribuzione</a> &gt;
+		{% if action == "mod" %}
+		<a href="{% url mod_vartmp dipendente.pk variazione.pk %}">modifica variazione temporanea di {{ dipendente }}</a> &gt;
+		{% else %}
+		<a href="{% url add_vartmp dipendente.pk %}">aggiungi variazione temporanea di {{ dipendente }}</a> &gt;
+		{% endif %}
+		<a href=".">conferma</a>
+	</fieldset>
+</div>
 {% if vartmp_del %}
 Verrano <b>eliminate</b> le seguenti varizioni temporanee già presenti nel DATABASE perché si sovrappongono totalmente con la nuova variazione temporanea:
 <ul>

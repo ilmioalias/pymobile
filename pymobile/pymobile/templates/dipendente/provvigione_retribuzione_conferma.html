@@ -1,4 +1,4 @@
-{% extends "popup_base.html" %}      
+{% extends "base.html" %}      
 
 {% block extrahead %}
 <title>PYMOBILE | Dipendenti</title>
@@ -11,6 +11,22 @@
 {% endblock %}
 
 {% block content %}
+<div class="navigation">
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../../../">home</a> &gt; 
+		<a href="{% url init_dipendente %}">amministrazione dipendenti</a> &gt;
+		<a href="{% url view_dipendente dipendente.pk %}">{{ dipendente }}</a> &gt;
+		<a href="{% url init_provvigione dipendente.pk %}">retribuzione</a> &gt;
+		{% if action == "mod" %}
+		<a href="{% url mod_retribuzione dipendente.pk retribuzione.pk %}">modifica retribuzione di {{ dipendente }}</a> &gt;
+		{% else %}
+		<a href="{% url add_retribuzione dipendente.pk %}">aggiungi retribuzione di {{ dipendente }}</a> &gt;
+		{% endif %}
+		<a href=".">conferma</a>
+	</fieldset>
+</div>
+{% load tags %}
 {% if retr_del %}
 Verrano <b>eliminate</b> le seguenti varizioni della retribuzione già presenti nel DATABASE perché precedenti alla nuova variazione della retribuzione:
 <ul>

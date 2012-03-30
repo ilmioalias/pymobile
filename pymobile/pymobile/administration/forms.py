@@ -809,6 +809,125 @@ class ContrattoFilterForm(forms.ModelForm):
                   "inviato",)
 
 
+class OpzioneForm(forms.Form):
+    email_titolare = forms.EmailField(label="email del titolare", 
+                                      help_text="Indirizzo email a cui inviare il resoconto",
+                                      required=False,)
+    provvigione_bonus_agente = forms.CharField(label="provvigione bonus default per agente",
+                                               widget=forms.Textarea(),
+                                               required=False,)
+    provvigione_bonus_telefonista = forms.CharField(label="provvigione bonus default per telefonista",
+                                                    widget=forms.Textarea(),
+                                                    required=False,)
+    
+    def values_from_provvigione_bonus_field(self, provvigione_bonus):
+        provvigione_bonus = provvigione_bonus.strip()
+        if not provvigione_bonus:
+            return []
+        
+        values = []
+        vs = provvigione_bonus.split(";")
+        for var in vs:
+            if var:
+                d = {}
+                opts = var.split(",")
+                for opt in opts:
+                    item = opt.split(":")
+                
+                    if len(item) == 2:
+                        k = item[0].strip()
+                        v = item[1].strip()
+                        d[k] = v             
+                values.append(d)
+                
+        return values    
+    
+    def get_provvigione_bonus_cleaned(self, values):
+        if not values:
+            return
+        
+        provvigione_bonus = ""
+        for d in values:
+            if d:
+                for k, v in d.iteritems():
+                    provvigione_bonus += str(k) + ":" + str(v) + ","
+                provvigione_bonus = provvigione_bonus[:-1] + ";"
+    
+        return provvigione_bonus  
+
+    def check_values(self, values):
+        if not values:
+            raise forms.ValidationError("provvigione bonus non valida, controlla la sintassi")
+        
+        for d in values:
+            if not "provvigione" in d:
+                provvigione_bonus = self.get_provvigione_bonus_cleaned([d])
+                raise forms.ValidationError("in <b>{}</b> non è stata indicata la chiave "\
+                                            "obbligatoria <b>provvigione</b>".format(provvigione_bonus))                
+            
+            if len(d) < 2:
+                raise forms.ValidationError("in <b>{}</b> oltre alla chiave obbligatoria "\
+                                            "<b>provvigione</b> devi indicare un'altra chiave".format(provvigione_bonus))
+            
+            for k, v in d.iteritems():
+                # controlliamo le chiavi e i loro valori
+                if k == "provvigione":
+                    v = d["provvigione"]
+                    try:
+                        v = float(v)
+                        if v < 0:
+                            raise forms.ValidationError("il valore <b>{}</b> della chiave <b>provvigione</b> deve essere un numero maggiore o uguale di 0".format(v))                                             
+                    except:
+                        raise forms.ValidationError("il valore <b>{}</b> della chiave <b>provvigione</b> deve un numero maggiore o uguale di 0".format(v))                         
+                    d["provvigione"] = v                    
+                elif k == "gestore":
+                    if not models.Gestore.objects.filter(denominazione=v).exists():
+                        raise forms.ValidationError("il gestore <b>{}</b> non esiste nel DATABASE".format(v))
+                elif k == "profilo":
+                    if not models.Tariffa.objects.filter(profilo=v).exists():
+                        raise forms.ValidationError("la tariffa <b>{}</b> non esiste nel DATABASE".format(v))
+                elif k == "tipo":
+                    if not models.TipologiaTariffa.objects.filter(denominazione=v).exists():
+                        raise forms.ValidationError("il tipo di tariffa <b>{}</b> non esiste nel DATABASE".format(v))
+                elif k == "fascia":
+                    if not models.FasciaTariffa.objects.filter(denominazione=v).exists():
+                        raise forms.ValidationError("la fascia <b>{}</b> non esiste nel DATABASE".format(v))   
+                elif k == "servizio":
+                    if not models.ServizioTariffa.objects.filter(denominazione=v).exists():
+                        raise forms.ValidationError("il servizio <b>{}</b> non esiste nel DATABASE".format(v))
+                elif k == "blindato":
+                    try:
+                        v = int(v)
+                    except : 
+                        raise forms.ValidationError("il valore <b>{}</b> della chiave <b>blindato</b> deve essere un intero maggiore o uguale di 0".format(v))                                                 
+                    if v < 0:
+                        raise forms.ValidationError("il valore <b>{}</b> della chiave <b>blindato</b> deve essere un intero maggiore o uguale di 0".format(v))
+                    d[k] = v
+                else:
+                    raise forms.ValidationError("la chiave <b>{}</b> non è ammessa".format(k))                                                                     
+            
+        return True
+
+    def clean_provvigione_bonus_agente(self):     
+        cdata = self.cleaned_data
+        provvigione_bonus = cdata.get("provvigione_bonus_agente")
+        if provvigione_bonus:
+            values = self.values_from_provvigione_bonus_field(provvigione_bonus)
+            self.check_values(values)
+            return self.get_provvigione_bonus_cleaned(values)
+        else:
+            return ""        
+
+    def clean_provvigione_bonus_telefonista(self):     
+        cdata = self.cleaned_data
+        provvigione_bonus = cdata.get("provvigione_bonus_telefonista")
+        if provvigione_bonus:
+            values = self.values_from_provvigione_bonus_field(provvigione_bonus)
+            self.check_values(values)
+            return self.get_provvigione_bonus_cleaned(values)
+        else:
+            return ""  
+
 #-------------------------------------------------------------------------------
 # STATISTICHE
 

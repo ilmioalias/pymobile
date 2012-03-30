@@ -93,17 +93,23 @@ def get_data(d, obiettivo):
     else:
         return ""
     
-@register.filter(name="get_inviati")
-def get_inviati(d, obiettivo):
-    key = obiettivo.denominazione
+@register.filter(name="get_contratti")
+def get_contratti(d, obiettivo):
+    if isinstance(obiettivo, str) or isinstance(obiettivo, unicode):
+        key = obiettivo
+    else:
+        key = obiettivo.denominazione
     if d.has_key(key):
-        return d[key]["inviati"]
+        return d[key]["contratti"]
     else:
         return ""
 
 @register.filter(name="get_punteggio")
 def get_punteggio(d, obiettivo):
-    key = obiettivo.denominazione
+    if isinstance(obiettivo, str) or isinstance(obiettivo, unicode):
+        key = obiettivo
+    else:
+        key = obiettivo.denominazione
     if d.has_key(key):
         return d[key]["punteggio"]
     else:
@@ -111,7 +117,10 @@ def get_punteggio(d, obiettivo):
     
 @register.filter(name="get_msg")
 def get_msg(d, obiettivo):
-    key = obiettivo.denominazione
+    if isinstance(obiettivo, str) or isinstance(obiettivo, unicode):
+        key = obiettivo
+    else:
+        key = obiettivo.denominazione
     if d.has_key(key):
         return d[key]["msg"]
     else:

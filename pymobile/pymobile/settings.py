@@ -187,8 +187,11 @@ LOGGING = {
 }
 
 # EMail Settings
-EMAIL_HOST = "localhost"
-EMAIL_PORT = 1025
+EMAIL_HOST="smtp.gmail.com"
+EMAIL_PORT=587
+EMAIL_HOST_USER="servermobiltime@gmail.com"
+EMAIL_HOST_PASSWORD="mobiltime2012"
+EMAIL_USE_TLS=True
 
 # Authentication
 AUTH_PROFILE_MODULE = 'administration.Dipendente'

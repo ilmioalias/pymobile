@@ -395,3 +395,67 @@ class ObiettivoTable(tables.Table):
         model = models.Obiettivo
         sequence = ("selection", "...", )
         exclude = ("id", "creazione", "modifica",)
+
+class AppuntamentoReportTable(tables.Table):
+    TMP_REF='''
+       {% if record.referente %}<a href="{% url view_referente record.pk record.referente.pk %}">{{ record.referente }}</a>{% endif %} 
+    '''
+    
+    TMP_AGT='''
+       {% if record.agente %}<a href="{% url view_dipendente record.agente.pk %}">{{ record.agente }}</a>{% endif %} 
+    '''    
+    
+    TMP_CONTRATTO='''
+        {% load tags %}
+        <table>
+            {% for obj in record.contratto_set.all %}
+            <tr>
+                <td><a href="{% url view_contratto obj.pk %}">{{ obj }}</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+    '''
+        
+    cliente = tables.LinkColumn("view_cliente", args=[A("cliente.pk")],)
+    telefonista = tables.LinkColumn("view_dipendente", args=[A("telefonista.pk")])
+    agente = tables.TemplateColumn(TMP_AGT)
+    referente = tables.TemplateColumn(TMP_REF)
+    richiamare = BooleanColumn()
+    contratto = tables.TemplateColumn(TMP_CONTRATTO, orderable=False)
+    
+    class Meta:
+        model = models.Appuntamento
+        attrs = {"class": "modeltable",}
+        exclude = ("id", "creazione", "modifica", "num_sim", "gestore_mob",
+                   "gestore_fisso", "nota", "data_assegnazione", "nota_esito")
+        sequence = ("data", "cliente", "...")
+        empty_text = "Nessuna Appuntamento"
+   
+class ContrattoReportTable(tables.Table):
+    TMP_PT='''
+        {% load tags %}
+        <table>            
+            {% for pt in record|get_pt %}
+            <tr>
+                <td><a href="{% url view_tariffa pt|get_pt_tariffa_pk %}">{{ pt|get_pt_tariffa }}</a>({{ pt.num }}) {% if pt.opzione %}[opzione]{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    '''
+    
+    cliente = tables.LinkColumn("view_cliente", args=[A("cliente.pk")],)
+    agente = tables.LinkColumn("view_dipendente", args=[A("agente.pk")])
+    piano_tariffario = tables.TemplateColumn(TMP_PT, orderable=False, verbose_name="Piano tariffario")
+    completo = BooleanColumn()
+    inviato = BooleanColumn()
+    caricato = BooleanColumn()
+    attivato = BooleanColumn()
+    
+    class Meta:
+        model = models.Contratto
+        attrs = {"class": "modeltable",}
+        exclude = ("id", "creazione", "modifica", "appuntamento", "pdf_contratto", "nota",
+                   "data_rescissione", "data_completato", "data_inviato", "data_caricato", 
+                   "data_attivato", "vas_telefonista", "vas_agente",)
+        sequence = ("cliente", "agente", "piano_tariffario", "...")
+        empty_text = "Nessuna Contratto"

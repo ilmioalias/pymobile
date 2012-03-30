@@ -37,10 +37,10 @@
 	    		<td></td>
 	    		{% endif %}
 	    		{% for obiettivo in obiettivi %}
-	    			{% if row|get_inviati:obiettivo %}
+	    			{% if row|get_contratti:obiettivo %}
 					<td>
 						<i>({{ row|get_data:obiettivo }})</i>  <br />
-						Inviati: <a href="{% url init_contratto %}?fdata_inviato=={{ row|get_data:obiettivo }}&finviato=!0">{{ row|get_inviati:obiettivo }}</a>, 
+						Inviati: <a href="{% url init_contratto %}?fdata_inviato=={{ row|get_data:obiettivo }}&finviato=!0">{{ row|get_contratti:obiettivo }}</a>, 
 						Punteggio: {{ row|get_punteggio:obiettivo }}
 					</td>
 					{% else %}
@@ -58,7 +58,7 @@
 	    		<td><b>Totali</b></td>
 	    		{% for obiettivo in obiettivi %}
 	    		<td>
-	    			Inviati: {{ totali|get_inviati:obiettivo }}<br />
+	    			Inviati: {{ totali|get_contratti:obiettivo }}<br />
 	    			Punteggio: {{ totali|get_punteggio:obiettivo }} <br />
 	    			<b><i>{{ totali|get_msg:obiettivo }}</i></b>
 	    		</td>

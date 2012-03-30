@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.http import HttpResponse          
+from django.http import HttpResponse      
 from django.shortcuts import render_to_response, HttpResponseRedirect, get_object_or_404
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
@@ -11,6 +11,7 @@ import pymobile.administration.models as models
 import pymobile.administration.forms as forms
 import pymobile.administration.tables as tables
 import pymobile.administration.utils as u
+from pymobile.administration.views.opzione.admin import get_default_options
 from datetime import datetime, timedelta
 from copy import deepcopy
 import logging
@@ -101,8 +102,16 @@ def add_object(request):
         data = {"principale": True}
         for subform in formset.forms:
             subform.initial = data
+    
+    default_opts = get_default_options()
+    provvigione_bonus_agente = default_opts["provvigione_bonus_agente"]
+    provvigione_bonus_telefonista = default_opts["provvigione_bonus_telefonista"]
         
-    data = {"modelform": form, "modelformset": formset, "action": action,}                
+    data = {"modelform": form, 
+            "modelformset": formset, 
+            "action": action,
+            "provvigione_bonus_agente": provvigione_bonus_agente,
+            "provvigione_bonus_telefonista": provvigione_bonus_telefonista}                
     return render_to_response(template, 
                               data,
                               context_instance=RequestContext(request))
@@ -322,7 +331,7 @@ def add_retribuzione(request, object_id):
             logger.debug("{}: aggiunto la retribuzione {} [id={}] per il dipendente {}"
                          .format(request.user, new_obj, new_obj.id, dipendente))
             messages.add_message(request, messages.SUCCESS, 'Retribuzione aggiunta')
-            return HttpResponse(reverse("init_provvigione", args=[dipendente_id]))
+            return HttpResponseRedirect(reverse("init_provvigione", args=[dipendente_id]))
     else:
         # recuperiamo le provvigioni iniziali, corrispondono a quelle della retribuzione precedente
         last_retribuzione = models.RetribuzioneDipendente.objects.filter(dipendente=dipendente,
@@ -379,62 +388,77 @@ def add_vartmp(request, object_id):
             # quelle da cancellare
             vartmp_del = variazioni.filter(data_inizio__gte=d_i,
                                            data_fine__lte=d_f,)
-            
-            if not post_query.get("verified", False) and (vartmp_del.exists() or vartmp_mod_i.exists() or vartmp_mod_f.exists()):
-                if vartmp_mod_i.exists() and vartmp_mod_f.exists() and vartmp_mod_f[0] == vartmp_mod_i[0]:
-                    vartmp_mod_f = None
-                data = {"dipendente": dipendente, 
-                        "vartmp_mod_i": vartmp_mod_i,
-                        "vartmp_mod_f": vartmp_mod_f, 
-                        "vartmp_del": vartmp_del,
-                        "variazione": post_query["variazione"],
-                        "principale": post_query["principale"],
-                        "data_inizio": post_query["data_inizio"],
-                        "data_fine": post_query["data_fine"],
-                        "provvigione_contratto": post_query["provvigione_contratto"],
-                        "provvigione_bonus": post_query["provvigione_bonus"],}
-                return render_to_response(TMP_PROV_VARTMP_CONF,
-                                          data,
-                                          context_instance=RequestContext(request))             
-            else:
-                vartmp_new = form.save(commit=False)
-                # eseguiamo le modifiche al databse
-                # eliminiamo 
-                if vartmp_del.exists():
-                    vartmp_del.delete()
-                # modifichiamo
-                if vartmp_mod_i.exists() and vartmp_mod_f.exists():
-                    if vartmp_mod_i[0] == vartmp_mod_f[0]:
-                        # questo è il caso in cui la nuova variazione abbia il periodo completamente 
-                        # compreso in un'altra variazione: dobbiamo creare due nuove variazione
-                        # più la nuova variazione
-                        # 1 - creiamo una nuova istanza 
-                        new = deepcopy(vartmp_mod_f[0])
-                        new.pk = None
-                        new.data_inizio = vartmp_new.data_fine + timedelta(1)
-                        new.save()
-                    else:
-                        t = vartmp_new.data_fine + timedelta(1)
-                        vartmp_mod_f.update(data_inizio=t)
-                    t = vartmp_new.data_inizio - timedelta(1)
-                    vartmp_mod_i.update(data_fine=t)                    
-                elif vartmp_mod_i.exists() and not vartmp_mod_f.exists():
-                    t = vartmp_new.data_inizio - timedelta(1)
-                    vartmp_mod_i.update(data_fine=t)
-                elif not vartmp_mod_i.exists() and vartmp_mod_f.exists():
+            # FIXME: aggiungere un avviso se altre var. tmp. vengono modficate
+#            if not post_query.get("verified", False) and (vartmp_del.exists() or vartmp_mod_i.exists() or vartmp_mod_f.exists()):
+#                if vartmp_mod_i.exists() and vartmp_mod_f.exists() and vartmp_mod_f[0] == vartmp_mod_i[0]:
+#                    vartmp_mod_f = None
+#                data = {"action": action,
+#                        "dipendente": dipendente, 
+#                        "vartmp_mod_i": vartmp_mod_i,
+#                        "vartmp_mod_f": vartmp_mod_f, 
+#                        "vartmp_del": vartmp_del,
+#                        "variazione": post_query["variazione"],
+#                        "principale": post_query["principale"],
+#                        "data_inizio": post_query["data_inizio"],
+#                        "data_fine": post_query["data_fine"],
+#                        "provvigione_contratto": post_query["provvigione_contratto"],
+#                        "provvigione_bonus": post_query["provvigione_bonus"],}
+#                html = render_to_string(TMP_PROV_VARTMP_CONF,
+#                                        data,)
+#                url = reverse("confirm_vartmp")
+#                return HttpResponse('''
+#                    <script type='text/javascript'>
+#                        var name = 'confirm';
+#                        var win = window.open('{}', name, 'height=600,width=800,resizable=yes,scrollbars=yes');
+#                        win.focus();
+#                    </script>'''.format(url))
+#                return render_to_response(TMP_PROV_VARTMP_CONF,
+#                                          data,
+#                                          context_instance=RequestContext(request))             
+#            else:
+            vartmp_new = form.save(commit=False)
+            mod_del = False
+            # eseguiamo le modifiche al databse
+            # eliminiamo 
+            if vartmp_del.exists():
+                mod_del = True
+                vartmp_del.delete()
+            # modifichiamo
+            if vartmp_mod_i.exists() and vartmp_mod_f.exists():
+                mod_del = True
+                if vartmp_mod_i[0] == vartmp_mod_f[0]:
+                    # questo è il caso in cui la nuova variazione abbia il periodo completamente 
+                    # compreso in un'altra variazione: dobbiamo creare due nuove variazione
+                    # più la nuova variazione
+                    # 1 - creiamo una nuova istanza 
+                    new = deepcopy(vartmp_mod_f[0])
+                    new.pk = None
+                    new.data_inizio = vartmp_new.data_fine + timedelta(1)
+                    new.save()
+                else:
                     t = vartmp_new.data_fine + timedelta(1)
                     vartmp_mod_f.update(data_inizio=t)
-                vartmp_new.save()
+                t = vartmp_new.data_inizio - timedelta(1)
+                vartmp_mod_i.update(data_fine=t)                    
+            elif vartmp_mod_i.exists() and not vartmp_mod_f.exists():
+                mod_del = True
+                t = vartmp_new.data_inizio - timedelta(1)
+                vartmp_mod_i.update(data_fine=t)
+            elif not vartmp_mod_i.exists() and vartmp_mod_f.exists():
+                mod_del = True
+                t = vartmp_new.data_fine + timedelta(1)
+                vartmp_mod_f.update(data_inizio=t)
+            vartmp_new.save()
                 
-                logger.debug("{}: aggiunto la variazione temporanea alla retribuzione {} [id={}] per il dipendente {}"
-                         .format(request.user, vartmp_new, vartmp_new.id, dipendente))
+            logger.debug("{}: aggiunto la variazione temporanea alla retribuzione {} [id={}] per il dipendente {}"
+                     .format(request.user, vartmp_new, vartmp_new.id, dipendente))
+            if mod_del:
+                messages.add_message(request, messages.SUCCESS, 'Variazione temporanea aggiunta '\
+                                     '(Sono state apportate delle modfiche)')
+            else:
                 messages.add_message(request, messages.SUCCESS, 'Variazione temporanea aggiunta')
-                url = reverse("init_provvigione", args=[dipendente_id])
-                return HttpResponse('''
-                                <script type='text/javascript'>
-                                    opener.redirectAfter(window, '{}');
-                                </script>'''.format(url)) 
-    
+            return HttpResponseRedirect(reverse("init_provvigione", args=[dipendente_id])) 
+
     else:   
         # recuperiamo le provvigioni iniziali, corrispondono a quelle della retribuzione precedente
         last_retribuzione = models.RetribuzioneDipendente.objects.filter(dipendente=dipendente,
@@ -486,50 +510,52 @@ def mod_retribuzione(request, object_id, provvigione_id):
                 vartmp_del = variazioni.filter(data_fine__lte=d_i,)
                 retr_del = retribuzioni.filter(data_inizio__lte=d_i).exclude(pk=provvigione_id)
                 
-                if not post_query.get("verified", False) and (vartmp_del.exists() or vartmp_mod.exists() or retr_del.exists()):
-                    data = {"dipendente": dipendente, 
-                            "vartmp_mod": vartmp_mod,
-                            "retr_del": retr_del, 
-                            "vartmp_del": vartmp_del,
-                            "principale": post_query["principale"],
-                            "data_inizio": post_query["data_inizio"],
-                            "fisso": post_query["fisso"],
-                            "provvigione_contratto": post_query["provvigione_contratto"],
-                            "provvigione_bonus": post_query["provvigione_bonus"],}
-                    return render_to_response(TMP_PROV_RETR_CONF,
-                                              data,
-                                              context_instance=RequestContext(request)) 
+#                if not post_query.get("verified", False) and (vartmp_del.exists() or vartmp_mod.exists() or retr_del.exists()):
+#                    data = {"dipendente": dipendente,
+#                            "retribuzione": obj,  
+#                            "vartmp_mod": vartmp_mod,
+#                            "retr_del": retr_del, 
+#                            "vartmp_del": vartmp_del,
+#                            "principale": post_query["principale"],
+#                            "data_inizio": post_query["data_inizio"],
+#                            "fisso": post_query["fisso"],
+#                            "provvigione_contratto": post_query["provvigione_contratto"],
+#                            "provvigione_bonus": post_query["provvigione_bonus"],}
+#                    return render_to_response(TMP_PROV_RETR_CONF,
+#                                              data,
+#                                              context_instance=RequestContext(request)) 
+#                else:
+                retr_new = form.save(commit=False)
+                mod_del = False
+                # eseguiamo le modifiche al databse
+                # eliminiamo 
+                if vartmp_del.exists():
+                    mod_del = True
+                    vartmp_del.delete()
+                if retr_del.exists():
+                    mod_del = True
+                    retr_del.delete()
+                # modifichiamo
+                if vartmp_mod.exists():
+                    mod_del = True
+                    vartmp_mod.update(data_inizio=retr_new.data_inizio)
+                retr_new.save()
+                
+                logger.debug("{}: modficata la retribuzione {} [id={}] per il dipendente {}"
+                             .format(request.user, retr_new, retr_new.id, dipendente))
+                if mod_del:
+                    messages.add_message(request, messages.SUCCESS, 'Retribuzione modificata '\
+                                         '(Sono state apportate alcune modifiche)')
                 else:
-                    retr_new = form.save(commit=False)
-                    # eseguiamo le modifiche al databse
-                    # eliminiamo 
-                    if vartmp_del.exists():
-                        vartmp_del.delete()
-                    if retr_del.exists():
-                        retr_del.delete()
-                    # modifichiamo
-                    if vartmp_mod.exists():
-                        vartmp_mod.update(data_inizio=retr_new.data_inizio)
-                    retr_new.save()
-                    
-                    logger.debug("{}: modficata la retribuzione {} [id={}] per il dipendente {}"
-                                 .format(request.user, retr_new, retr_new.id, dipendente))
                     messages.add_message(request, messages.SUCCESS, 'Retribuzione modificata')
-                    url = reverse("init_provvigione", args=[dipendente_id])
-                    return HttpResponse('''
-                                    <script type='text/javascript'>
-                                        opener.redirectAfter(window, '{}');
-                                    </script>'''.format(url))                                     
+                return HttpResponseRedirect(reverse("init_provvigione", args=[dipendente_id]))                                     
             else:
                 retr_new = form.save()
                 
                 logger.debug("{}: modficata la retribuzione {} [id={}] per il dipendente {}"
                              .format(request.user, retr_new, retr_new.id, dipendente)) 
-                url = reverse("init_provvigione", args=[dipendente_id])
-                return HttpResponse('''
-                                <script type='text/javascript'>
-                                    opener.redirectAfter(window, '{}');
-                                </script>'''.format(url))                                
+                messages.add_message(request, messages.SUCCESS, 'Retribuzione modificata')
+                return HttpResponseRedirect(reverse("init_provvigione", args=[dipendente_id]))                                
     else:
         form = forms.RetribuzioneForm(instance=obj)  
         
@@ -576,60 +602,65 @@ def mod_vartmp(request, object_id, provvigione_id):
             # quelle da cancellare
             vartmp_del = variazioni.filter(data_inizio__gte=d_i,data_fine__lte=d_f,)
             
-            if not post_query.get("verified", False) and (vartmp_del.exists() or vartmp_mod_i.exists() or vartmp_mod_f.exists()):
-                if vartmp_mod_i.exists() and vartmp_mod_f.exists() and vartmp_mod_f[0] == vartmp_mod_i[0]:
-                    vartmp_mod_f = None
-                data = {"dipendente": dipendente, 
-                        "vartmp_mod_i": vartmp_mod_i,
-                        "vartmp_mod_f": vartmp_mod_f, 
-                        "vartmp_del": vartmp_del,
-                        "variazione": post_query["variazione"],
-                        "principale": post_query["principale"],
-                        "data_inizio": post_query["data_inizio"],
-                        "data_fine": post_query["data_fine"],
-                        "provvigione_contratto": post_query["provvigione_contratto"],
-                        "provvigione_bonus": post_query["provvigione_bonus"],}
-                return render_to_response(TMP_PROV_VARTMP_CONF,
-                                          data,
-                                          context_instance=RequestContext(request)) 
-            else:
-                vartmp_new = form.save(commit=False)
-                # eseguiamo le modifiche al databse
-                # eliminiamo 
-                if vartmp_del.exists():
-                    vartmp_del.delete()
-                # modifichiamo
-                if vartmp_mod_i.exists() and vartmp_mod_f.exists():
-                    if vartmp_mod_i[0] == vartmp_mod_f[0]:
-                        # questo è il caso in cui la nuova variazione abbia il periodo completamente 
-                        # compreso in un'altra variazione: dobbiamo creare due nuove variazione
-                        # più la nuova variazione
-                        # 1 - creiamo una nuova istanza 
-                        new = deepcopy(vartmp_mod_f[0])
-                        new.pk = None
-                        new.data_inizio = vartmp_new.data_fine + timedelta(1)
-                        new.save()
-                    else:
-                        t = vartmp_new.data_fine + timedelta(1)
-                        vartmp_mod_f.update(data_inizio=t)
-                    t = vartmp_new.data_inizio - timedelta(1)
-                    vartmp_mod_i.update(data_fine=t)                    
-                elif vartmp_mod_i.exists() and not vartmp_mod_f.exists():
-                    t = vartmp_new.data_inizio - timedelta(1)
-                    vartmp_mod_i.update(data_fine=t)
-                elif not vartmp_mod_i.exists() and vartmp_mod_f.exists():
+#            if not post_query.get("verified", False) and (vartmp_del.exists() or vartmp_mod_i.exists() or vartmp_mod_f.exists()):
+#                if vartmp_mod_i.exists() and vartmp_mod_f.exists() and vartmp_mod_f[0] == vartmp_mod_i[0]:
+#                    vartmp_mod_f = None
+#                data = {"dipendente": dipendente, 
+#                        "vartmp_mod_i": vartmp_mod_i,
+#                        "vartmp_mod_f": vartmp_mod_f, 
+#                        "vartmp_del": vartmp_del,
+#                        "variazione": post_query["variazione"],
+#                        "principale": post_query["principale"],
+#                        "data_inizio": post_query["data_inizio"],
+#                        "data_fine": post_query["data_fine"],
+#                        "provvigione_contratto": post_query["provvigione_contratto"],
+#                        "provvigione_bonus": post_query["provvigione_bonus"],}
+#                return render_to_response(TMP_PROV_VARTMP_CONF,
+#                                          data,
+#                                          context_instance=RequestContext(request)) 
+#            else:
+            vartmp_new = form.save(commit=False)
+            mod_del = False
+            # eseguiamo le modifiche al databse
+            # eliminiamo 
+            if vartmp_del.exists():
+                mod_del = True
+                vartmp_del.delete()
+            # modifichiamo
+            if vartmp_mod_i.exists() and vartmp_mod_f.exists():
+                mod_del = True
+                if vartmp_mod_i[0] == vartmp_mod_f[0]:
+                    # questo è il caso in cui la nuova variazione abbia il periodo completamente 
+                    # compreso in un'altra variazione: dobbiamo creare due nuove variazione
+                    # più la nuova variazione
+                    # 1 - creiamo una nuova istanza 
+                    new = deepcopy(vartmp_mod_f[0])
+                    new.pk = None
+                    new.data_inizio = vartmp_new.data_fine + timedelta(1)
+                    new.save()
+                else:
                     t = vartmp_new.data_fine + timedelta(1)
                     vartmp_mod_f.update(data_inizio=t)
-                vartmp_new.save()
-                
-                logger.debug("{}: modficata la variazione temporanea della retribuzione {} [id={}] per il dipendente {}"
-                             .format(request.user, vartmp_new, vartmp_new.id, dipendente))
-                messages.add_message(request, messages.SUCCESS, 'variazione temporanea modificata')
-                url = reverse("init_provvigione", args=[dipendente_id])
-                return HttpResponse('''
-                                <script type='text/javascript'>
-                                    opener.redirectAfter(window, '{}');
-                                </script>'''.format(url))                      
+                t = vartmp_new.data_inizio - timedelta(1)
+                vartmp_mod_i.update(data_fine=t)                    
+            elif vartmp_mod_i.exists() and not vartmp_mod_f.exists():
+                mod_del = True
+                t = vartmp_new.data_inizio - timedelta(1)
+                vartmp_mod_i.update(data_fine=t)
+            elif not vartmp_mod_i.exists() and vartmp_mod_f.exists():
+                mod_del = True
+                t = vartmp_new.data_fine + timedelta(1)
+                vartmp_mod_f.update(data_inizio=t)
+            vartmp_new.save()
+            
+            logger.debug("{}: modficata la variazione temporanea della retribuzione {} [id={}] per il dipendente {}"
+                         .format(request.user, vartmp_new, vartmp_new.id, dipendente))
+            if mod_del:
+                messages.add_message(request, messages.SUCCESS, 'Variazione temporanea modificata '\
+                                     '(Sono state apportate delle modfiche)')
+            else:
+                messages.add_message(request, messages.SUCCESS, 'Variazione temporanea modificata')
+            return HttpResponseRedirect(reverse("init_provvigione", args=[dipendente_id]))                      
     else: 
         form = forms.VariazioneRetribuzioneForm(instance=obj)
 
@@ -680,7 +711,7 @@ def del_retribuzione(request, object_id):
     objs = models.RetribuzioneDipendente.objects.filter(id__in=ids)
     
     logger.debug("{}: ha intenzione di eliminare le retribuzioni {} [id={}] per il dipendente {}"
-                 .format(request.user, [(str(obj), "id=" + str(obj.id)) for obj in objs]))
+                 .format(request.user, [(str(obj), "id=" + str(obj.id)) for obj in objs], ids, dipendente))
     
     data = {"dipendente": dipendente, "objs": objs, "tipo": "ret",}
     return render_to_response(template,
@@ -720,9 +751,9 @@ def del_vartmp(request, object_id):
     query_get = request.GET.copy()
     ids = query_get.getlist("id")      
     objs = models.RetribuzioneDipendente.objects.filter(id__in=ids)
-
+    print(objs)
     logger.debug("{}: ha intenzione di eliminare le varizioni temporanee della retribuzione {} [id={}] per il dipendente {}"
-                 .format(request.user, [(str(obj), "id=" + str(obj.id)) for obj in objs]))
+                 .format(request.user, [(str(obj), "id=" + str(obj.id)) for obj in objs], ids, dipendente))
     
     data = {"dipendente": dipendente, "objs": objs, "tipo": "tmp",}
     return render_to_response(template,

@@ -39,6 +39,14 @@ var cancelForm = function(){
 	// window.close();
 };
 
+var openConfirm = function(html){
+	var href = html
+	var name = "confirm";
+	var win = window.open(name, 'height=600,width=800,resizable=yes,scrollbars=yes');
+	win.html(html);
+	win.focus();	
+};
+
 var saveAddObject = function(j_obj){
 	var form = j_obj.closest("form");
 	var hidden = $("<input type='hidden' name='add_another' />");

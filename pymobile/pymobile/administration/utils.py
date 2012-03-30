@@ -289,4 +289,3 @@ def is_telefonista(user):
         if user.groups.filter(name="telefonista").count() > 0:
             return True
     return False
-    

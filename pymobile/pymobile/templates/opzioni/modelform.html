@@ -1,49 +1,38 @@
 {% extends "base.html" %}      
 
 {% block extrahead %}
-<title>PYMOBILE | Dipendenti</title>
+<title>PYMOBILE | Opzioni Iniziali</title> 
 {{ modelform.media }}
 {% endblock %}
 
 {% block header %} 
-<h2>Amministrazione Dipendenti | 
-	{% if tipo == "ret" %}{% if action == "mod" %}Modifica{% else %}Aggiungi{% endif %} variazione della retribuzione di {{ dipendente }}{% endif %}
-	{% if tipo == "tmp" %}{% if action == "mod" %}Modifica{% else %}Aggiungi{% endif %} variazione temporanea della retribuzione di {{ dipendente }}{% endif %}
-</h2>
+<h2>Amministrazione Opzioni Iniziali | Modifica Opzioni Iniziali</h2>
 {% endblock %}
 
 {% block content %}
+{% load tags %}
 <div class="navigation">
 	<fieldset>
 	<legend>Sei qui</legend>
-		<a href="../../../">home</a> &gt; 
-		<a href="{% url init_dipendente %}">amministrazione dipendenti</a> &gt;
-		<a href="{% url view_dipendente dipendente.pk %}">{{ dipendente }}</a> &gt;
-		<a href="{% url init_provvigione dipendente.pk %}">retribuzione</a> &gt;
-		{% if tipo == "ret" %}
-		<a href=".">{% if action == "mod" %}modifica{% else %}aggiungi{% endif %} retribuzione di {{ dipendente }}</a>
-		{% endif %}
-		{% if tipo == "tmp" %}
-		<a href=".">{% if action == "mod" %}modifica{% else %}aggiungi{% endif %} variazione temporanea della retribuzione di {{ dipendente }}</a>
-		{% endif %}
+		<a href="../../">home</a> &gt;
+		<a href="{% url init_opzione %}">amministrazione opzioni iniziali</a> &gt;
+		<a href="{% url mod_opzione %}">modifica opzioni iniziali</a>
 	</fieldset>
 </div>
 <div class="modelform_div">
-	<input type="hidden" id="earliest" name="earliest" value="{{ data_inizio }}" />
-	<input type="hidden" id="latest" name="latest" value="{{ data_fine }}" />
 	<form class="modelform" action="." method="post">
 		<div class="modelform_fieldset_div">
 			<fieldset class="modelform_fieldset">
-			<legend>Dati Provvigione</legend>
+				<legend><b>Dati Opzioni Iniziali</b></legend>
 				{% csrf_token %}
 				{% for hidden_field in modelform.hidden_fields %}
 				   {{ hidden_field }}
-				{% endfor %}					
+				{% endfor %}						
 				<table>
 					{% if modelform.non_field_errors %}
 					<tbody>
 						<tr class="field_error">
-							<td colspan="2">{{ modelform.non_field_errors|first|safe }}</td>
+							<td colspan="2">{{ modelform.non_field_errors|first }}</td>
 						</tr>					
 					</tbody>
 					{% endif %}					
@@ -58,6 +47,14 @@
 							<td>{{ field.label_tag }}</td>
 							<td>
 								{{ field }}
+								{% if field|isdate %}
+									<input type="button" class="dateclear" value="svuota" />
+					    		{% endif %}
+							    {% if field|isfk %}
+							    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_fk field.html_name %}">
+							    		<img src="{{ STATIC_URL }}/img/add.png" />
+						    		</a>
+					    		{% endif %}
 							</td>
 						</tr>
 						{% if field.help_text %}
@@ -66,13 +63,16 @@
 							</tr>
 						{% endif %}
 					</tbody>
-					{% endfor %}	
+					{% endfor %}
 				</table>
 			</fieldset>
 		</div>
 		<div class="submitrow">
 			<input type="submit" class="modelform_save" value="salva" />
-			<button onclick="window.close()">Annulla</button>
+			{% if action == "add" %}
+			<input type="button" class="modelform_save_and_add" value="salva e aggiungi un altro" />
+			{% endif %}
+			<button class="cancel">Annulla</button>
 		</div>
 	</form>
 </div>

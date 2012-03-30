@@ -36,6 +36,16 @@ urlpatterns += patterns('pymobile.administration.views',
                             "account.admin.logout_user",
                             name="logout"),)
 
+#-------------------------------------------------------------------------------
+# HOME
+urlpatterns += patterns('pymobile.administration.views',
+                        url(r"^pymobile/home/$", 
+                            "home.init",
+                            name="home"),
+                        url(r"^pymobile/home/send_mail$", 
+                            "home.send_report_mail",
+                            name="send_report_mail"),)
+
 
 #-------------------------------------------------------------------------------
 # AMMINISTRAZIONE
@@ -57,6 +67,15 @@ INFO_APP={"template_name": "appuntamento/view.html",
 # contratto
 INFO_CON={"template_name": "contratto/view.html", 
           "queryset": models.Contratto.objects.all()}
+
+# opzioni
+urlpatterns += patterns('pymobile.administration.views',
+                        url(r'^pymobile/opzione/$', 
+                            "opzione.admin.init", 
+                            name="init_opzione"),
+                        url(r'^pymobile/opzione/mod/$', 
+                            "opzione.admin.mod_object", 
+                            name="mod_opzione"))
 
 # account
 urlpatterns += patterns('pymobile.administration.views',
@@ -113,6 +132,10 @@ urlpatterns += patterns('pymobile.administration.views',
                         url(r'^pymobile/dipendente/(?P<object_id>\d+)/provvigione/mod_vartmp/(?P<provvigione_id>\d+)/$', 
                             "dipendente.admin.mod_vartmp", 
                             name="mod_vartmp"),
+#                        url(r'^pymobile/dipendente/provvigione/confirm_vartmp/$', 
+#                            "direct_to_template", 
+#                            {"template": "dipendente/provvigione.variazione.conferma.html"}, 
+#                            name="confirm_vartmp"),
                         url(r'^pymobile/dipendente/(?P<object_id>\d+)/provvigione/del_retribuzione/$', 
                             "dipendente.admin.del_retribuzione", 
                             name="del_retribuzione"),

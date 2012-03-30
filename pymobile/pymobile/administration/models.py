@@ -132,18 +132,18 @@ class RetribuzioneDipendente(models.Model):
     def __unicode__(self):
         if self.variazione:
             if self.dipendente.ruolo == "agt": 
-                prov = "{}% per contratto".format(self.provvigione_contratto)
+                prov = "{}% per contratto".format(str(self.provvigione_contratto))
             else:
-                prov = "{}€ per contratto".format(self.provvigione_contratto)
+                prov = "{}€ per contratto".format(str(self.provvigione_contratto))
             if self.provvigione_bonus:
                 prov += " + provvigione bonus"
             return "da {} a {}: {}".format(self.data_inizio, self.data_fine, prov)
         else:
             prov = "fisso={}".format(self.fisso)
             if self.dipendente.ruolo == "agt": 
-                prov += " + {}% per contratto".format(self.provvigione_contratto)
+                prov += " + {}% per contratto".format(str(self.provvigione_contratto))
             else:
-                prov += " + {}€ per contratto".format(self.provvigione_contratto)
+                prov += " + {}€ per contratto".format(str(self.provvigione_contratto))
             if self.provvigione_bonus:
                 prov += " + provvigione bonus"
             return "da {}: {}".format(self.data_inizio, prov)  

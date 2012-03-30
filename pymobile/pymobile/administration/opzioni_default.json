@@ -1,0 +1,5 @@
+{
+    "email_titolare": "luigi_curzi@yahoo.it", 
+    "provvigione_bonus_telefonista": "provvigione:1.0,tipo:sim;provvigione:10.0,gestore:telecom,servizio:ull;provvigione:10.0,gestore:telecom,servizio:nip;provvigione:5.0,tipo:adsl;provvigione:10.0,fascia:premium,tipo:adsl;", 
+    "provvigione_bonus_agente": "provvigione:10.0,blindato:1;"
+}

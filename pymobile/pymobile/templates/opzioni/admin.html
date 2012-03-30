@@ -1,0 +1,41 @@
+{% extends "base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Opzioni Iniziali</title>
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Opzioni Iniziali</h2>
+{% endblock %}
+
+{% load tags %}
+
+{% block content %}
+<div class="navigation">
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../">home</a> &gt;
+		<a href=".">amministrazione opzioni iniziali</a>
+	</fieldset>
+</div>
+<div class="actions">
+	<fieldset>
+	<legend>Azioni</legend>
+		<a class="addrow" href="{% url mod_opzione %}">modifica opzioni iniziali</a>
+	</fieldset>
+</div>
+<div id="modeltable_div">
+	<fieldset>
+	<legend>Opzioni</legend> 
+		<table>
+			{% for k,v in opts %}
+			{% if "provvigione_" in k %}
+			<tr><td><b>{{ k }}:</b></td><td><textarea cols="80" readonly="readonly">{{ v }}</textarea></td></tr>
+			{% else %}
+			<tr><td><b>{{ k }}:</b></td><td>{{ v }}</td></tr>
+			{% endif %}
+			{% endfor %}
+		</table>	
+	</fieldset>	
+</div>
+{% endblock %}

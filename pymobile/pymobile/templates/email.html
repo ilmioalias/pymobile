@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<body>
+	{% load tags %} 
+  	Email Riepilogativa di oggi, {% now "d/m/Y" %}
+  	<fieldset>
+	<legend>Finanze</legend>
+		<fieldset>
+		<legend>Totali</legend>
+			<table>
+				<th title="stipulati/completati/inviati/caricati/attivati">Contratti</th>
+				<th>Entrate</th>
+				<th>Uscite</th>
+				<th>Totali</th>
+				<tr>
+					<td>
+						{{ finanze.contratti.stipulati }}/
+						{{ finanze.contratti.completi }}/
+						{{ finanze.contratti.inviati }}/
+						{{ finanze.contratti.caricati }}/
+						{{ finanze.contratti.attivati }}
+					</td>
+					<td>{{ finanze.totali.entrate }}&euro;</td>
+					<td>{{ finanze.totali.uscite }}&euro;</td>
+					<td>{{ finanze.totali.totali }}&euro;</td>
+				</tr>		
+			</table>	
+		</fieldset>
+		<fieldset>
+		<legend>Entrate</legend>
+			<table>
+				<th title="stipulati/completati/inviati/caricati/attivati">Contratti</th>
+				<th>Entrate</th>				
+				<tr>
+					<td>
+						{{ finanze.contratti.stipulati }}/
+						{{ finanze.contratti.completi }}/
+						{{ finanze.contratti.inviati }}/
+						{{ finanze.contratti.caricati }}/
+						{{ finanze.contratti.attivati }}
+					</td>
+					<td>{{ finanze.entrate.entrate }}&euro;</td>
+				</tr>		
+			</table>	
+		</fieldset>
+		<fieldset>
+		<legend>Uscite</legend>
+			<table>
+				<th title="stipulati/completati/inviati/caricati/attivati">Contratti</th>
+				<th>Prov. Agenti</th>
+				<th>Prov. Bonus Agenti</th>
+				<th>Prov. Tel.</th>
+				<th>Prov. Bonus Tel.</th>
+				<th>Uscite</th>				
+				<tr>
+					<td>
+						{{ finanze.contratti.stipulati }}/
+						{{ finanze.contratti.completi }}/
+						{{ finanze.contratti.inviati }}/
+						{{ finanze.contratti.caricati }}/
+						{{ finanze.contratti.attivati }}
+					</td>
+					<td>{{ finanze.uscite.prov_agt }}&euro;</td>
+					<td>{{ finanze.uscite.prov_bonus_agt }}&euro;</td>
+					<td>{{ finanze.uscite.prov_tel }}&euro;</td>
+					<td>{{ finanze.uscite.prov_bonus_tel }}&euro;</td>
+					<td>{{ finanze.uscite.uscite }}&euro;</td>
+				</tr>		
+			</table>	
+		</fieldset>
+	</fieldset>
+	<fieldset>
+	<legend>Classifiche (quarto corrente)</legend>
+		{% if ranking_tim_telecom %}
+		<fieldset>
+		<legend>Tim Telecom</legend>
+			<table>
+				<th>Agente</th>
+				<th>SIM</th>
+				<th>Dati/OPZ</th>
+				<th>NIP/ULL</th>
+				<th>ADSL</th>
+				<th>Punti Tim</th>
+				<th>Punti Telecom</th>
+				<th>TOT Punti</th>
+				<th>Posizione</th>
+				{% for row in ranking_tim_telecom %}
+				<tr>
+					<td>{{ row.agente }}</td>
+					<td>{{ row.sim }}</td>
+					<td>{{ row.dati_opz }}</td>
+					<td>{{ row.nip_ull }}</td>
+					<td>{{ row.adsl }}</td>
+					<td>{{ row.punti_tim }}</td>
+					<td>{{ row.punti_telecom }}</td>
+					<td>{{ row.tot_punti }}</td>
+					<td>{{ row.posizione }}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</fieldset>
+		{% endif %}
+		{% if ranking_edison %}
+		<fieldset>
+		<legend>Edison</legend>
+			<table>
+				<th>Agente</th>
+				<th>Bus. Energia</th>
+				<th>Res. Energia</th>
+				<th>Bus. Gas</th>
+				<th>Res. Gas</th>
+				<th>Totale</th>
+				<th>Posizione</th>
+				{% for row in ranking_edison %}
+				<tr>
+					<td>{{ row.agente }}</td>
+					<td>{{ row.bus_en }}</td>
+					<td>{{ row.pri_en }}</td>
+					<td>{{ row.bus_gas }}</td>
+					<td>{{ row.pri_gas }}</td>
+					<td>{{ row.tot }}</td>
+					<td>{{ row.posizione }}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</fieldset>
+		{% endif %}
+	</fieldset>
+	<fieldset>
+	<legend>Obiettivi (quarto corrente)</legend>
+		<table>
+			{% for obiettivo in obiettivi %}
+			<th>{{ obiettivo }}</th>
+			{% endfor %}
+			<tr>
+				{% for obiettivo in obiettivi %}
+				<td>{{ obiettivi|get_punteggio:obiettivo }} 
+					(contratti: {{ obiettivi|get_contratti:obiettivo }})
+					<br /><i><b>{{ obiettivi|get_msg:obiettivo }}</b></i></td>
+				{% endfor %}
+			</tr>
+		</table>
+	</fieldset>
+  	Buon lavoro.
+</body>
+</html>

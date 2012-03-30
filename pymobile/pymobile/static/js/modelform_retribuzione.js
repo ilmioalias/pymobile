@@ -38,5 +38,5 @@ jQuery(document).ready(function($){
 	  	e.setHours(0,0,0,0);
 	  	opts.earliest = e;
 	  	fine.removeAttr("disabled").AnyTime_noPicker().AnyTime_picker(opts);		
-	};		
+	};
 });

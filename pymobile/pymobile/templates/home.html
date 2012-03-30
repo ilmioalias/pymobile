@@ -1,0 +1,54 @@
+{% extends "base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Home</title>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/reporttable.js"></script> 
+{% endblock %}
+
+{% block header %} 
+<h2>Home</h2>
+{% endblock %}
+
+{% load tags %}
+
+{% block content %}
+<div class="navigation">
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../">home</a>
+	</fieldset>
+</div>
+<div class="actions">
+	<fieldset>
+	<legend>Azioni</legend>
+		{% if user|get_group == "amministratore" %}
+		<a class="addrow" href="{% url send_report_mail %}">invia mail resoconto</a>
+		{% else %}
+		nessuna azione disponibile
+		{% endif %}
+	</fieldset>
+</div>
+<div id="reporttable_div">
+	<fieldset>
+	<legend>Informazioni</legend>
+		<fieldset>
+		<legend>Prossimi <a href="{% url init_appuntamento %}">Appuntamenti</a></legend> 
+			{% load django_tables2 %}
+			{% render_table table_appuntamenti %}		
+		</fieldset>
+		{% if user|get_group == "amministratore" %}
+		<fieldset>
+		<legend><a href="{% url init_contratto %}">Contratti</a> in Scadenza (prossimo mese)</legend> 
+			{% load django_tables2 %}
+			{% render_table table_contratti_scadenza %}		
+		</fieldset>
+		
+		<fieldset>
+		<legend>Ultimi <a href="{% url init_contratto %}">Contratti</a> (ultima settimana)</legend> 
+			{% load django_tables2 %}
+			{% render_table table_contratti %}		
+		</fieldset>
+		{% endif %}
+	</fieldset>
+</div>
+{% endblock %}

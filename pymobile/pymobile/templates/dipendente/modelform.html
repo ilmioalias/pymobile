@@ -26,6 +26,10 @@
 	</fieldset>
 </div>
 <div class="modelform_div">
+	{% if action == "add" %}
+	<input type="hidden" id="id_provvigione_bonus_agente" name="provvigione_bonus_agente" value="{{ provvigione_bonus_agente }}" />
+	<input type="hidden" id="id_provvigione_bonus_telefonista" name="provvigione_bonus_telefonista" value="{{ provvigione_bonus_telefonista }}" />
+	{% endif %}
 	<form class="modelform" action="." method="post">
 		<div class="modelform_fieldset_div">
 			<fieldset class="modelform_fieldset">
