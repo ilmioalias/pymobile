@@ -27,7 +27,9 @@
 	<legend>Azioni</legend>
 		{% if user|get_group == "amministratore" %}
 			{% if object.ruolo == "tel" %}
+				{% if object.account %}
 				<a href="{% url view_account object.account.pk %}">gestisci account</a> |
+				{% endif %}
 				<a href="{% url init_appuntamento %}?ftelefonista=={{ object.id }}">visualizza appuntamenti</a> |
 			{% endif %}
 			{% if object.ruolo == "agt" %}
