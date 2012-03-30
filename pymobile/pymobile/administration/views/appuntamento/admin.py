@@ -184,6 +184,7 @@ def assign_object(request):
             ids = query_post.getlist("id")
             agente_id = query_post["agente"]
             agente = get_object_or_404(models.Dipendente, id=agente_id)
+            appuntamenti = models.Appuntamento.objects.filter(id__in=ids)
             
             models.Appuntamento.objects.filter(id__in=ids).update(agente=agente_id)
             
@@ -193,7 +194,6 @@ def assign_object(request):
                 from_email = "agenzia"
                 subject = "Prossimi appuntamenti"
                 msg = "Appuntamenti assegnati:\n"
-                appuntamenti = models.Appuntamento.objects.filter(id__in=ids)
                 for appuntamento in appuntamenti:
                     msg += "\t- {}\n".format(appuntamento)
                 msg += "\nBuon Lavoro."
