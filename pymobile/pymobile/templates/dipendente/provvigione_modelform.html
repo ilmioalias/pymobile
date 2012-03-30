@@ -13,6 +13,7 @@
 {% endblock %}
 
 {% block content %}
+{% load tags %}
 <div class="navigation">
 	<fieldset>
 	<legend>Sei qui</legend>
@@ -58,6 +59,9 @@
 							<td>{{ field.label_tag }}</td>
 							<td>
 								{{ field }}
+								{% if field|isdate %}
+									<input type="button" class="dateclear" value="svuota" />
+					    		{% endif %}
 							</td>
 						</tr>
 						{% if field.help_text %}
