@@ -38,12 +38,8 @@ def login_user(request):
                 logger.debug("{}: autenticato".format(user))
                 messages.add_message(request, messages.SUCCESS, 'Benvenuto {}'.format(user))
                 # Redirect to a success page.
-                # FIXME: qui deve eessere ridirezionato verso una home page
                 # FIXME: usare "next_page"?!
-                if u.is_telefonista(user):
-                    url = reverse("init_appuntamento")
-                else:
-                    url = reverse("init_dipendente")
+                url = reverse("home")    
                 return HttpResponseRedirect(url)
             else:
                 logger.debug("{}: ha tentato a autenticarsi [account non più attivo]".format(user))
