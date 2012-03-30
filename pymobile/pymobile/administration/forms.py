@@ -815,11 +815,38 @@ class OpzioneForm(forms.Form):
                                       required=False,)
     provvigione_bonus_agente = forms.CharField(label="provvigione bonus default per agente",
                                                widget=forms.Textarea(),
-                                               required=False,)
+                                               required=False,
+                                                    help_text='''
+        Chiavi: <b>gestore</b>, <b>profilo</b>, <b>tipo</b>, <b>fascia</b>, <b>servizio</b>, <b>blindato</b>, <b>provvigione</b><br/> 
+        La chiave <b>provvigione</b> (valore in euro) è obbligatoria, 
+        ognuna delle altre chiavi è opzionale, ma almeno una deve essere presente oltre a <b>provvigione</b>.
+        Le chiavi <b>gestore</b>, <b>profilo</b>, <b>tipo</b>, <b>fascia</b>, <b>servizio</b> si riferiscono alle tariffe, 
+        mentre <b>blindato</b> al cliente firmatario del contratto; la chiave <b>blindato</b> accetta come valore un intero; 
+        qualunque intero maggiore di 0 corrisponde a <i>vero</i>, 0 a <i>falso</i>. 
+        <br/><b>ex:</b> se si volesse aggiungere per il dipendente selezionato una provvigione 
+        bonus di 5€ per tutte le tariffe di tipo SIM e fascia LOW vendute ad un cliente <i>blindato</i>, basterà inserire: 
+        <br/><b>tipo: sim, fascia: low, blindato: 1, provvigione: 5;</b><br/> 
+        le chiavi devono essere separate dalla <i>virgola</i>, i <i>due punti</i> servono per indicare 
+        il valore della chiave e il <i>punto e virgola</i> è usato come termine; è possibile inserire
+        più di una provvigione speciale per un singolo dipendente; gli spazi e l'ordine  di inserimento delle chiavi non sono influenti.<br/>
+    ''',)
     provvigione_bonus_telefonista = forms.CharField(label="provvigione bonus default per telefonista",
                                                     widget=forms.Textarea(),
-                                                    required=False,)
-    
+                                                    required=False,
+                                                    help_text='''
+        Chiavi: <b>gestore</b>, <b>profilo</b>, <b>tipo</b>, <b>fascia</b>, <b>servizio</b>, <b>blindato</b>, <b>provvigione</b><br/> 
+        La chiave <b>provvigione</b> (valore in euro) è obbligatoria, 
+        ognuna delle altre chiavi è opzionale, ma almeno una deve essere presente oltre a <b>provvigione</b>.
+        Le chiavi <b>gestore</b>, <b>profilo</b>, <b>tipo</b>, <b>fascia</b>, <b>servizio</b> si riferiscono alle tariffe, 
+        mentre <b>blindato</b> al cliente firmatario del contratto; la chiave <b>blindato</b> accetta come valore un intero; 
+        qualunque intero maggiore di 0 corrisponde a <i>vero</i>, 0 a <i>falso</i>. 
+        <br/><b>ex:</b> se si volesse aggiungere per il dipendente selezionato una provvigione 
+        bonus di 5€ per tutte le tariffe di tipo SIM e fascia LOW vendute ad un cliente <i>blindato</i>, basterà inserire: 
+        <br/><b>tipo: sim, fascia: low, blindato: 1, provvigione: 5;</b><br/> 
+        le chiavi devono essere separate dalla <i>virgola</i>, i <i>due punti</i> servono per indicare 
+        il valore della chiave e il <i>punto e virgola</i> è usato come termine; è possibile inserire
+        più di una provvigione speciale per un singolo dipendente; gli spazi e l'ordine  di inserimento delle chiavi non sono influenti.<br/>
+    ''',)
     def values_from_provvigione_bonus_field(self, provvigione_bonus):
         provvigione_bonus = provvigione_bonus.strip()
         if not provvigione_bonus:
