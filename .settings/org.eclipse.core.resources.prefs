@@ -1,4 +1,4 @@
-#Thu Mar 29 19:20:58 CEST 2012
+#Sat Mar 31 22:51:18 CEST 2012
 eclipse.preferences.version=1
 encoding//pymobile/pymobile/administration/admin.py=utf-8
 encoding//pymobile/pymobile/administration/forms.py=utf-8
@@ -17,3 +17,5 @@ encoding//pymobile/pymobile/administration/views/reports/business.py=utf-8
 encoding//pymobile/pymobile/administration/views/reports/goals.py=utf-8
 encoding//pymobile/pymobile/administration/views/reports/rankings.py=utf-8
 encoding//pymobile/pymobile/administration/views/tariffa/admin.py=utf-8
+encoding//pymobile/pymobile/middleware/session.py=utf-8
+encoding//pymobile/pymobile/settings.py=utf-8

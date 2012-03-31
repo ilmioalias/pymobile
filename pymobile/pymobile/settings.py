@@ -1,5 +1,8 @@
+# -*- coding: utf-8 -*-
+
 # Django settings for pymobile project.
 import os
+
 PROJECT_ROOT_PATH = os.path.dirname(__file__)
 
 DEBUG = True
@@ -98,6 +101,8 @@ TEMPLATE_LOADERS = (
 #     'django.template.loaders.eggs.Loader',
 )
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -105,6 +110,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfResponseMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'middleware.session.timeOutSessionMiddleware',
 )
 
 ROOT_URLCONF = 'pymobile.urls'
