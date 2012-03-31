@@ -199,7 +199,7 @@ def add_child_object(request, field_name):
                     </script>'''.format(new_obj.pk, new_obj))
     else:
         form_class, gestore, template = get_child_form(field_name)
-        form = form_class(post_query)
+        form = form_class()
       
     data = {"modelform": form, "action": action, "gestore": gestore,}     
     return render_to_response(template, 
