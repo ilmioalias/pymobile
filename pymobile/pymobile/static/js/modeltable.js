@@ -27,7 +27,6 @@ var sortTable = function(j_obj){
 	var search = search_cur;
 	if (sort || search){
 		var url = "?" + sort + "&" + search;
-		console.log(url);
 		$.get(url,
 			function(data){
 				updateTable(data);
@@ -101,7 +100,6 @@ var getFilter = function(form){
 			});
 		};		
 	});
-	console.log(url);
 	return url;
 	// return dict;	
 };
@@ -290,6 +288,7 @@ var tableClickHandlers = function(){
 		};
 	});	
 	$("select.modeltable_actions").change(function(e){
+		e.preventDefault();
 		var opt_sel = $(this).find("option:selected").attr("value");
 		if ($(this).siblings(".assign").length){
 			if (opt_sel != "assign") {
@@ -301,6 +300,13 @@ var tableClickHandlers = function(){
 	});
 	$("button.modeltable_actions_ok").click(function(e){
 		e.preventDefault();
+		// $.get("/pymobile/check_session/", function(data){
+			// console.log("get");
+			// console.log(data);
+			// if (data == "true"){
+				// console.log("sessione attiva");	
+			// };
+		// });
 		var action = $(this).siblings("select.modeltable_actions").find("option:selected").attr("value");
 		var rows = $("table.modeltable td.selection > input:checked");
 		if (rows.length > 0){

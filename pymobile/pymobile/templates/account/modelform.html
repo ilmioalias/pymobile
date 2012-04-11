@@ -71,7 +71,12 @@
 								    		</a>
 							    		{% endif %}
 									</td>
-								</tr><!-- 
+								</tr>
+								{% if field.label == "Nome utente" %}
+								<tr class="field_help">
+									<td></td><td>non è possibile usare il nome utente <i>admin</i></td>
+								</tr>
+								{% endif %}<!-- 
 								{% if field.help_text %}
 									<tr class="field_help">
 										<td></td><td>{{ field.help_text }}</td>
@@ -98,7 +103,12 @@
 							    		</a>
 						    		{% endif %}
 								</td>
-							</tr><!-- 
+							</tr>
+							{% if field.label == "Nome utente" %}
+							<tr class="field_help">
+								<td></td><td>non è possibile usare il nome utente <i>admin</i></td>
+							</tr>
+							{% endif %}<!-- 
 							{% if field.help_text %}
 								<tr class="field_help">
 									<td></td><td>{{ field.help_text }}</td>

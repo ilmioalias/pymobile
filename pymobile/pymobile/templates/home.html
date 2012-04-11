@@ -32,12 +32,17 @@
 	<fieldset>
 	<legend>Informazioni</legend>
 		<fieldset>
+		<legend><a href="{% url init_appuntamento %}">Appuntamenti</a> da Richiamare</legend> 
+			{% load django_tables2 %}
+			{% render_table table_appuntamenti_richiamare %}		
+		</fieldset>
 		<legend>Prossimi <a href="{% url init_appuntamento %}">Appuntamenti</a></legend> 
 			{% load django_tables2 %}
 			{% render_table table_appuntamenti %}		
 		</fieldset>
+		
 		{% if user|get_group == "amministratore" %}
-		<fieldset>
+		<fieldset>	
 		<legend><a href="{% url init_contratto %}">Contratti</a> in Scadenza (prossimo mese)</legend> 
 			{% load django_tables2 %}
 			{% render_table table_contratti_scadenza %}		

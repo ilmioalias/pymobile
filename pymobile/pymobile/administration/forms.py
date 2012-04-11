@@ -592,7 +592,7 @@ class AppuntamentoForm(forms.ModelForm):
         return cdata
     
     class Media:
-        js = ("js/modelform.js",)
+        js = ("js/modelform.js", "js/modelform_appuntamento.js")
 
     class Meta:
         model = models.Appuntamento
@@ -600,7 +600,8 @@ class AppuntamentoForm(forms.ModelForm):
                    "cliente": forms.Select(attrs={"class": "fk", }),
                    "referente": forms.Select(attrs={"class": "fk", }),
                    "agente": forms.Select(attrs={"class": "fk", }),
-                   "data": forms.DateTimeInput(format="%d/%m/%Y %H:%M", attrs={"class": "datetime",}),}       
+                   "data": forms.DateTimeInput(format="%d/%m/%Y %H:%M", attrs={"class": "datetime",}),
+                   "data_richiamare": forms.DateInput(format="%d/%m/%Y", attrs={"class": "date",}),}       
 
 class AppuntamentoTelefonistaForm(forms.ModelForm):           
     def clean(self):
@@ -725,30 +726,34 @@ class ContrattoForm(forms.ModelForm):
                 msg = "La data di scadenza è precedente alla data di stiupula"
                 self._errors["data_scadenza"] = self.error_class([msg])
         if data_rescissione:
-            if data_rescissione <= data_stipula or data_rescissione >= data_scadenza:
-                # creiamo il msg di errore per il campo "data_inizo"
-                msg = "La data di rescissione è precedente alla data di stiupula "\
-                    "o successiva alla data di scadenza"
-                self._errors["data_rescissione"] = self.error_class([msg])
+            if data_stipula:
+                if data_rescissione <= data_stipula:
+                    # creiamo il msg di errore per il campo "data_inizo"
+                    msg = "La data di rescissione è precedente alla data di stiupula "
+                    self._errors["data_rescissione"] = self.error_class([msg])
+            if data_scadenza:
+                if data_rescissione >= data_scadenza:
+                    # creiamo il msg di errore per il campo "data_inizo"
+                    msg = "La data di rescissione è successiva alla data di scadenza"
+                    self._errors["data_rescissione"] = self.error_class([msg])
         
         # controlliamo che l'agente selezionato non sia stato "assunto" successivamente 
         # alla stipula del contratto
         agente = cdata.get("agente")
-        if agente:
+        if agente and data_stipula:
             data_assunzione = agente.data_assunzione
             if data_assunzione > data_stipula:
                 # creiamo il msg di errore per il campo "data_inizo"
                 msg = "la data di assunzione dell'agente selezionato è successiva "\
                     "alla data di stipula del contratto"
                 self._errors["agente"] = self.error_class([msg])
-            
+        
             data_licenziamento = agente.data_licenziamento
             if data_licenziamento and data_licenziamento <= data_stipula:
                 # creiamo il msg di errore per il campo "data_inizo"
                 msg = "la data di licenziamento dell'agente selezionato è precendente "\
                     "alla data di stipula del contratto"
                 self._errors["agente"] = self.error_class([msg])
-            
             
         # controlliamo se l'appuntamento selezionato è plausibile, cioè le date
         # corrispondono e il cliente è lo stesso del contratto

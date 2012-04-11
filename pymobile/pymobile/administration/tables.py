@@ -232,6 +232,7 @@ class AppuntamentoTable(tables.Table):
     agente = tables.TemplateColumn(TMP_AGT)
     referente = tables.TemplateColumn(TMP_REF)
     richiamare = BooleanColumn()
+    data_richiamare = NullColumn()
     contratto = tables.TemplateColumn(TMP_CONTRATTO, orderable=False)
     selection = tables.CheckBoxColumn(accessor=A('pk'),
                                       attrs=tables.Attrs({"class": "selection"}), 

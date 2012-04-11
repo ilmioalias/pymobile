@@ -5,7 +5,8 @@ Created on 31/mar/2012
 
 @author: luigi
 '''
-from pymobile.administration.views.account.admin import logout_user
+from django.http import HttpResponse
+from pymobile.administration.views.account.admin import logout_user, logout_user_ajax
 import datetime
 from django.contrib import messages
 import logging
@@ -16,22 +17,22 @@ logger = logging.getLogger("file")
 class timeOutSessionMiddleware(object):
     # FIXME: controllare come fa scadere la sessione anche su richieste ajax
     def process_request(self, request):
-        if not request.user:
-            return None
-        if request.user.is_authenticated():
-            if 'lastRequest' in request.session:            
-                elapsed_time = datetime.datetime.now() - \
-                              request.session['lastRequest']
-                if elapsed_time.seconds > 1 * 60:
+        if request.user and request.user.is_authenticated():
+            now = datetime.datetime.now()
+            if (request.session.has_key("last_activity") and
+                (now - request.session["last_activity"]).seconds > 900):
+                if request.is_ajax():
                     # sessione scade dopo 15 minuti di inattività
-                    del request.session['lastRequest']
                     logger.debug("{}: sessione scaduta".format(request.user)) 
-                    messages.add_message(request, messages.SUCCESS, 'Sessione scaduta')  
-                    logout_user(request)
-
-            request.session['lastRequest'] = datetime.datetime.now()
-        else:
-            if 'lastRequest' in request.session:
-                del request.session['lastRequest'] 
-
+                    messages.add_message(request, messages.ERROR, 'Sessione scaduta')
+                    return logout_user_ajax(request)
+                else:
+                    # sessione scade dopo 15 minuti di inattività
+                    logger.debug("{}: sessione scaduta".format(request.user)) 
+                    messages.add_message(request, messages.ERROR, 'Sessione scaduta')  
+                    return logout_user(request)
+            else:
+                request.session["last_activity"] = now
+                            
         return None
+    

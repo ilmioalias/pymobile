@@ -54,6 +54,19 @@ def login_user(request):
         return render_to_response(TMP_LOGIN,
                                   context_instance=RequestContext(request))
 
+def logout_user_ajax(request):
+    user = request.user
+    auth.logout(request)
+    logger.debug("{}: logout".format(user))
+    # Redirect to a success page.
+    messages.add_message(request, messages.SUCCESS, 'Logout effettuato')
+    return HttpResponse('''
+                        <script type="text/javascript">
+                            console.log(opener);
+                            window.location.href = '{}';
+                        </script>
+                        '''. format(reverse("login")))
+
 @login_required     
 def logout_user(request):
     user = request.user

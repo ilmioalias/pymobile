@@ -374,6 +374,8 @@ class Appuntamento(models.Model):
     data_assegnazione = models.DateField(verbose_name="data dell'assegnazione",
                                          blank=True, null=True, editable=False)
     richiamare = models.BooleanField(help_text="da richiamare", default=False)
+    data_richiamare = models.DateField(verbose_name="data in cui richiamare il cliente",
+                                       blank=True, null=True)
     nota_esito = models.TextField(verbose_name="nota dell'esito",
                                   blank=True)
     data_contatto = models.DateField(auto_now_add=True, verbose_name="Data contatto")
@@ -438,6 +440,11 @@ class Contratto(models.Model):
     data_caricato = models.DateField(blank=True, 
                                      verbose_name="data del caricamento",
                                      editable=False, null=True)
+    rifiutato = models.BooleanField(default=False, 
+                                   help_text="contratto rifiutato")
+    data_rifiutato = models.DateField(blank=True, 
+                                      verbose_name="data del rifiuto",
+                                      editable=False, null=True)
     attivato = models.BooleanField(default=False, 
                                    help_text="contratto attivato")
     data_attivato = models.DateField(blank=True, 
@@ -462,6 +469,11 @@ class Contratto(models.Model):
             self.data_caricato = None
         elif self.caricato and not self.data_caricato:
             self.data_caricato = datetime.datetime.now()
+        
+        if not self.rifiutato and self.data_rifiutato:
+            self.data_rifiutato = None
+        elif self.rifiutato and not self.data_rifiutato:
+            self.data_rifiutato = datetime.datetime.now()
         
         if not self.attivato and self.data_attivato:
             self.data_attivato = None

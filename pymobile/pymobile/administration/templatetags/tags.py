@@ -132,4 +132,11 @@ def get_group(user):
         return user.groups.all()[0].name
     else:
         return ""
+
+@register.filter(name="get_pdf")
+def get_pdf(contratto):
+    if contratto:
+        return contratto.pdf_contratto
+    else:
+        return ""
     

@@ -8,7 +8,7 @@
 <key>DJANGO_MANAGE_LOCATION</key>
 <value>pymobile/pymobile/manage.py</value>
 <key>DJANGO_SETTINGS_MODULE</key>
-<value>pymobile.pymobile.settings</value>
+<value>settings</value>
 </pydev_variables_property>
 <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
 <path>/pymobile/pymobile</path>

@@ -23,7 +23,7 @@
 <div class="actions">
 	<fieldset>
 	<legend>Azioni</legend>
-		<a href="#">ottieni copia contratto</a> |
+		<a href="/media/{{ object|get_pdf }}">ottieni copia contratto</a> |
 		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_contratto object.id %}">modifica</a> |
 		<a id="del_{{ object.id }}" class="deleteobj" href="{% url del_contratto %}?id={{ object.id }}">elimina</a>
 	</fieldset>
@@ -52,7 +52,7 @@
 							{% for pt in object|get_pt%}
 							<tr><td>Tariffa</td><td><a href="{% url view_tariffa pt|get_pt_tariffa_pk %}">{{ pt|get_pt_tariffa }}</a></td></tr>
 							<tr><td>Quantità</td><td>{{ pt.num }}</td></tr>
-							<tr><td>Opzione</td><td>{% if pt.opzione %}<img src="{{ STATIC_URL }}/img/spunta.png" />{% endif %}</td></tr>
+							<tr><td>Opzione</td><td>{% if pt.opzione %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" />{% endif %}</td></tr>
 							{% endfor %}
 						</table>
 					</fieldset>
@@ -74,6 +74,7 @@
 			<tr><td>Completato</td><td>{% if object.completo %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" /> [{{ object.data_completato }}]{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
 			<tr><td>Inviato</td><td>{% if object.inviato %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" /> [{{ object.data_inviato }}]{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
 			<tr><td>Caricato</td><td>{% if object.caricato %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" /> [{{ object.data_caricato }}]{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
+			<tr><td>Rifiutato</td><td>{% if object.rifiutato %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" /> [{{ object.data_rifiutato }}]{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
 			<tr><td>Attivato</td><td>{% if object.attivato %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" /> [{{ object.data_attivato }}]{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
 			{% if object.nota %}
 			<tr><td>Nota</td><td>{{ object.nota }}</td></tr>

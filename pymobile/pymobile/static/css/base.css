@@ -14,6 +14,23 @@ fieldset input {
 	border-bottom: 1px solid gray;
 	border-left: 1px solid gray;
 	width: 100px;
+	text-transform: uppercase;
+}
+
+fieldset input[type='text'] {
+    text-transform: uppercase;
+}
+
+fieldset input[type='text'] {
+    text-transform: uppercase;
+}
+
+fieldset input#id_username, fieldset input#id_email {
+    text-transform: none;
+}
+
+form#login_form fieldset input {
+    text-transform: none;
 }
 
 fieldset input:hover {

@@ -50,6 +50,18 @@ def init(request):
     table_appuntamenti.order_by = request.GET.get("app-sort")
     table_appuntamenti.paginate(page=request.GET.get("app-page", 1))
     
+    # tabella appuntamenti da richiamare
+    if u.is_telefonista(user):
+        appuntamenti_richiamare = models.Appuntamento.objects.filter(data_richiamare__gte=today,
+                                                          telefonista=user).order_by("data")
+    else:
+        appuntamenti_richiamare = models.Appuntamento.objects.filter(data_richiamare__gte=today).order_by("data")        
+    table_appuntamenti_richiamare = tables.AppuntamentoReportTable(appuntamenti_richiamare,
+                                                  prefix="app_ric-",
+                                                  per_page_field=10,) 
+    table_appuntamenti_richiamare.order_by = request.GET.get("app_ric-sort")
+    table_appuntamenti_richiamare.paginate(page=request.GET.get("app_ric-page", 1))
+        
     # tabella ultimi contratti
     contratti = models.Contratto.objects.filter(data_stipula__gte=week[0],
                                                 data_stipula__lte=week[1]).order_by("data_stipula")        
@@ -70,6 +82,7 @@ def init(request):
     
     if request.is_ajax():
         data = {"table_appuntamenti": table_appuntamenti,
+                "table_appuntamenti_richiamare": table_appuntamenti_richiamare,
                 "table_contratti": table_contratti,
                 "table_contratti_scadenza": table_contratti_scadenza,}
         return render_to_response(template, 
@@ -77,6 +90,7 @@ def init(request):
                                   context_instance=RequestContext(request))   
         
     data = {"table_appuntamenti": table_appuntamenti,
+            "table_appuntamenti_richiamare": table_appuntamenti_richiamare,
             "table_contratti": table_contratti,
             "table_contratti_scadenza": table_contratti_scadenza,}
     return render_to_response(template, 

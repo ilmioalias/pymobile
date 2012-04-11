@@ -37,6 +37,13 @@ urlpatterns += patterns('pymobile.administration.views',
                             name="logout"),)
 
 #-------------------------------------------------------------------------------
+# SESSIONE
+#urlpatterns += patterns('middleware.session',
+#                        url(r"^pymobile/check_session/$", 
+#                            "check_session",
+#                            name="check_session"),)
+
+#-------------------------------------------------------------------------------
 # HOME
 urlpatterns += patterns('pymobile.administration.views',
                         url(r"^pymobile/home/$", 
@@ -66,7 +73,7 @@ INFO_APP={"template_name": "appuntamento/view.html",
           "queryset": models.Appuntamento.objects.all()}
 # contratto
 INFO_CON={"template_name": "contratto/view.html", 
-          "queryset": models.Contratto.objects.all()}
+          "queryset": models.Contratto.objects.all(),}
 
 # opzioni
 urlpatterns += patterns('pymobile.administration.views',
@@ -250,6 +257,11 @@ urlpatterns += patterns('pymobile.administration.views',
                         url(r'^pymobile/contratto/(?P<object_id>\d+)/$', 
                             object_detail, INFO_CON, 
                             name="view_contratto"),)
+#                        url(r'^pymobile/contratto/(?P<object_id>\d+)/get_pdf/$', 
+#                            "django.views.generic.simple.redirect_to",
+#                            {"":}, 
+#                            name="get_pdf"),)
+
 
 #-------------------------------------------------------------------------------
 # STATISTICHE
