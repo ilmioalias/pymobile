@@ -76,11 +76,7 @@ def add_object(request):
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_cliente")) 
             else:
-                url = reverse("init_cliente")
-                return HttpResponse('''
-                                <script type='text/javascript'>
-                                    opener.redirectAfter(window, '{}');
-                                </script>'''.format(url))
+                return HttpResponseRedirect(reverse("init_cliente")) 
     else:
         form = forms.ClienteForm()    
 
@@ -121,11 +117,7 @@ def mod_object(request, object_id):
             if request.POST.has_key("add_another"):              
                 return HttpResponseRedirect(reverse("add_cliente")) 
             else:
-                url = reverse("view_cliente", args=[object_id,])
-                return HttpResponse('''
-                                <script type='text/javascript'>
-                                    opener.redirectAfter(window, '{}');
-                                </script>'''.format(url))                 
+                return HttpResponseRedirect(reverse("view_cliente", args=[object_id,]))                
     else: 
         form = forms.ClienteForm(instance=obj)
     
