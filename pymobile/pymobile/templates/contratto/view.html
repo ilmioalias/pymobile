@@ -23,7 +23,11 @@
 <div class="actions">
 	<fieldset>
 	<legend>Azioni</legend>
-		<a href="/media/{{ object|get_pdf }}">ottieni copia contratto</a> |
+		{% if user|get_group == "amministratore" %}
+			{% if object.pdf_contratto %}
+			<a href="{% url get_pdf object.id %}">ottieni copia contratto</a> |
+			{% endif %}
+		{% endif %}
 		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_contratto object.id %}">modifica</a> |
 		<a id="del_{{ object.id }}" class="deleteobj" href="{% url del_contratto %}?id={{ object.id }}">elimina</a>
 	</fieldset>

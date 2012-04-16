@@ -256,12 +256,10 @@ urlpatterns += patterns('pymobile.administration.views',
                             name="add_contratto_fk"),
                         url(r'^pymobile/contratto/(?P<object_id>\d+)/$', 
                             object_detail, INFO_CON, 
-                            name="view_contratto"),)
-#                        url(r'^pymobile/contratto/(?P<object_id>\d+)/get_pdf/$', 
-#                            "django.views.generic.simple.redirect_to",
-#                            {"":}, 
-#                            name="get_pdf"),)
-
+                            name="view_contratto"),
+                        url(r'^pymobile/contratto/(?P<object_id>\d+)/get_pdf/$', 
+                            "contratto.admin.send_file",
+                            name="get_pdf"),)
 
 #-------------------------------------------------------------------------------
 # STATISTICHE

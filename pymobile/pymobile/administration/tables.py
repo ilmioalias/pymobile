@@ -271,6 +271,7 @@ class ContrattoTable(tables.Table):
     completo = BooleanColumn()
     inviato = BooleanColumn()
     caricato = BooleanColumn()
+    rifiutato = BooleanColumn()
     attivato = BooleanColumn()
     selection = tables.CheckBoxColumn(accessor=A('pk'),
                                       attrs=tables.Attrs({"class": "selection"}), 
@@ -282,7 +283,7 @@ class ContrattoTable(tables.Table):
         attrs = {"class": "modeltable",}
         exclude = ("id", "creazione", "modifica", "appuntamento", "pdf_contratto", "nota",
                    "data_rescissione", "data_completato", "data_inviato", "data_caricato", 
-                   "data_attivato", "vas_telefonista", "vas_agente",)
+                   "data_rifiutato", "data_attivato", "vas_telefonista", "vas_agente",)
         sequence = ("selection", "cliente", "agente", "piano_tariffario", "...")
         empty_text = "Nessuna Contratto"
         order_by = ("-data_stipula", "-data_scadenza",)

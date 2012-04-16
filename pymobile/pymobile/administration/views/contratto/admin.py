@@ -7,11 +7,15 @@ from django.core.urlresolvers import reverse
 from django.forms.models import inlineformset_factory
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.core.servers.basehttp import FileWrapper
 
+import pymobile.settings as settings
 import pymobile.administration.models as models
 import pymobile.administration.forms as forms
 import pymobile.administration.tables as tables
 import pymobile.administration.utils as u
+import mimetypes
+import os
 import logging
 
 # Get an instance of a logger
@@ -233,3 +237,26 @@ def add_child_object(request, field_name):
     return render_to_response(template, 
                               data,
                               context_instance=RequestContext(request))
+
+@login_required
+@user_passes_test(lambda user: not u.is_telefonista(user),)
+def send_file(request, object_id):
+    # informazioni file
+    pdffile = models.Contratto.objects.get(pk=object_id).pdf_contratto
+    pdffile_path = settings.MEDIA_ROOT + pdffile.name
+    basename = os.path.basename(pdffile_path)
+    size = pdffile.size
+    m = mimetypes.guess_type(pdffile_path)
+    mimetype = m[0]
+    encoding = m[1]
+    
+    # filewrapper è un funzione che divide il file in chunck così da non caricare
+    # tutto in memoria
+    wrapper = FileWrapper(file(pdffile_path))
+    response = HttpResponse(wrapper,)
+    response['Content-Type'] = mimetype
+    response['Content-Length'] = size
+    response['Content-Encoding'] = encoding
+    response['Content-Disposition'] = 'attachment; filename=' + basename
+    
+    return response
