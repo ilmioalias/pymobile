@@ -401,7 +401,9 @@ class ClienteFilterForm(forms.ModelForm):
     blindato = forms.MultipleChoiceField(choices=BLINDATO,
                                          initial=[0, 1],
                                          widget=forms.CheckboxSelectMultiple()) 
-
+    gestore = forms.ModelChoiceField(queryset=models.Gestore.objects.all(),
+                                     label="Gestore del cliente")
+    
     class Media:
         js = ("js/filterform.js",)
     

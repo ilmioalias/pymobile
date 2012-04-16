@@ -33,6 +33,14 @@ form#login_form fieldset input {
     text-transform: none;
 }
 
+form#filter_modeltable_form fieldset input {
+    text-transform: none;
+}
+
+form#filter_reporttable_form fieldset input {
+    text-transform: none;
+}
+
 fieldset input:hover {
 	background-color:#F0F0F1;
 }

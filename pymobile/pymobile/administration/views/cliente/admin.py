@@ -42,9 +42,20 @@ def init(request):
         if query_get.has_key("sort"):
             ordering = query_get["sort"]
             del query_get["sort"]
+        if query_get.has_key("fgestore"):
+            gestore = query_get["fgestore"][1:]
+            excluded = []
+            for obj in objs:
+                if not obj.contratto_set.filter(piano_tariffario__gestore=gestore).exists():
+                    excluded.append(obj.id)
+            objs = objs.exclude(id__in=excluded)
+            del query_get["fgestore"]
+            initial["gestore"] = gestore
         if query_get:
-            objs, initial = u.filter_objs(objs, query_get)
-        
+            objs, initial_values = u.filter_objs(objs, query_get)
+            for k, v in initial_values.iteritems():
+                initial[k] = v
+            
     table = tables.ClienteTable(objs, order_by=(ordering,))
     table.paginate(page=pag)
     
