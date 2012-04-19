@@ -30,12 +30,14 @@
 			<a href="{% url canvas_tim_telecom %}">Canvas Tim-Telecom</a><br />
 			<a href="{% url canvas_edison %}">Canvas Edison</a>	
 		</fieldset>
-		{% if user|get_group == "amministratore" %}
+		{% if user|get_group != "telefonista" %}
 		<fieldset>
 		<legend>Economia</legend>
+			{% if user|get_group == "amministratore" %}
 			<a href="{% url inout %}">Entrate/Uscite</a>
+			{% endif %}
 		</fieldset>
-			<fieldset>
+		<fieldset>
 		<legend>Obiettivi</legend>
 			<a href="{% url canvas_obiettivo_trimestrale %}">Situazione Obiettivi Trimestrali</a> <br />
 			<a href="{% url init_obiettivo_trimestrale %}">Gestione Obiettivi Trimestrali</a>	

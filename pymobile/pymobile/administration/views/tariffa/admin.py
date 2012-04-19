@@ -25,7 +25,8 @@ TMP_DEL="tariffa/deleteform.html"
 TMP_VIEW="tariffa/view.html"
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def init(request):
     template = TMP_ADMIN
     objs = models.Tariffa.objects.all()
@@ -60,7 +61,8 @@ def init(request):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) == "amministratore")
 def add_object(request):  
     template = TMP_FORM
     action = "add"
@@ -88,7 +90,8 @@ def add_object(request):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) == "amministratore")
 def mod_object(request, object_id):
     template = TMP_FORM
     action = "mod"
@@ -119,7 +122,8 @@ def mod_object(request, object_id):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) == "amministratore")
 def del_object(request):
     template = TMP_DEL
     
@@ -158,7 +162,8 @@ def del_object(request):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) == "amministratore")
 def add_child_object(request, field_name):
     action = "Aggiungi" 
     
@@ -207,7 +212,8 @@ def add_child_object(request, field_name):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) == "amministratore")
 def init_attribute(request, attribute):
     template = "tariffa/attribute_admin.html"
     model = get_model("administration", attribute + "tariffa")
@@ -243,7 +249,8 @@ def init_attribute(request, attribute):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) == "amministratore")
 def add_attribute(request, attribute):  
     template = "tariffa/attribute_modelform.html"
     action = "add"
@@ -278,7 +285,8 @@ def add_attribute(request, attribute):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) == "amministratore")
 def mod_attribute(request, attribute, object_id):
     template = "tariffa/attribute_modelform.html"
     action = "mod"
@@ -316,7 +324,8 @@ def mod_attribute(request, attribute, object_id):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) == "amministratore")
 def del_attribute(request, attribute):
     template = "tariffa/attribute_deleteform.html"
     model = get_model("administration", attribute + "tariffa")

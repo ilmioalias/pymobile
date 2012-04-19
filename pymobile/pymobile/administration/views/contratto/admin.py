@@ -29,7 +29,8 @@ TMP_DEL="contratto/deleteform.html"
 TMP_VIEW="contratto/view.html"
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def init(request):
     template = TMP_ADMIN
     objs = models.Contratto.objects.all()
@@ -63,7 +64,8 @@ def init(request):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def add_object(request):  
     template = TMP_FORM
     action = "add"
@@ -105,7 +107,8 @@ def add_object(request):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def mod_object(request, object_id):
     template = TMP_FORM
     action = "mod"
@@ -151,7 +154,8 @@ def mod_object(request, object_id):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def del_object(request):
     template = TMP_DEL
     
@@ -190,7 +194,8 @@ def del_object(request):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def add_child_object(request, field_name):
     action = "Aggiungi" 
     
@@ -239,7 +244,8 @@ def add_child_object(request, field_name):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def send_file(request, object_id):
     # informazioni file
     pdffile = models.Contratto.objects.get(pk=object_id).pdf_contratto

@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	$("div.table-container").on("click", "table#retribuzione td.retribuzione a.visualizza", function(e){
+	$("div.table-container").on("click", "a.view_details", function(e){
 		e.preventDefault();
 		var img = $(this).find("img");
 		var p = $(this).next("p.info");
@@ -13,7 +13,7 @@ $(document).ready(function(){
 			p.hide("fast");			
 		};
 	});
-	$("div.table-container").on("click", "table#retribuzione td.variazione a.visualizza", function(e){
+	$("div.table-container").on("click", "a.view_details", function(e){
 		e.preventDefault();
 		var img = $(this).find("img");
 		var p = $(this).next("p.info");

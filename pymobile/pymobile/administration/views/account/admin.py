@@ -77,7 +77,8 @@ def logout_user(request):
     return HttpResponseRedirect(reverse("login"))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: not u.get_group(user) == "telefonista")
 def init(request):
     template = TMP_ADMIN
     objs = User.objects.filter(is_superuser=False)
@@ -113,7 +114,8 @@ def init(request):
                               context_instance=RequestContext(request))        
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) == "amministratore")
 def add_object(request):  
     template = TMP_FORM
     action = "add"
@@ -121,7 +123,6 @@ def add_object(request):
     if request.method == "POST":
         post_query = request.POST.copy()
         form = forms.AccountForm(post_query)
-        
         if form.is_valid():
             new_obj = form.save()
             
@@ -141,7 +142,8 @@ def add_object(request):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) == "amministratore")
 def mod_object(request, object_id):
     template = TMP_FORM
     action = "mod"
@@ -181,7 +183,8 @@ def mod_object(request, object_id):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) == "amministratore")
 def del_object(request):
     template = TMP_DEL
     
@@ -220,7 +223,8 @@ def del_object(request):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) == "amministratore")
 def mod_password(request, object_id):
     template = "account/mod_password.html"
     

@@ -98,7 +98,7 @@ def init(request):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista",)
 def send_report_mail(request):
     default_options = get_default_options()
     email = default_options["email_titolare"]

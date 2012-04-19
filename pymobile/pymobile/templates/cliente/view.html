@@ -15,7 +15,7 @@
 <div class="navigation">
 	<fieldset>
 	<legend>Sei qui</legend>
-		{% if user|get_group == "amministratore" %}
+		{% if user|get_group != "telefonista" %}
 		<a href="../../">home</a> &gt; 
 		<a href="{% url init_cliente %}">amministrazione clienti</a> &gt;
 		{% endif %}
@@ -26,11 +26,11 @@
 	<fieldset>
 	<legend>Azioni</legend>
 		<a href="{% url init_appuntamento %}?fcliente=={{ object.id }}">visualizza appuntamenti</a> |
-		{% if user|get_group == "amministratore" %}
+		{% if user|get_group != "telefonista" %}
 		<a href="{% url init_contratto %}?fcliente=={{ object.id }}">visualizza contratti</a> |
 		{% endif %}
 		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_cliente object.id %}">modifica</a> 
-		{% if user|get_group == "amministratore" %}
+		{% if user|get_group != "telefonista" %}
 		| <a id="del_{{ object.id }}" class="deleteobj" href="{% url del_cliente %}?id={{ object.id }}">elimina</a>
 		{% endif %}
 	</fieldset>

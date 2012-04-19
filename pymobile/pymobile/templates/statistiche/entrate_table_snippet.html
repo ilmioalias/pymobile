@@ -4,9 +4,18 @@
 <tfoot id="totals_row">
 	<tr>
 		<td><b>Totali</b></td>
-		{% for tot in totals_in %}
-		<td>{{ tot }}</td>
-		{% endfor %}
+		<td>{{ totals_in.n_stipulati }}</td>
+		<td>
+			{{ totals_in.entrate.total|stringformat:".2f" }}€
+			{% if totals_in.entrate.total > 0 %}
+			<a class="view_details" href="#"><img src="{{ STATIC_URL }}/img/destra.png" /></a>
+	        <p class="info">
+	            {% for gestore, total in totals_in.entrate.details.iteritems %}
+	            <b>{{ gestore }}</b>: {{ total|stringformat:".2f" }}€<br />
+	            {% endfor %}
+	        </p>
+	        {% endif %}
+        </td>
 	</tr>
 </tfoot>   
 {% endblock %}

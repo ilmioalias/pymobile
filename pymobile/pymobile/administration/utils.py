@@ -195,6 +195,11 @@ def get_telefonisti_ids(query):
     
     return ids   
 
+def get_gestori_ids(query):
+    ids = [g[1:] for g in query.getlist("fgestore")]
+    
+    return ids
+
 def values_from_provvigione_bonus(provvigione_bonus):
     provvigione_bonus = provvigione_bonus.strip()
     if not provvigione_bonus:
@@ -289,3 +294,20 @@ def is_telefonista(user):
         if user.groups.filter(name="telefonista").count() > 0:
             return True
     return False
+
+def is_amministratore(user):
+    if user:
+        if user.groups.filter(name="amministratore").count() > 0:
+            return True
+    return False
+
+def is_amministratore_limitato(user):
+    if user:
+        if user.groups.filter(name="amministratore limitato").count() > 0:
+            return True
+    return False
+
+def get_group(user):
+    if user:
+        return str(user.groups.all()[0])    
+    return ""

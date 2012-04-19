@@ -41,7 +41,7 @@
 			{% render_table table_appuntamenti %}		
 		</fieldset>
 		
-		{% if user|get_group == "amministratore" %}
+		{% if user|get_group != "telefonista" %}
 		<fieldset>	
 		<legend><a href="{% url init_contratto %}">Contratti</a> in Scadenza (prossimo mese)</legend> 
 			{% load django_tables2 %}

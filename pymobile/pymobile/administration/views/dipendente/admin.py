@@ -35,7 +35,8 @@ TMP_PROV_VARTMP_CONF="dipendente/provvigione_variazione_conferma.html"
 TMP_PROV_RETR_CONF="dipendente/provvigione_retribuzione_conferma.html"
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def init(request):
     template = TMP_ADMIN
     objs = models.Dipendente.objects.all()
@@ -70,7 +71,8 @@ def init(request):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def add_object(request):  
     template = TMP_FORM
     action = "add"
@@ -117,7 +119,8 @@ def add_object(request):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def mod_object(request, object_id):
     template = TMP_FORM
     action = "mod"
@@ -148,7 +151,8 @@ def mod_object(request, object_id):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def del_object(request):
     template = TMP_DEL
     
@@ -186,7 +190,8 @@ def del_object(request):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def init_provvigione(request, object_id):
     # FIXME: data licenziamento non è presa in considerazione
     # da correggere, non ora però
@@ -303,7 +308,8 @@ def init_provvigione(request, object_id):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def add_retribuzione(request, object_id):
     template = TMP_PROV_CONTRATTO_FORM
     action = "add"
@@ -352,7 +358,8 @@ def add_retribuzione(request, object_id):
                               context_instance=RequestContext(request))    
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def add_vartmp(request, object_id):
     template = TMP_PROV_BONUS_FORM
     action = "add"
@@ -479,7 +486,8 @@ def add_vartmp(request, object_id):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def mod_retribuzione(request, object_id, provvigione_id):
     template = TMP_PROV_CONTRATTO_FORM
     action = "mod"
@@ -575,7 +583,8 @@ def mod_retribuzione(request, object_id, provvigione_id):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def mod_vartmp(request, object_id, provvigione_id):
     template = TMP_PROV_BONUS_FORM
     action = "mod"
@@ -677,7 +686,8 @@ def mod_vartmp(request, object_id, provvigione_id):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def del_retribuzione(request, object_id):
     template = TMP_PROV_CONTRATTO_DELFORM
     
@@ -719,7 +729,8 @@ def del_retribuzione(request, object_id):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def del_vartmp(request, object_id):
     template = TMP_PROV_BONUS_DELFORM
     

@@ -3,7 +3,7 @@ var sort_cur="";
 
 var updateTable = function(html_data){
 	var table = $(html_data).find("div#reporttable_div");
-	$("div#reporttable_div").html(table);		
+	$("div#reporttable_div").replaceWith(table);		
 };
 
 var getSort = function(j_obj){
@@ -233,15 +233,15 @@ var redirectAfter = function(win, url){
 };
 
 var tableClickHandlers = function(){
-	$("div#reporttable_div").on("click", "th.orderable > a", function(e){
+	$("div#content").on("click", "div#reporttable_div th.orderable > a", function(e){
 		e.preventDefault();
 		sortTable($(this));
 	});	
-	$("div#reporttable_div").on("click", "li.pagination a.next", function(e){
+	$("div#content").on("click", "div#reporttable_div li.pagination a.next", function(e){
 		e.preventDefault();
 		changePage($(this));
 	});
-	$("div#reporttable_div").on("click", "li.pagination a.previous", function(e){
+	$("div#content").on("click", "div#reporttable_div li.pagination a.previous", function(e){
 		e.preventDefault();
 		changePage($(this));
 	});	

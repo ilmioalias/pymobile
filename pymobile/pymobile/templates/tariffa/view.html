@@ -23,9 +23,11 @@
 <div class="actions">
 	<fieldset>
 	<legend>Azioni</legend>
-		<a href="{% url init_contratto %}?fpiano_tariffario=={{ object.id }}">visualizza contratti</a> |
+		<a href="{% url init_contratto %}?fpiano_tariffario=={{ object.id }}">visualizza contratti</a>
+		{% if user|get_group == "amministratore" %} |
 		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_tariffa object.id %}">modifica</a> |
 		<a id="del_{{ object.id }}" class="deleteobj" href="{% url del_tariffa %}?id={{ object.id }}">elimina</a>
+		{% endif %}
 	</fieldset>
 </div>
 <!-- <div class="div_menu">

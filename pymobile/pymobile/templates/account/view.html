@@ -15,17 +15,23 @@
 <div class="navigation">
 	<fieldset>
 	<legend>Sei qui</legend>
-		<a href="../../">home</a> &gt; 
+		<a href="../../">home</a> &gt;
+		{% if user|get_group == "amministratore" %} 
 		<a href="{% url init_account %}">amministrazione account</a> &gt;
+		{% endif %}
 		<a href="./">{{ object }}</a>
 	</fieldset>
 </div>
 <div class="actions">
 	<fieldset>
 	<legend>Azioni</legend>
+		{% if user|get_group == "amministratore" %}
 		<a href="{% url mod_password object.id %}">modifica password</a> |
 		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_account object.id %}">modifica</a> |
 		<a id="del_{{ object.id }}" class="deleteobj" href="{% url del_account %}?id={{ object.id }}">elimina</a>
+		{% else %}
+		nessuna azione disponibile
+		{% endif %}
 	</fieldset>
 </div> 
 <div class="div_detail">

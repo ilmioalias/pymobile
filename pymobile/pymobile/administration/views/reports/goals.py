@@ -95,7 +95,8 @@ def get_points(obiettivi, contratti):
     
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def canvas_obiettivo_trimestrale(request):
     template = TMP_CANVAS
     
@@ -261,7 +262,8 @@ def check_tariffa(obiettivo, tariffa):
     return result
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def init_obiettivo_trimestrale(request):
     template = TMP_ADMIN
     # determiniamo solo gli obiettivi attivi
@@ -295,7 +297,8 @@ def init_obiettivo_trimestrale(request):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def add_obiettivo_trimestrale(request):  
     template = TMP_FORM
     action = "add"
@@ -323,7 +326,8 @@ def add_obiettivo_trimestrale(request):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def mod_obiettivo_trimestrale(request, object_id):
     template = TMP_FORM
     action = "mod"
@@ -354,7 +358,8 @@ def mod_obiettivo_trimestrale(request, object_id):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def del_obiettivo_trimestrale(request):
     template = TMP_DEL
     

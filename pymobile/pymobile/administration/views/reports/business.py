@@ -13,6 +13,13 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 def get_daily_totals(contratti, date):
     in_tot_day = 0
     out_tot_day = 0
+    in_detail_day = {}
+    out_detail_day = {}
+    gestori = models.Gestore.objects.all()
+    for gestore in gestori:
+        g = str(gestore)
+        in_detail_day[g] = 0
+        out_detail_day[g] = 0
     out_tot_prov_agt_day = 0
     out_tot_prov_tel_day = 0
     out_tot_prov_bonus_agt_day = 0
@@ -39,43 +46,58 @@ def get_daily_totals(contratti, date):
         # determiniamo il piano tariffario
         pts = models.PianoTariffario.objects.filter(contratto=contratto).iterator()
     
-        in_tot_contratto = 0
-        out_tot_prov_agt_contratto = 0
-        out_tot_prov_tel_contratto = 0
-        out_tot_prov_bonus_agt_contratto = 0
-        out_tot_prov_bonus_tel_contratto = 0
+#        in_tot_contratto = 0
+#        out_tot_prov_agt_contratto = 0
+#        out_tot_prov_tel_contratto = 0
+#        out_tot_prov_bonus_agt_contratto = 0
+#        out_tot_prov_bonus_tel_contratto = 0
         for pt in pts:
             tariffa = pt.tariffa
+            gestore = str(tariffa.gestore)
             q = pt.num
             sac = float(tariffa.sac)
             
             # determiniamo le entrate dovute alla tariffa del contratto considerato
-            in_tot_contratto += sac * q
+            partial = sac * q
+            in_detail_day[gestore] += partial
+            in_tot_day += partial
+#            in_tot_contratto += partial
             
             # determiniamo le uscite dovute alla tariffa del contratto considerato
             # 1: provvigione dovuta all'agente:                    
             prov_agente = calc_provvigione(agente, cliente, tariffa, date)
-            out_tot_prov_agt_contratto += prov_agente[0] * q
-            out_tot_prov_bonus_agt_contratto += prov_agente[1] * q
+            o_agt_prov = prov_agente[0] * q
+            out_tot_prov_agt_day += o_agt_prov
+            o_agt_bonus = prov_agente[1] * q
+            out_tot_prov_bonus_agt_day += o_agt_bonus
+            out_detail_day[gestore] += o_agt_prov + o_agt_bonus 
+#            out_tot_prov_agt_contratto += prov_agente[0] * q
+#            out_tot_prov_bonus_agt_contratto += prov_agente[1] * q
             # 2: provvigione dovuta al telefonista
             if telefonista:
                 prov_telefonista = calc_provvigione(telefonista, cliente, 
                                                     tariffa, 
                                                     date)
-                out_tot_prov_tel_contratto += prov_telefonista[0] * q
-                out_tot_prov_bonus_tel_contratto += prov_telefonista[1] * q
+                o_tel_prov = prov_telefonista[0] * q
+                out_tot_prov_tel_day += prov_telefonista[0] * q
+                o_tel_bonus = prov_telefonista[1] * q
+                out_tot_prov_bonus_tel_day += prov_telefonista[1] * q
+                out_detail_day[gestore] += o_tel_prov + o_tel_bonus
+#                out_tot_prov_tel_contratto += prov_telefonista[0] * q
+#                out_tot_prov_bonus_tel_contratto += prov_telefonista[1] * q
             
         # determiniamo le entrate della giornata
-        in_tot_day += in_tot_contratto
+#        in_tot_day += in_tot_contratto
         
         # determiniamo le uscite della giornata
-        out_tot_prov_agt_day += out_tot_prov_agt_contratto
-        out_tot_prov_bonus_agt_day += out_tot_prov_bonus_agt_contratto
-        out_tot_prov_tel_day += out_tot_prov_tel_contratto
-        out_tot_prov_bonus_tel_day += out_tot_prov_bonus_tel_contratto
+#        out_tot_prov_agt_day += out_tot_prov_agt_contratto
+#        out_tot_prov_bonus_agt_day += out_tot_prov_bonus_agt_contratto
+#        out_tot_prov_tel_day += out_tot_prov_tel_contratto
+#        out_tot_prov_bonus_tel_day += out_tot_prov_bonus_tel_contratto
         out_tot_day = out_tot_prov_agt_day + out_tot_prov_bonus_agt_day + \
             out_tot_prov_tel_day + out_tot_prov_bonus_tel_day + \
             vas_telefonista + vas_agente
+        
         
         n += 1
         if contratto.attivato:
@@ -86,23 +108,32 @@ def get_daily_totals(contratti, date):
             i += 1
         if contratto.caricato:
             cr += 1
-
-    tot = {"entrate": in_tot_day,
-           "uscite": out_tot_day,
-           "totali": in_tot_day - out_tot_day}
-    tot_in = {"entrate": in_tot_day}
-    tot_out = {"uscite": out_tot_day,
+    
+    tot_detail_day = {}
+    for gestore in gestori:
+        g = str(gestore)
+        tot_detail_day[g] =  in_detail_day[g] - out_detail_day[g]
+    tot = {"entrate": {"total": in_tot_day,
+                       "details": in_detail_day},
+           "uscite": {"total": out_tot_day,
+                      "details": out_detail_day},
+           "totali": {"total": in_tot_day - out_tot_day,
+                      "details": tot_detail_day}}
+    tot_in = {"entrate": {"total":in_tot_day,
+                          "details": in_detail_day}}
+    tot_out = {"uscite": {"total": out_tot_day,
+                          "details": out_detail_day},
                "prov_agt": out_tot_prov_agt_day, 
                "prov_bonus_agt": out_tot_prov_bonus_agt_day,
                "prov_tel": out_tot_prov_tel_day,
                "prov_bonus_tel": out_tot_prov_bonus_tel_day,}            
     
-#    t = str(n) + "/" + str(c) + "/" + str(i) + "/" + str(cr) + "/" + str(a)
     t = {"stipulati": n, "completi": c, "inviati": i, "caricati": cr, "attivati": a,}
     return {"totali": tot, "entrate": tot_in, "uscite": tot_out, "contratti": t, }
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) == "amministratore")
 def inout(request):
     #TODO: controllare che effettivamente i calcoli siano giusti
     getcontext().prec = 2
@@ -129,7 +160,8 @@ def inout(request):
     if request.method == "GET" and request.GET.has_key("ftelefonista"):
         tel_ids = u.get_telefonisti_ids(request.GET)
         if tel_ids:
-            contratti = contratti.filter(telefonista__in=tel_ids)    
+            contratti = contratti.filter(telefonista__in=tel_ids)   
+    # FIXME: implementare selezione gestori
     
     objs = []
     objs_in = []
@@ -142,6 +174,13 @@ def inout(request):
     n_attivati = 0
     in_tot = 0
     out_tot = 0
+    in_tot_detail = {}
+    out_tot_detail = {}
+    gestori = models.Gestore.objects.all()
+    for gestore in gestori:
+        g = str(gestore)
+        in_tot_detail[g] = 0
+        out_tot_detail[g] = 0
     out_tot_prov_agt = 0
     out_tot_prov_bonus_agt = 0
     out_tot_prov_tel = 0
@@ -252,7 +291,6 @@ def inout(request):
 #                       "prov_bonus_tel": "{0:.2f}".format(Decimal(out_tot_prov_bonus_tel_day)),}
             
             daily_totals = get_daily_totals(contratti_day, date["data_stipula"]) 
-            
             t = "{}/{}/{}/{}".format(daily_totals["contratti"]["stipulati"],
                                      daily_totals["contratti"]["completi"],
                                      daily_totals["contratti"]["inviati"],
@@ -260,27 +298,32 @@ def inout(request):
                                      daily_totals["contratti"]["attivati"])
             objs.append({"data": date["data_stipula"], 
                          "n_stipulati": t, 
-                         "entrate": "{0:.2f}".format(Decimal(daily_totals["totali"]["entrate"])), 
-                         "uscite": "{0:.2f}".format(Decimal(daily_totals["totali"]["uscite"])),
-                         "totali": "{0:.2f}".format(Decimal(daily_totals["totali"]["totali"])),})
-            objs_in.append({"data": date["data_stipula"], 
-                            "n_stipulati": t, 
-                            "entrate": "{0:.2f}".format(Decimal(daily_totals["entrate"]["entrate"]))}) 
+                         "entrate": daily_totals["totali"]["entrate"], 
+                         "uscite": daily_totals["totali"]["uscite"],
+                         "totali": daily_totals["totali"]["totali"]})
+            objs_in.append({"data": date["data_stipula"],
+                            "n_stipulati": t,
+                            "entrate": daily_totals["entrate"]["entrate"]})
             objs_out.append({"data": date["data_stipula"], 
-                            "n_stipulati": t, 
-                            "uscite": "{0:.2f}".format(Decimal(daily_totals["uscite"]["uscite"])),
+                            "n_stipulati": t,
+                            "uscite": daily_totals["uscite"]["uscite"],
                             "prov_agt": "{0:.2f}".format(Decimal(daily_totals["uscite"]["prov_agt"])),
                             "prov_bonus_agt": "{0:.2f}".format(Decimal(daily_totals["uscite"]["prov_bonus_agt"])),
                             "prov_tel": "{0:.2f}".format(Decimal(daily_totals["uscite"]["prov_tel"])),
                             "prov_bonus_tel": "{0:.2f}".format(Decimal(daily_totals["uscite"]["prov_bonus_tel"]))})
-#            
+            
 #            objs.append(obj)
 #            objs_in.append(obj_in)
 #            objs_out.append(obj_out)
             
-            # aggoirniamo i totali
-            in_tot += daily_totals["totali"]["entrate"]
-            out_tot += daily_totals["totali"]["uscite"]
+            # aggoiorniamo i totali
+            in_tot += daily_totals["totali"]["entrate"]["total"]
+            out_tot += daily_totals["totali"]["uscite"]["total"]
+            # aggiorniamo i dettagli dei totali
+            for gestore in gestori:
+                g = str(gestore)
+                in_tot_detail[g] += daily_totals["totali"]["entrate"]["details"][g]
+                out_tot_detail[g] += daily_totals["totali"]["uscite"]["details"][g]
             out_tot_prov_agt += daily_totals["uscite"]["prov_agt"]
             out_tot_prov_bonus_agt += daily_totals["uscite"]["prov_bonus_agt"]
             out_tot_prov_tel += daily_totals["uscite"]["prov_tel"]
@@ -298,18 +341,39 @@ def inout(request):
 #            out_tot_prov_tel += out_tot_prov_tel_day
 #            out_tot_prov_bonus_tel += out_tot_prov_bonus_tel_day
     
-    totals = ["{}/{}/{}/{}/{}".format(n_stipulati, n_completi, n_inviati, n_caricati, n_attivati), 
-             "{0:.2f}".format(Decimal(in_tot)),
-             "{0:.2f}".format(Decimal(out_tot)),
-             "{0:.2f}".format(Decimal(in_tot - out_tot)),]
-    totals_in = ["{}/{}/{}/{}/{}".format(n_stipulati, n_completi, n_inviati, n_caricati, n_attivati), 
-                 "{0:.2f}".format(Decimal(in_tot)),]
-    totals_out = ["{}/{}/{}/{}/{}".format(n_stipulati, n_completi, n_inviati, n_caricati, n_attivati),
-                  "{0:.2f}".format(Decimal(out_tot_prov_agt)),
-                  "{0:.2f}".format(Decimal(out_tot_prov_bonus_agt)),
-                  "{0:.2f}".format(Decimal(out_tot_prov_tel)),
-                  "{0:.2f}".format(Decimal(out_tot_prov_bonus_tel)),
-                  "{0:.2f}".format(Decimal(out_tot)),]
+    tot_tot_detail = {}
+    for gestore in gestori:
+        g = str(gestore)
+        tot_tot_detail[g] = in_tot_detail[g] - out_tot_detail[g]
+    totals = {"n_stipulati": "{}/{}/{}/{}/{}".format(n_stipulati, n_completi, n_inviati, n_caricati, n_attivati),
+              "entrate": {"total": in_tot,
+                          "details": in_tot_detail},
+              "uscite": {"total": out_tot,
+                         "details": out_tot_detail},
+              "totali": {"total": in_tot - out_tot,
+                         "details": tot_tot_detail}}
+#    totals = ["{}/{}/{}/{}/{}".format(n_stipulati, n_completi, n_inviati, n_caricati, n_attivati), 
+#             "{0:.2f}".format(Decimal(in_tot)),
+#             "{0:.2f}".format(Decimal(out_tot)),
+#             "{0:.2f}".format(Decimal(in_tot - out_tot)),]
+#    totals_in = ["{}/{}/{}/{}/{}".format(n_stipulati, n_completi, n_inviati, n_caricati, n_attivati), 
+#                 "{0:.2f}".format(Decimal(in_tot)),]
+    totals_in = {"n_stipulati": "{}/{}/{}/{}/{}".format(n_stipulati, n_completi, n_inviati, n_caricati, n_attivati),
+                 "entrate": {"total": in_tot,
+                             "details": in_tot_detail}}
+    totals_out = {"n_stipulati": "{}/{}/{}/{}/{}".format(n_stipulati, n_completi, n_inviati, n_caricati, n_attivati),
+                  "uscite": {"total": out_tot,
+                            "details": out_tot_detail},
+                  "prov_agt": out_tot_prov_agt,
+                  "prov_bonus_agt": out_tot_prov_bonus_agt,
+                  "prov_tel": out_tot_prov_tel,
+                  "prov_bonus_tel": out_tot_prov_bonus_tel}
+#    totals_out = ["{}/{}/{}/{}/{}".format(n_stipulati, n_completi, n_inviati, n_caricati, n_attivati),
+#                  "{0:.2f}".format(Decimal(out_tot_prov_agt)),
+#                  "{0:.2f}".format(Decimal(out_tot_prov_bonus_agt)),
+#                  "{0:.2f}".format(Decimal(out_tot_prov_tel)),
+#                  "{0:.2f}".format(Decimal(out_tot_prov_bonus_tel)),
+#                  "{0:.2f}".format(Decimal(out_tot)),]
     
     # creiamo le tabelle 
     table = tables.InOutTotalsTable(objs, per_page_field=10,)

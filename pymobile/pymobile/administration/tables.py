@@ -181,7 +181,9 @@ class TariffaTable(tables.Table):
     TMP_OP='''
         {% load tags %}
         <a id="view_id_{{ record.pk }}" href="{% url view_tariffa record.pk %}">visualizza</a>
+        {% if user|get_group == "amministratore" %}
         <a id="del_id_{{ record.pk }}" class="deleterow" href="{% url del_tariffa %}?id={{ record.pk }}">elimina</a>
+        {% endif %}
     '''
     
     tipo = NullColumn()
@@ -326,13 +328,43 @@ class InOutTotalsTable(tables.Table):
         {% load tags %}
         <a href="{% url init_contratto %}?fdata_stipula=={{ record.data|get_date }}">{{ record.data }}</a>
     '''
+    TMP_IN='''
+        {% load tags %}
+        {{ record.entrate.total|stringformat:".2f" }}€
+        <a class="view_details" href="#"><img src="{{ STATIC_URL }}/img/destra.png" /></a>
+        <p class="info">
+            {% for gestore, total in record.entrate.details.iteritems %}
+            <b>{{ gestore }}</b>: {{ total|stringformat:".2f" }}€<br />
+            {% endfor %}
+        </p>
+    '''
+    TMP_OUT='''
+        {% load tags %}
+        {{ record.uscite.total|stringformat:".2f" }}€
+        <a class="view_details" href="#"><img src="{{ STATIC_URL }}/img/destra.png" /></a>
+        <p class="info">
+            {% for gestore, total in record.uscite.details.iteritems %}
+            <b>{{ gestore }}</b>: {{ total|stringformat:".2f" }}€<br />
+            {% endfor %}
+        </p>
+    '''
+    TMP_TOT='''
+        {% load tags %}
+        {{ record.totali.total|stringformat:".2f" }}€
+        <a class="view_details" href="#"><img src="{{ STATIC_URL }}/img/destra.png" /></a>
+        <p class="info">
+            {% for gestore, total in record.totali.details.iteritems %}
+            <b>{{ gestore }}</b>: {{ total|stringformat:".2f" }}€<br />
+            {% endfor %}
+        </p>
+    '''
     
     data = tables.TemplateColumn(TMP_DATA)
     n_stipulati = tables.Column(verbose_name="S/Co/I/C/A", orderable=False,
                                 attrs=tables.Attrs(th={"title": "stipulati/completati/inviati/caricati/attivati"}))
-    entrate = tables.Column()
-    uscite = tables.Column()
-    totali = tables.Column()
+    entrate = tables.TemplateColumn(TMP_IN, accessor="record.entrate.total")
+    uscite = tables.TemplateColumn(TMP_OUT, accessor="record.uscite.total")
+    totali = tables.TemplateColumn(TMP_TOT, accessor="record.totali.total")
 
     class Meta:
         empty_text = "Tabella vuota"
@@ -351,11 +383,21 @@ class InTable(tables.Table):
         {% load tags %}
         <a href="{% url init_contratto %}?fdata_stipula=={{ record.data|get_date }}">{{ record.data }}</a>
     '''
+    TMP_IN='''
+        {% load tags %}
+        {{ record.entrate.total|stringformat:".2f" }}€
+        <a class="view_details" href="#"><img src="{{ STATIC_URL }}/img/destra.png" /></a>
+        <p class="info">
+            {% for gestore, total in record.entrate.details.iteritems %}
+            <b>{{ gestore }}</b>: {{ total|stringformat:".2f" }}€<br />
+            {% endfor %}
+        </p>
+    '''
     
     data = tables.TemplateColumn(TMP_DATA)
     n_stipulati = tables.Column(verbose_name="S/Co/I/C/A", orderable=False)
-    entrate = tables.Column()
-
+    entrate = tables.TemplateColumn(TMP_IN, accessor="record.entrate.total")
+    
     class Meta:
         empty_text = "Tabella vuota"
         attrs = {"id": "entratetable"}
@@ -366,6 +408,16 @@ class OutTable(tables.Table):
         {% load tags %}
         <a href="{% url init_contratto %}?fdata_stipula=={{ record.data|get_date }}">{{ record.data }}</a>
     '''
+    TMP_OUT='''
+        {% load tags %}
+        {{ record.uscite.total|stringformat:".2f" }}€
+        <a class="view_details" href="#"><img src="{{ STATIC_URL }}/img/destra.png" /></a>
+        <p class="info">
+            {% for gestore, total in record.uscite.details.iteritems %}
+            <b>{{ gestore }}</b>: {{ total|stringformat:".2f" }}€<br />
+            {% endfor %}
+        </p>
+    '''
     
     data = tables.TemplateColumn(TMP_DATA)
     n_stipulati = tables.Column(verbose_name="S/Co/I/C/A", orderable=False)
@@ -373,7 +425,7 @@ class OutTable(tables.Table):
     prov_bonus_agt = tables.Column(verbose_name="Prov. bonus agente")
     prov_tel = tables.Column(verbose_name="Prov. tel.")
     prov_bonus_tel = tables.Column(verbose_name="Prov. bonus tel.")
-    uscite = tables.Column()
+    uscite = tables.TemplateColumn(TMP_OUT, accessor="record.uscite.total")
     
     class Meta:
         empty_text = "Tabella vuota"

@@ -48,7 +48,8 @@ def set_default_options(opts):
     json_file.close()   
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def init(request):
     template = TMP_INIT
     
@@ -60,7 +61,8 @@ def init(request):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def mod_object(request):
     template = TMP_FORM
 

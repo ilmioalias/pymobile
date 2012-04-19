@@ -34,19 +34,23 @@
 			<fieldset>
 			<legend>Navigazione</legend>
 			<ul>
-				{% if user|get_group == "amministratore" %}
+				{% if user|get_group != "telefonista" %}
 				<li><a href="{% url home %}">Home</a></li>
+				{% endif %}
+				{% if user|get_group == "amministratore" %}
 				<li><a href="{% url init_account %}">Amministrazione Account</a></li>
+				{% endif %}
+				{% if user|get_group != "telefonista" %}
 				<li><a href="{% url init_dipendente %}">Amministrazione Dipendenti</a></li>
 				<li><a href="{% url init_cliente %}">Amministrazione Clienti</a></li>
 				<li><a href="{% url init_tariffa %}">Amministrazione Tariffe</a></li>
 				{% endif %}
 				<li><a href="{% url init_appuntamento %}">Amministrazione Appuntamenti</a></li>
-				{% if user|get_group == "amministratore" %}
+				{% if user|get_group != "telefonista" %}
 				<li><a href="{% url init_contratto %}">Amministrazione Contratti</a></li>
 				{% endif %}
 				<li><a href="{% url init_statistiche %}">Statistiche</a></li>
-				{% if user|get_group == "amministratore" %}				
+				{% if user|get_group != "telefonista" %}				
 				<li><a href="{% url init_opzione %}">Opzioni Iniziali</a></li>
 				{% endif %}
 			</ul>

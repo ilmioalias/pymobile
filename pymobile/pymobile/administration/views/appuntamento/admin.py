@@ -172,7 +172,8 @@ def del_object(request):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def assign_object(request):
     template = TMP_ASSIGN
     
@@ -364,7 +365,8 @@ def del_referente(request, object_id):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def send_mail_to_agente(request, object_id):
     template = "appuntamento/send_mailform.html"
     

@@ -189,6 +189,21 @@ div.table-container {
 	background-color:#FFFFFF;
 }
 
+#content table#entratetable td p{
+    padding: 0px 25px;
+    display:none;
+}
+
+#content table#totalitable td p{
+    padding: 0px 25px;
+    display:none;
+}
+
+#content table#uscitetable td p{
+    padding: 0px 25px;
+    display:none;
+}
+
 div.modeltable_actions_div *{
     width: auto;
 }

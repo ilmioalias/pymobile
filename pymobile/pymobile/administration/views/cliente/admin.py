@@ -24,7 +24,8 @@ TMP_DEL="cliente/deleteform.html"
 TMP_VIEW="cliente/view.html"
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def init(request):
     template = TMP_ADMIN
     objs = models.Cliente.objects.all()
@@ -138,7 +139,8 @@ def mod_object(request, object_id):
                               context_instance=RequestContext(request))
 
 @login_required
-@user_passes_test(lambda user: not u.is_telefonista(user),)
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
 def del_object(request):
     template = TMP_DEL
     

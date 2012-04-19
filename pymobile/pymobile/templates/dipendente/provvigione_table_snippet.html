@@ -24,7 +24,7 @@
 			<td {% if row.retribuzione %}rowspan="{{ row.rowspan_r }}"{% endif %} {% if row.retribuzione %}class="retribuzione"{% else %}class="libero"{% endif %}>
 				{% if row.retribuzione %}
 				Il: {{ row.retribuzione.data_fine }}{% if row.retribuzione.principale %} <b><i>(assunzione)</i></b>{% endif %}
-				<a class="visualizza" href="#"><img src="{{ STATIC_URL }}/img/destra.png" /></a>
+				<a class="view_details" href="#"><img src="{{ STATIC_URL }}/img/destra.png" /></a>
 				<p class="info">
 				    Fisso: {{ row.retribuzione.fisso }}<br />
 				    Provvigione per contratto: {{ row.retribuzione.provvigione_contratto }}<br />

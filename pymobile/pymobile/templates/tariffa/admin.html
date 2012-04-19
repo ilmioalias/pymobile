@@ -23,10 +23,14 @@
 <div class="actions">
 	<fieldset>
 	<legend>Azioni</legend>
+		{% if user|get_group == "amministratore" %}
 		<a class="addrow" href="{% url add_tariffa %}">aggiungi tariffa</a> |
 		<a href="{% url init_attribute "tipologia" %}">gestisci tipologie</a> |
 		<a href="{% url init_attribute "fascia" %}">gestisci fascie</a> |
 		<a href="{% url init_attribute "servizio" %}">gestisci servizi</a>
+		{% else %}
+		nessuna azione disponibile
+		{% endif %}
 	</fieldset>
 </div>
 <div id="modeltable_div">

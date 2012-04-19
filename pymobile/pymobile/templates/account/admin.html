@@ -23,7 +23,11 @@
 <div class="actions">
 	<fieldset>
 	<legend>Azioni</legend>
+		{% if user|get_group == "amministratore" %}
 		<a class="addrow" href="{% url add_account %}">aggiungi account</a>
+		{% else %}
+		nessuna azione disponibile
+		{% endif %}
 	</fieldset>
 </div>
 <div id="modeltable_div">

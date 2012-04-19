@@ -63,7 +63,7 @@ class AccountForm(forms.ModelForm):
                     cdata["cognome"] = ""
                 if email:
                     cdata["email"] = ""
-            elif group.name == "amministratore":
+            else:
                 if not nome:
                     # creiamo il msg di errore per il campo "data_inizo"
                     msg = "è necessario indicare il nome"
@@ -78,16 +78,14 @@ class AccountForm(forms.ModelForm):
                     self.errors["email"] = self.error_class([msg])
                 if profile:
                     cdata["profile"] = ""
-            else:
-                raise forms.ValidationError("Gruppo non valido")
-            
+
             # questo è un hack perché django si aspettta una sequenza di gruppi
             cdata["groups"] = [group,]
         
         if not self.instance.pk:
             password = cdata.get("password")
             password_confirm = cdata.get("password_confirm")
-            if password:
+            if password and password_confirm:
                 if password != password_confirm:
                     # creiamo il msg di errore per il campo "data_inizo"
                     msg = "la password e la conferma della password non coincidono"
@@ -982,6 +980,8 @@ class InOutFilterForm(forms.Form):
                                             label="Selezione Agenti")
     telefonista = forms.ModelMultipleChoiceField(queryset=models.Dipendente.objects.filter(ruolo="tel"),
                                             label="Selezione Telefonisti")
+    gestore = forms.ModelMultipleChoiceField(queryset=models.Gestore.objects.all(),
+                                             label="Selezione Gestori")
 
 class ObiettivoForm(forms.ModelForm):
     anno_inizio = forms.ChoiceField(choices=[("", "")], 
