@@ -196,7 +196,6 @@ def init_provvigione(request, object_id):
     # FIXME: data licenziamento non è presa in considerazione
     # da correggere, non ora però
     template = TMP_PROV
-    
     dipendente = get_object_or_404(models.Dipendente, pk=object_id)
     
     period = u.get_current_quarter()
@@ -211,9 +210,9 @@ def init_provvigione(request, object_id):
     variazioni = models.RetribuzioneDipendente.objects.filter(
                             dipendente=object_id, variazione=True,).order_by("-data_inizio")                                                     
     
-    data_min = datetime.strptime(data_inizio, "%d/%m/%Y").date() if data_inizio else period[0]
+    data_min = datetime.strptime(data_inizio[1:], "%d/%m/%Y").date() if data_inizio else period[0]
     data_min = data_min if data_min >= earliest_retribuzione.data_inizio else earliest_retribuzione.data_inizio
-    data_max = datetime.strptime(data_fine, "%d/%m/%Y").date() if data_fine else period[1]
+    data_max = datetime.strptime(data_fine[1:], "%d/%m/%Y").date() if data_fine else period[1]
     retribuzioni = retribuzioni.filter(data_fine__gte=data_min, 
                                        data_inizio__lte=data_max)
     variazioni = variazioni.filter(data_fine__gte=data_min,
