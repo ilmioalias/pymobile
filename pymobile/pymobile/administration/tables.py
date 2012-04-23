@@ -332,7 +332,7 @@ class InOutTotalsTable(tables.Table):
         {% load tags %}
         {{ record.entrate.total|stringformat:".2f" }}€
         <a class="view_details" href="#"><img src="{{ STATIC_URL }}/img/destra.png" /></a>
-        <p class="info">
+        <p class="details">
             {% for gestore, total in record.entrate.details.iteritems %}
             <b>{{ gestore }}</b>: {{ total|stringformat:".2f" }}€<br />
             {% endfor %}
@@ -342,7 +342,7 @@ class InOutTotalsTable(tables.Table):
         {% load tags %}
         {{ record.uscite.total|stringformat:".2f" }}€
         <a class="view_details" href="#"><img src="{{ STATIC_URL }}/img/destra.png" /></a>
-        <p class="info">
+        <p class="details">
             {% for gestore, total in record.uscite.details.iteritems %}
             <b>{{ gestore }}</b>: {{ total|stringformat:".2f" }}€<br />
             {% endfor %}
@@ -352,7 +352,7 @@ class InOutTotalsTable(tables.Table):
         {% load tags %}
         {{ record.totali.total|stringformat:".2f" }}€
         <a class="view_details" href="#"><img src="{{ STATIC_URL }}/img/destra.png" /></a>
-        <p class="info">
+        <p class="details">
             {% for gestore, total in record.totali.details.iteritems %}
             <b>{{ gestore }}</b>: {{ total|stringformat:".2f" }}€<br />
             {% endfor %}
@@ -387,7 +387,7 @@ class InTable(tables.Table):
         {% load tags %}
         {{ record.entrate.total|stringformat:".2f" }}€
         <a class="view_details" href="#"><img src="{{ STATIC_URL }}/img/destra.png" /></a>
-        <p class="info">
+        <p class="details">
             {% for gestore, total in record.entrate.details.iteritems %}
             <b>{{ gestore }}</b>: {{ total|stringformat:".2f" }}€<br />
             {% endfor %}
@@ -412,7 +412,7 @@ class OutTable(tables.Table):
         {% load tags %}
         {{ record.uscite.total|stringformat:".2f" }}€
         <a class="view_details" href="#"><img src="{{ STATIC_URL }}/img/destra.png" /></a>
-        <p class="info">
+        <p class="details">
             {% for gestore, total in record.uscite.details.iteritems %}
             <b>{{ gestore }}</b>: {{ total|stringformat:".2f" }}€<br />
             {% endfor %}

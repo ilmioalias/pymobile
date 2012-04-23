@@ -5,10 +5,12 @@ import pymobile.administration.models as models
 import pymobile.administration.tables as tables
 import pymobile.administration.forms as forms
 from decimal import Decimal, getcontext
+from datetime import timedelta
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required, user_passes_test
+
 
 def get_daily_totals(contratti, date):
     in_tot_day = 0
@@ -45,12 +47,7 @@ def get_daily_totals(contratti, date):
         
         # determiniamo il piano tariffario
         pts = models.PianoTariffario.objects.filter(contratto=contratto).iterator()
-    
-#        in_tot_contratto = 0
-#        out_tot_prov_agt_contratto = 0
-#        out_tot_prov_tel_contratto = 0
-#        out_tot_prov_bonus_agt_contratto = 0
-#        out_tot_prov_bonus_tel_contratto = 0
+
         for pt in pts:
             tariffa = pt.tariffa
             gestore = str(tariffa.gestore)
@@ -61,7 +58,6 @@ def get_daily_totals(contratti, date):
             partial = sac * q
             in_detail_day[gestore] += partial
             in_tot_day += partial
-#            in_tot_contratto += partial
             
             # determiniamo le uscite dovute alla tariffa del contratto considerato
             # 1: provvigione dovuta all'agente:                    
@@ -71,8 +67,6 @@ def get_daily_totals(contratti, date):
             o_agt_bonus = prov_agente[1] * q
             out_tot_prov_bonus_agt_day += o_agt_bonus
             out_detail_day[gestore] += o_agt_prov + o_agt_bonus 
-#            out_tot_prov_agt_contratto += prov_agente[0] * q
-#            out_tot_prov_bonus_agt_contratto += prov_agente[1] * q
             # 2: provvigione dovuta al telefonista
             if telefonista:
                 prov_telefonista = calc_provvigione(telefonista, cliente, 
@@ -83,22 +77,12 @@ def get_daily_totals(contratti, date):
                 o_tel_bonus = prov_telefonista[1] * q
                 out_tot_prov_bonus_tel_day += prov_telefonista[1] * q
                 out_detail_day[gestore] += o_tel_prov + o_tel_bonus
-#                out_tot_prov_tel_contratto += prov_telefonista[0] * q
-#                out_tot_prov_bonus_tel_contratto += prov_telefonista[1] * q
             
-        # determiniamo le entrate della giornata
-#        in_tot_day += in_tot_contratto
-        
         # determiniamo le uscite della giornata
-#        out_tot_prov_agt_day += out_tot_prov_agt_contratto
-#        out_tot_prov_bonus_agt_day += out_tot_prov_bonus_agt_contratto
-#        out_tot_prov_tel_day += out_tot_prov_tel_contratto
-#        out_tot_prov_bonus_tel_day += out_tot_prov_bonus_tel_contratto
         out_tot_day = out_tot_prov_agt_day + out_tot_prov_bonus_agt_day + \
             out_tot_prov_tel_day + out_tot_prov_bonus_tel_day + \
             vas_telefonista + vas_agente
-        
-        
+                
         n += 1
         if contratto.attivato:
             a += 1
@@ -187,108 +171,9 @@ def inout(request):
     out_tot_prov_bonus_tel = 0
     
     if contratti.exists():
-        
         dates = contratti.values("data_stipula").distinct()
         for date in dates:
-#            in_tot_day = 0
-#            out_tot_day = 0
-#            out_tot_prov_agt_day = 0
-#            out_tot_prov_tel_day = 0
-#            out_tot_prov_bonus_agt_day = 0
-#            out_tot_prov_bonus_tel_day = 0
-
             contratti_day = contratti.filter(data_stipula=date["data_stipula"]).iterator()
-            
-#            n = 0
-#            a = 0
-#            c = 0
-#            i = 0
-#            cr = 0
-#            for contratto in contratti_day:
-#                # informazioni utili
-#                cliente = contratto.cliente
-#                agente = contratto.agente
-#                telefonista = None
-#                if contratto.appuntamento:
-#                    telefonista = contratto.appuntamento.telefonista
-#                
-#                # uscite: bonus per agente/telefonista in base al contratto
-#                vas_agente = float(contratto.vas_agente)
-#                vas_telefonista = float(contratto.vas_telefonista)
-#                
-#                # determiniamo il piano tariffario
-#                pts = models.PianoTariffario.objects.filter(contratto=contratto).iterator()
-#            
-#                in_tot_contratto = 0
-#                out_tot_prov_agt_contratto = 0
-#                out_tot_prov_tel_contratto = 0
-#                out_tot_prov_bonus_agt_contratto = 0
-#                out_tot_prov_bonus_tel_contratto = 0
-#                for pt in pts:
-#                    tariffa = pt.tariffa
-#                    q = pt.num
-#                    sac = float(tariffa.sac)
-#                    
-#                    # determiniamo le entrate dovute alla tariffa del contratto considerato
-#                    in_tot_contratto += sac * q
-#                    
-#                    # determiniamo le uscite dovute alla tariffa del contratto considerato
-#                    # 1: provvigione dovuta all'agente:                    
-#                    prov_agente = calc_provvigione(agente, cliente, tariffa, date["data_stipula"])
-#                    out_tot_prov_agt_contratto += prov_agente[0] * q
-#                    out_tot_prov_bonus_agt_contratto += prov_agente[1] * q
-#                    # 2: provvigione dovuta al telefonista
-#                    if telefonista:
-#                        prov_telefonista = calc_provvigione(telefonista, cliente, 
-#                                                            tariffa, 
-#                                                            date["data_stipula"])
-#                        out_tot_prov_tel_contratto += prov_telefonista[0] * q
-#                        out_tot_prov_bonus_tel_contratto += prov_telefonista[1] * q
-#                    
-#                # determiniamo le entrate della giornata
-#                in_tot_day += in_tot_contratto
-#                
-#                # determiniamo le uscite della giornata
-#                out_tot_prov_agt_day += out_tot_prov_agt_contratto
-#                out_tot_prov_bonus_agt_day += out_tot_prov_bonus_agt_contratto
-#                out_tot_prov_tel_day += out_tot_prov_tel_contratto
-#                out_tot_prov_bonus_tel_day += out_tot_prov_bonus_tel_contratto
-#                out_tot_day = out_tot_prov_agt_day + out_tot_prov_bonus_agt_day + \
-#                    out_tot_prov_tel_day + out_tot_prov_bonus_tel_day + \
-#                    vas_telefonista + vas_agente
-#                
-#                n += 1
-#                n_stipulati += 1
-#                if contratto.attivato:
-#                    a += 1
-#                    n_attivati += 1
-#                if contratto.completo:
-#                    c += 1
-#                    n_completi += 1
-#                if contratto.inviato:
-#                    i += 1
-#                    n_inviati += 1
-#                if contratto.caricato:
-#                    cr += 1
-#                    n_caricati += 1
-#                
-#            # inseriamo i dati per la tabella delle entrate
-#            t = str(n) + "/" + str(c) + "/" + str(i) + "/" + str(cr) + "/" + str(a)
-#            obj = {"data": date["data_stipula"],
-#                    "n_stipulati": t,
-#                    "entrate": "{0:.2f}".format(Decimal(in_tot_day)),
-#                    "uscite": "{0:.2f}".format(Decimal(out_tot_day)),
-#                    "totali": "{0:.2f}".format(Decimal(in_tot_day - out_tot_day))}
-#            obj_in = {"data": date["data_stipula"], 
-#                      "n_stipulati": t, 
-#                      "entrate": "{0:.2f}".format(Decimal(in_tot_day))}
-#            obj_out = {"data": date["data_stipula"], 
-#                       "n_stipulati": t, 
-#                       "uscite": "{0:.2f}".format(Decimal(out_tot_day)),
-#                       "prov_agt": "{0:.2f}".format(Decimal(out_tot_prov_agt_day)), 
-#                       "prov_bonus_agt": "{0:.2f}".format(Decimal(out_tot_prov_bonus_agt_day)),
-#                       "prov_tel": "{0:.2f}".format(Decimal(out_tot_prov_tel_day)),
-#                       "prov_bonus_tel": "{0:.2f}".format(Decimal(out_tot_prov_bonus_tel_day)),}
             
             daily_totals = get_daily_totals(contratti_day, date["data_stipula"]) 
             t = "{}/{}/{}/{}".format(daily_totals["contratti"]["stipulati"],
@@ -311,11 +196,7 @@ def inout(request):
                             "prov_bonus_agt": "{0:.2f}".format(Decimal(daily_totals["uscite"]["prov_bonus_agt"])),
                             "prov_tel": "{0:.2f}".format(Decimal(daily_totals["uscite"]["prov_tel"])),
                             "prov_bonus_tel": "{0:.2f}".format(Decimal(daily_totals["uscite"]["prov_bonus_tel"]))})
-            
-#            objs.append(obj)
-#            objs_in.append(obj_in)
-#            objs_out.append(obj_out)
-            
+
             # aggoiorniamo i totali
             in_tot += daily_totals["totali"]["entrate"]["total"]
             out_tot += daily_totals["totali"]["uscite"]["total"]
@@ -334,12 +215,6 @@ def inout(request):
             n_inviati += daily_totals["contratti"]["inviati"]
             n_caricati += daily_totals["contratti"]["caricati"]
             n_attivati += daily_totals["contratti"]["attivati"]
-#            in_tot += in_tot_day
-#            out_tot += out_tot_day
-#            out_tot_prov_agt += out_tot_prov_agt_day
-#            out_tot_prov_bonus_agt += out_tot_prov_bonus_agt_day
-#            out_tot_prov_tel += out_tot_prov_tel_day
-#            out_tot_prov_bonus_tel += out_tot_prov_bonus_tel_day
     
     tot_tot_detail = {}
     for gestore in gestori:
@@ -352,12 +227,6 @@ def inout(request):
                          "details": out_tot_detail},
               "totali": {"total": in_tot - out_tot,
                          "details": tot_tot_detail}}
-#    totals = ["{}/{}/{}/{}/{}".format(n_stipulati, n_completi, n_inviati, n_caricati, n_attivati), 
-#             "{0:.2f}".format(Decimal(in_tot)),
-#             "{0:.2f}".format(Decimal(out_tot)),
-#             "{0:.2f}".format(Decimal(in_tot - out_tot)),]
-#    totals_in = ["{}/{}/{}/{}/{}".format(n_stipulati, n_completi, n_inviati, n_caricati, n_attivati), 
-#                 "{0:.2f}".format(Decimal(in_tot)),]
     totals_in = {"n_stipulati": "{}/{}/{}/{}/{}".format(n_stipulati, n_completi, n_inviati, n_caricati, n_attivati),
                  "entrate": {"total": in_tot,
                              "details": in_tot_detail}}
@@ -368,12 +237,6 @@ def inout(request):
                   "prov_bonus_agt": out_tot_prov_bonus_agt,
                   "prov_tel": out_tot_prov_tel,
                   "prov_bonus_tel": out_tot_prov_bonus_tel}
-#    totals_out = ["{}/{}/{}/{}/{}".format(n_stipulati, n_completi, n_inviati, n_caricati, n_attivati),
-#                  "{0:.2f}".format(Decimal(out_tot_prov_agt)),
-#                  "{0:.2f}".format(Decimal(out_tot_prov_bonus_agt)),
-#                  "{0:.2f}".format(Decimal(out_tot_prov_tel)),
-#                  "{0:.2f}".format(Decimal(out_tot_prov_bonus_tel)),
-#                  "{0:.2f}".format(Decimal(out_tot)),]
     
     # creiamo le tabelle 
     table = tables.InOutTotalsTable(objs, per_page_field=10,)
@@ -387,7 +250,6 @@ def inout(request):
     table_out.order_by = request.GET.get("out-sort")
     
     if request.is_ajax():
-#        template = "statistiche/entrate_uscite_table_snippet.html"
         data = {"table": table,
                 "table_in": table_in,
                 "table_out": table_out,
@@ -411,6 +273,25 @@ def inout(request):
             "period": (period[0], period[1])}
     return render_to_response(template, data,
                               context_instance=RequestContext(request))  
+
+# FIXME: calcolare il fisso
+#def calc_fisso(period):
+#    # determiniamo i dipendenti attivi per il periodo di tempo consderato
+#    dipendenti = models.Dipendente.objects.filter(data_assunzione__lte=period[0], 
+#                                                  data_licenziamento__gte=period[1])\
+#                                                  .iterators()
+#    fisso_tot = 0
+#    # FIXME: migliorare il conteggio, così è semplice ma troppo macchinoso
+#    # forse bisogna mettere mano alla tabella RetribuzioneDipendente
+#    for dipendente in dipendenti:
+#        retribuzioni = dipendente.retribuzionedipendente_set.filter(variazione=False,
+#                                                                    data_inizio__lte=period[0],
+#                                                                    data_fine__gte=period[1])
+#        data_cur = period[0]
+#        while data_cur <= period[1]:
+#            data_cur += timedelta(1)
+#            fisso_month =
+    
 
 def calc_provvigione(dipendente, cliente, tariffa, date):
     # determiniamo la modalità di calcolo della retribuzione per il dipendente

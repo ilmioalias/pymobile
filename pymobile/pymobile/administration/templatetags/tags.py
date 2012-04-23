@@ -139,4 +139,3 @@ def get_pdf(contratto):
         return contratto.pdf_contratto
     else:
         return ""
-    

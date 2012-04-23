@@ -6,8 +6,11 @@ from django import forms
 from django.contrib.auth.models import User, Group
 from django.forms.models import inlineformset_factory
 from django.utils.datetime_safe import datetime
+from django.db.models import Q
 
 import pymobile.administration.models as models
+from copy import deepcopy
+from datetime import timedelta
 
 #-------------------------------------------------------------------------------
 # AMMINISTRAZIONE
@@ -319,7 +322,7 @@ class RetribuzioneBaseForm(forms.ModelForm):
             return ""
    
     class Media:
-        js = ("js/modelform_retribuzione.js",)
+        js = ("js/modelform.js", "js/modelform_retribuzione.js",)
     
     class Meta:
         model = models.RetribuzioneDipendente
@@ -354,7 +357,69 @@ class RetribuzioneForm(RetribuzioneBaseForm):
                     self._errors["data_inizio"] = self.error_class([msg])        
         
         return cdata
-                         
+    
+    def save(self, commit=True):
+        cdata = self.cleaned_data
+        
+        #FIXME: usiamo una transaction?
+        # controlliamo se vengono modifcate o cancellate altre variazioni temporanee
+        # 1 - quelle da modifcare
+        dipendente = cdata["dipendente"]
+        d_i = cdata["data_inizio"]
+        # troviamo le variazioni che contengo le date scelte nel form
+        retribuzioni = models.RetribuzioneDipendente.objects.filter(dipendente=dipendente,
+                                                                    variazione=False)
+        if self.instance.pk:
+            retribuzioni = retribuzioni.exclude(pk=self.instance.pk)
+            
+        ret_prev = retribuzioni.filter(Q(data_fine__lt=d_i) | 
+                                       Q(data_inizio__lt=d_i, 
+                                         data_fine__isnull=True)).order_by("-data_inizio")
+        ret_next = retribuzioni.filter(data_inizio__gt=d_i)
+        # FIXME: aggiungere un avviso se altre var. tmp. vengono modficate
+        ret_new = RetribuzioneBaseForm.save(self, commit=False)
+        # eseguiamo le modifiche al databse
+        # modifichiamo
+        if ret_prev.exists() and ret_next.exists():
+            ret_new.data_fine = ret_next[0].data_inizio - timedelta(1)
+            t = ret_new.data_inizio - timedelta(1)
+            obj_prev = ret_prev[0]
+            obj_prev.data_fine = t
+            obj_prev.save()
+        elif ret_prev.exists() and not ret_next.exists():
+            ret_new.data_fine = None
+            t = ret_new.data_inizio - timedelta(1)
+            obj_prev = ret_prev[0]
+            obj_prev.data_fine = t
+            obj_prev.save()
+
+        # se modifichiamo la retribuzione principale (cioè quella dell'assunzione)
+        # dobbiamo verificare se devono essere mdoficate altre retribuzioni/variazioni
+        if self.instance.pk and self.instance.principale:
+            #FIXME: usiamo una transaction?
+            # controlliamo se vengono modifcate o cancellate altre variazioni temporanee
+            # 1 - quelle da modifcare
+            # troviamo le variazioni che contengo le date scelte nel form
+            variazioni = models.RetribuzioneDipendente.objects.filter(dipendente=dipendente,
+                                                                      variazione=True)
+            vartmp_mod = variazioni.filter(data_inizio__lt=d_i, data_fine__gte=d_i)
+            # quelle da cancellare
+            vartmp_del = variazioni.filter(data_fine__lte=d_i,)
+            ret_del = retribuzioni.filter(data_inizio__lt=d_i)
+            # eseguiamo le modifiche al databse
+            # eliminiamo 
+            if vartmp_del.exists():
+                vartmp_del.delete()
+            if ret_del.exists():
+                ret_del.delete()
+            # modifichiamo
+            if vartmp_mod.exists():
+                vartmp_mod.update(data_inizio=ret_new.data_inizio)
+
+        if commit:
+            ret_new.save()
+        return ret_new
+   
     class Meta:
         model = models.RetribuzioneDipendente
         widgets = {"dipendente": forms.HiddenInput(),
@@ -370,7 +435,64 @@ RetribuzioneFormset = inlineformset_factory(models.Dipendente,
                                             can_delete=False)
 
 class VariazioneRetribuzioneForm(RetribuzioneBaseForm):
+    
+    def save(self, commit=True):
+        cdata = self.cleaned_data
         
+        #FIXME: usiamo una transaction?
+        # controlliamo se vengono modifcate o cancellate altre variazioni temporanee
+        # 1 - quelle da modifcare
+        dipendente = cdata["dipendente"]
+        d_i = cdata["data_inizio"]
+        d_f = cdata["data_fine"]
+        # troviamo le variazioni che contengo le date scelte nel form
+        variazioni = models.RetribuzioneDipendente.objects.filter(dipendente=dipendente,
+                                                                  variazione=True)
+        if self.instance.pk:
+            variazioni = variazioni.exclude(pk=self.instance.pk)
+  
+        vartmp_mod_i = variazioni.filter(data_inizio__lte=d_i, data_fine__gte=d_i)
+        vartmp_mod_f = variazioni.filter(data_inizio__lte=d_f, data_fine__gte=d_f)
+        # quelle da cancellare
+        vartmp_del = variazioni.filter(data_inizio__gte=d_i,
+                                       data_fine__lte=d_f,)
+        # FIXME: aggiungere un avviso se altre var. tmp. vengono modficate
+        vartmp_new = RetribuzioneBaseForm.save(self, commit=False)
+#        mod_del = False
+        # eseguiamo le modifiche al databse
+        # eliminiamo 
+        if vartmp_del.exists():
+#            mod_del = True
+            vartmp_del.delete()
+        # modifichiamo
+        if vartmp_mod_i.exists() and vartmp_mod_f.exists():
+#            mod_del = True
+            if vartmp_mod_i[0] == vartmp_mod_f[0]:
+                # questo è il caso in cui la nuova variazione abbia il periodo completamente 
+                # compreso in un'altra variazione: dobbiamo creare due nuove variazione
+                # più la nuova variazione
+                # 1 - creiamo una nuova istanza 
+                new = deepcopy(vartmp_mod_f[0])
+                new.pk = None
+                new.data_inizio = vartmp_new.data_fine + timedelta(1)
+                new.save()
+            else:
+                t = vartmp_new.data_fine + timedelta(1)
+                vartmp_mod_f.update(data_inizio=t)
+            t = vartmp_new.data_inizio - timedelta(1)
+            vartmp_mod_i.update(data_fine=t)                    
+        elif vartmp_mod_i.exists() and not vartmp_mod_f.exists():
+#            mod_del = True
+            t = vartmp_new.data_inizio - timedelta(1)
+            vartmp_mod_i.update(data_fine=t)
+        elif not vartmp_mod_i.exists() and vartmp_mod_f.exists():
+#            mod_del = True
+            t = vartmp_new.data_fine + timedelta(1)
+            vartmp_mod_f.update(data_inizio=t)
+        if commit:
+            vartmp_new.save()
+        return vartmp_new
+
     class Meta:
         model = models.RetribuzioneDipendente
         exclude = ("fisso",)

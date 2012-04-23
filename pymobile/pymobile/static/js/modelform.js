@@ -155,8 +155,9 @@ var initModelformClickHandler = function(){
 		e.preventDefault();
 		cancelForm();
 	});
-	$("form.modelform .dateclear").click(function(e){
+	$("form.modelform input.dateclear").click(function(e){
 		e.preventDefault();
+		console.log("ciao");
 		$(this).prev(".date, .datetime").val("").change();
 	});
 	$("form.modelform input.date_end").attr("disabled", "true");

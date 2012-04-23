@@ -123,8 +123,8 @@ class RetribuzioneDipendente(models.Model):
         # automaticamente quando viene inserita una nuova retribuzione. deve avvenire
         # la stessa cosa che avviene cone le var.tmp. e nel template un colore deve 
         # definire i vari periodi
-        if not self.variazione:
-            self.data_fine = self.data_inizio
+#        if not self.variazione:
+#            self.data_fine = self.data_inizio
         if self.variazione:
             self.fisso = 0
         models.Model.clean(self)
