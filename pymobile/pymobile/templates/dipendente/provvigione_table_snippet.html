@@ -24,7 +24,8 @@
     		{% if row.retribuzione != "occupied" %}
 			<td {% if row.retribuzione %}rowspan="{{ row.rowspan_r }}"{% endif %} {% if row.retribuzione %}class="retribuzione"{% else %}class="libero"{% endif %}>
 				{% if row.retribuzione %}
-				Il: {{ row.retribuzione.data_inizio }}{% if row.retribuzione.principale %} <b><i>(assunzione)</i></b>{% endif %}
+				Da: {{ row.retribuzione.data_inizio }}{% if row.retribuzione.principale %} <b><i>(assunzione)</i></b>{% endif %}
+				{% if row.retribuzione.data_fine %}A: {{ row.retribuzione.data_fine }}{% endif %}
 				<a class="view_details" href="#"><img src="{{ STATIC_URL }}/img/destra.png" /></a>
 				<p class="details">
 				    Fisso: {{ row.retribuzione.fisso }}<br />
