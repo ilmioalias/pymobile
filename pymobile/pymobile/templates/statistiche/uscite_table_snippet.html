@@ -11,11 +11,11 @@
 		<td>{{ totals_out.prov_bonus_tel|stringformat:".2f" }}</td>
 		<td>
 			{{ totals_out.uscite.total|stringformat:".2f" }}€
-			{% if totals_out.uscite.total > 0 %}
+			{% if totals_out.uscite.total != 0 %}
 			<a class="view_details" href="#"><img src="{{ STATIC_URL }}/img/destra.png" /></a>
-	        <p class="info">
-	            {% for gestore, total in totals_out.uscite.details.iteritems %}
-	            <b>{{ gestore }}</b>: {{ total|stringformat:".2f" }}€<br />
+	        <p class="details">
+	            {% for k, total in totals_out.uscite.details.iteritems %}
+	            <b>{{ k }}</b>: {{ total|stringformat:".2f" }}€<br />
 	            {% endfor %}
 	        </p>
 	        {% endif %}

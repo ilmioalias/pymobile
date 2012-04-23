@@ -10,6 +10,7 @@ from datetime import timedelta
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.db.models import Q
 
 
 def get_daily_totals(contratti, date):
@@ -216,10 +217,17 @@ def inout(request):
             n_caricati += daily_totals["contratti"]["caricati"]
             n_attivati += daily_totals["contratti"]["attivati"]
     
+    # aggiungiamo il fisso
+    tot_fisso = calc_fisso(period)
+    out_tot += tot_fisso
+    
     tot_tot_detail = {}
     for gestore in gestori:
         g = str(gestore)
         tot_tot_detail[g] = in_tot_detail[g] - out_tot_detail[g]
+    tot_tot_detail["fisso"] = tot_fisso
+    out_tot_detail["fisso"] = tot_fisso
+    
     totals = {"n_stipulati": "{}/{}/{}/{}/{}".format(n_stipulati, n_completi, n_inviati, n_caricati, n_attivati),
               "entrate": {"total": in_tot,
                           "details": in_tot_detail},
@@ -232,7 +240,7 @@ def inout(request):
                              "details": in_tot_detail}}
     totals_out = {"n_stipulati": "{}/{}/{}/{}/{}".format(n_stipulati, n_completi, n_inviati, n_caricati, n_attivati),
                   "uscite": {"total": out_tot,
-                            "details": out_tot_detail},
+                             "details": out_tot_detail},
                   "prov_agt": out_tot_prov_agt,
                   "prov_bonus_agt": out_tot_prov_bonus_agt,
                   "prov_tel": out_tot_prov_tel,
@@ -274,25 +282,45 @@ def inout(request):
     return render_to_response(template, data,
                               context_instance=RequestContext(request))  
 
-# FIXME: calcolare il fisso
-#def calc_fisso(period):
-#    # determiniamo i dipendenti attivi per il periodo di tempo consderato
-#    dipendenti = models.Dipendente.objects.filter(data_assunzione__lte=period[0], 
-#                                                  data_licenziamento__gte=period[1])\
-#                                                  .iterators()
-#    fisso_tot = 0
-#    # FIXME: migliorare il conteggio, così è semplice ma troppo macchinoso
-#    # forse bisogna mettere mano alla tabella RetribuzioneDipendente
-#    for dipendente in dipendenti:
-#        retribuzioni = dipendente.retribuzionedipendente_set.filter(variazione=False,
-#                                                                    data_inizio__lte=period[0],
-#                                                                    data_fine__gte=period[1])
-#        data_cur = period[0]
-#        while data_cur <= period[1]:
-#            data_cur += timedelta(1)
-#            fisso_month =
+# calcolare il fisso
+def calc_fisso(period):
+    # determiniamo i dipendenti attivi per il periodo di tempo consderato
+    dipendenti = models.Dipendente.objects.filter(Q(data_assunzione__gte=period[0],
+                                                    data_assunzione__lte=period[1]) |
+                                                  Q(data_licenziamento__gte=period[0],
+                                                    data_licenziamento__lte=period[1]) |
+                                                  Q(data_assunzione__lte=period[0],
+                                                    data_licenziamento__gte=period[1]))\
+                                                .distinct()\
+                                                .iterator()
+    fisso_tot = 0
+    for dipendente in dipendenti:
+        retribuzioni = dipendente.retribuzionedipendente_set.filter(Q(data_inizio__gte=period[0], 
+                                                                      data_inizio__lte=period[1]) |
+                                                                    Q(data_fine__gte=period[0],
+                                                                      data_fine__lte=period[1]) |
+                                                                    Q(data_inizio__lte=period[0],
+                                                                      data_fine__gte=period[1]),
+                                                                    variazione=False,)\
+                                                                    .distinct()\
+                                                                    .order_by("data_inizio")
+        start = period[0]
+        if start < retribuzioni[0].data_inizio:
+            start = retribuzioni[0].data_inizio
+        for retribuzione in retribuzioni:
+            end = retribuzione.data_fine
+            if not end or end > period[1]:
+                end = period[1]
+            days = (end - start).days
+            # fisso calcolato su 30 giorni
+            fisso_tot += days * (retribuzione.fisso / 30)
+            if not end:
+                break
+            start = retribuzione.data_inizio
     
-
+    return float(fisso_tot)
+            
+        
 def calc_provvigione(dipendente, cliente, tariffa, date):
     # determiniamo la modalità di calcolo della retribuzione per il dipendente
     # prima verifichiamo se vi una variazione della retribuzione, altrimenti usiamo
@@ -305,7 +333,7 @@ def calc_provvigione(dipendente, cliente, tariffa, date):
     if not retribuzione.exists():
         retribuzione = models.RetribuzioneDipendente.objects.filter(variazione=False,
                                                                     dipendente=dipendente,
-                                                                    data_inizio__lte=date)\
+                                                                    data_inizio__lte=date,)\
                                                                     .order_by("-data_inizio")
     
         if not retribuzione.exists():
