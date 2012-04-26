@@ -286,7 +286,10 @@ urlpatterns += patterns('pymobile.administration.views.reports',
 urlpatterns += patterns('pymobile.administration.views.reports',
                         url(r'^pymobile/statistiche/finanze/inout/$', 
                             "business.inout", 
-                            name="inout"),)
+                            name="inout"),
+                        url(r'^pymobile/statistiche/finanze/details/$', 
+                            "business.details", 
+                            name="details"),)
 
 # Obiettivi
 urlpatterns += patterns('pymobile.administration.views.reports',

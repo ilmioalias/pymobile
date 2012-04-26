@@ -1,0 +1,103 @@
+{% extends "base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Statistiche</title>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/reporttable.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/reporttable_view_details.js"></script>
+{{ filterform.media }} 
+{% endblock %}
+
+{% block header %} 
+<h2>Statistiche: Economia - Dettaglio Dipendente</h2>
+{% endblock %}
+
+{% load tags %}
+
+{% block content %}
+<div class="navigation">
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../">home</a> &gt;
+		<a href="{% url init_statistiche %}">statistiche</a> &gt;
+		<a href=".">economia: dettaglio dipendente</a>
+	</fieldset>
+</div>
+<div id="reporttable_div">
+	<fieldset>
+	<legend>Tabella dettaglio dipendente {% if dipendente %}<i>(da {{ period.0 }} a {{ period.1 }})</i>{% endif %}</legend>
+		 <fieldset>
+	 	{% if dipendente %}
+		<legend>Dettagli dipendente <b><a href="{% url view_dipendente dipendente.pk %}">{{ dipendente }}</a></b></legend>
+			<table>
+				<tr>
+					<td>
+					<fieldset>
+					<legend>Informazioni</legend>
+				 		<table>
+				 			<tr><td><b>Cognome: </b></td><td>{{ dipendente.cognome }}</td></tr>
+							<tr><td><b>Nome: </b></td><td>{{ dipendente.nome }}</td></tr>
+							<tr><td><b>Ruolo: </b></td><td>{{ dipendente.get_ruolo_display }}</td></tr>
+						</table>
+					</fieldset>
+					</td>
+				</tr>
+				<tr>
+					<td>
+					<fieldset>
+					<legend>Dettagli contratti</legend>
+				 		<table>
+				 			<tr><td><b>Stipulati: </b></td><td>{{ details.stipulati.tot }}</td></tr>
+				 			<tr><td>di cui: </td><td></td></tr>
+				 			{% for k,v in details.stipulati.details.iteritems %}
+								<tr><td><b>{{ k }}: </b></td><td>{{ v }}</td></tr>
+							{% endfor %}
+						</table>
+					</fieldset>
+					</td>
+				</tr>
+				<tr>
+					<td>
+					<fieldset>
+					<legend>Dettagli economia</legend>
+				 		<table>
+				 			<tr><td><b>Totale dovuto: </b></td><td>{{ details.economia.tot_uscite|stringformat:".2f" }}€</td></tr>
+				 			<tr><td>di cui: </td><td></td></tr>
+							<tr><td><b>Totale fisso: </b></td><td>{{ details.economia.tot_fisso|stringformat:".2f" }}€</td></tr>
+							<tr><td><b>Totale provvigione (per contratto): </b></td><td>{{ details.economia.tot_prov|stringformat:".2f" }}€</td></tr>
+							<tr><td><b>Totale provvigione (bonus): </b></td><td>{{ details.economia.tot_prov_bonus|stringformat:".2f" }}€</td></tr>
+							<tr><td><b>Totale vas: </b></td><td>{{ details.economia.extra|stringformat:".2f" }}€</td></tr>
+							<tr><td><b>Rendimento: </b></td><td>{{ details.economia.tot_entrate|stringformat:".2f" }}€</td></tr>
+						</table>
+					</fieldset>
+					</td>
+				</tr>
+			</table>
+		</fieldset>
+		{% else %}
+			<b>Selezionare un dipendente e il periodo di riferimento</b>
+		{% endif %}
+	</fieldset>
+</div>
+{% endblock %}
+
+{% block extraleft_bar %}
+<div id="filter_reporttable_div">
+	<form id="filter_reporttable_form" action=".">
+		<fieldset class="filter_reporttable_fieldset">
+		<legend>Filtro</legend>
+			<table>				
+				{% for field in filterform.visible_fields %}
+				<tbody>
+					<tr><td><b>{{ field.label_tag }}</b></td><td>{{ field }}</td></tr>
+					{% if field.help_text %}
+					<tr class="field_help"><td></td><td>{{ field.help_text }}</td></tr>
+					{% endif %}
+				</tbody>
+				{% endfor %}
+			</table>
+		</fieldset>
+		<input type="submit" id="filter_reporttable_search" value="cerca" />
+		<input type="reset" id="filter_reporttable_reset" value="reset" />
+	</form>
+</div>	
+{% endblock %}

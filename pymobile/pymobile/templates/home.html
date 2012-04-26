@@ -36,6 +36,8 @@
 			{% load django_tables2 %}
 			{% render_table table_appuntamenti_richiamare %}		
 		</fieldset>
+		
+		<fieldset>
 		<legend>Prossimi <a href="{% url init_appuntamento %}">Appuntamenti</a></legend> 
 			{% load django_tables2 %}
 			{% render_table table_appuntamenti %}		

@@ -1105,6 +1105,16 @@ class InOutFilterForm(forms.Form):
     gestore = forms.ModelMultipleChoiceField(queryset=models.Gestore.objects.all(),
                                              label="Selezione Gestori")
 
+class DetailsForm(forms.Form):
+    CHOICHES=(("", ""), ("yesterday", "ieri"), ("today", "oggi"), ("month", "mese"), 
+              ("quarter", "quarto"), ("year", "anno"), ("manual", "ricerca manuale"))
+    
+    periodo = forms.ChoiceField(choices=CHOICHES, initial="")
+    dipendente = forms.ModelChoiceField(queryset=models.Dipendente.objects.all(),
+                                            label="Selezione Dipendente")
+#    gestore = forms.ModelMultipleChoiceField(queryset=models.Gestore.objects.all(),
+#                                             label="Selezione Gestori")
+
 class ObiettivoForm(forms.ModelForm):
     anno_inizio = forms.ChoiceField(choices=[("", "")], 
                                     label="Anno d'inizio")

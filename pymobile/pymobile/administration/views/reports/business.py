@@ -18,15 +18,19 @@ def get_daily_totals(contratti, date):
     out_tot_day = 0
     in_detail_day = {}
     out_detail_day = {}
+    n_stipulati_details = {}
     gestori = models.Gestore.objects.all()
     for gestore in gestori:
         g = str(gestore)
         in_detail_day[g] = 0
         out_detail_day[g] = 0
+        n_stipulati_details[g] = 0
     out_tot_prov_agt_day = 0
     out_tot_prov_tel_day = 0
     out_tot_prov_bonus_agt_day = 0
     out_tot_prov_bonus_tel_day = 0
+    out_tot_extra_agt = 0
+    out_tot_extra_tel = 0
     
     n = 0
     a = 0
@@ -45,6 +49,8 @@ def get_daily_totals(contratti, date):
         # uscite: bonus per agente/telefonista in base al contratto
         vas_agente = float(contratto.vas_agente)
         vas_telefonista = float(contratto.vas_telefonista)
+        out_tot_extra_agt += vas_agente
+        out_tot_extra_tel += vas_telefonista 
         
         # determiniamo il piano tariffario
         pts = models.PianoTariffario.objects.filter(contratto=contratto).iterator()
@@ -85,6 +91,7 @@ def get_daily_totals(contratti, date):
             vas_telefonista + vas_agente
                 
         n += 1
+        n_stipulati_details[gestore] += 1
         if contratto.attivato:
             a += 1
         if contratto.completo:
@@ -111,9 +118,16 @@ def get_daily_totals(contratti, date):
                "prov_agt": out_tot_prov_agt_day, 
                "prov_bonus_agt": out_tot_prov_bonus_agt_day,
                "prov_tel": out_tot_prov_tel_day,
-               "prov_bonus_tel": out_tot_prov_bonus_tel_day,}            
+               "prov_bonus_tel": out_tot_prov_bonus_tel_day,
+               "extra_agt": out_tot_extra_agt,
+               "extra_tel": out_tot_extra_tel,}            
     
-    t = {"stipulati": n, "completi": c, "inviati": i, "caricati": cr, "attivati": a,}
+    t = {"stipulati": n, 
+         "completi": c, 
+         "inviati": i, 
+         "caricati": cr, 
+         "attivati": a, 
+         "details": n_stipulati_details}
     return {"totali": tot, "entrate": tot_in, "uscite": tot_out, "contratti": t, }
 
 @login_required
@@ -121,7 +135,7 @@ def get_daily_totals(contratti, date):
 @user_passes_test(lambda user: u.get_group(user) == "amministratore")
 def inout(request):
     #TODO: controllare che effettivamente i calcoli siano giusti
-    getcontext().prec = 2
+#    getcontext().prec = 2
     template = "statistiche/entrate_uscite.html"
     
     if request.method == "GET" and request.GET.has_key("fperiodo"):
@@ -134,7 +148,7 @@ def inout(request):
     contratti = models.Contratto.objects.filter(data_stipula__gte=period[0], 
                                                 data_stipula__lte=period[1])\
                                                 .order_by("data_stipula")\
-                                                .select_related("piano_tariffario")
+                                                .select_related()
                                                   
     # ricaviamo contratti solo degli agenti selezionati 
     if request.method == "GET" and request.GET.has_key("fagente"):
@@ -145,7 +159,16 @@ def inout(request):
     if request.method == "GET" and request.GET.has_key("ftelefonista"):
         tel_ids = u.get_telefonisti_ids(request.GET)
         if tel_ids:
-            contratti = contratti.filter(telefonista__in=tel_ids)   
+#            contratti = contratti.filter(telefonista__in=tel_ids)
+            filter_ids = []
+            telefonisti = models.Dipendente.objects.filter(id__in=tel_ids)
+            for contratto in contratti:
+                if contratto.appuntamento:
+                    if contratto.appuntamento.telefonista in telefonisti:
+                        filter_ids.append(contratto.id)
+            if filter_ids:
+                contratti = contratti.filter(id__in=filter_ids)
+               
     # FIXME: implementare selezione gestori
     
     objs = []
@@ -283,18 +306,21 @@ def inout(request):
                               context_instance=RequestContext(request))  
 
 # calcolare il fisso
-def calc_fisso(period):
+def calc_fisso(period, dipendenti=None):
     # determiniamo i dipendenti attivi per il periodo di tempo consderato
-    dipendenti = models.Dipendente.objects.filter(Q(data_assunzione__gte=period[0],
-                                                    data_assunzione__lte=period[1]) |
-                                                  Q(data_licenziamento__gte=period[0],
-                                                    data_licenziamento__lte=period[1]) |
-                                                  Q(data_assunzione__lte=period[0],
-                                                    data_licenziamento__gte=period[1]))\
-                                                .distinct()\
-                                                .iterator()
+    print(dipendenti)
+    if not dipendenti:
+        dipendenti = models.Dipendente.objects.filter(Q(data_assunzione__gte=period[0],
+                                                        data_assunzione__lte=period[1]) |
+                                                      Q(data_licenziamento__gte=period[0],
+                                                        data_licenziamento__lte=period[1]) |
+                                                      Q(data_assunzione__lte=period[0],
+                                                        data_licenziamento__gte=period[1]))\
+                                                     .distinct()\
+                                                     .iterator()
     fisso_tot = 0
     for dipendente in dipendenti:
+        print("ci sono")
         retribuzioni = dipendente.retribuzionedipendente_set.filter(Q(data_inizio__gte=period[0], 
                                                                       data_inizio__lte=period[1]) |
                                                                     Q(data_fine__gte=period[0],
@@ -393,3 +419,141 @@ def calc_provvigione(dipendente, cliente, tariffa, date):
                 ret_bonus += value["provvigione"]
         
     return (ret_contratto, ret_bonus)
+
+@login_required
+#@user_passes_test(lambda user: not u.is_telefonista(user),)
+@user_passes_test(lambda user: u.get_group(user) != "telefonista")
+def details(request):
+    #TODO: controllare che effettivamente i calcoli siano giusti
+#    getcontext().prec = 2
+    template = "statistiche/dettaglio_dipendente.html"
+    
+    if request.method == "GET" and request.GET.has_key("fperiodo"):
+        period = u.get_period(request.GET)
+    else:
+        period = u.get_current_month()
+        
+    # entrate
+    # 1 - contratti stipulati
+    contratti = models.Contratto.objects.filter(data_stipula__gte=period[0], 
+                                                data_stipula__lte=period[1])\
+                                                .order_by("data_stipula")\
+                                                .select_related()
+                                                  
+    # ricaviamo contratti solo degli agenti selezionati
+    dipendente = None 
+    if request.method == "GET" and request.GET.has_key("fdipendente"):
+        dipendente_id = request.GET["fdipendente"][1:]
+        
+        if dipendente_id:
+            dipendente = models.Dipendente.objects.get(id=dipendente_id)
+            if dipendente.ruolo == "agt":
+                contratti = contratti.filter(agente=dipendente)
+            else:
+                filter_ids = []
+                for contratto in contratti:
+                    if contratto.appuntamento:
+                        if contratto.appuntamento.telefonista == dipendente:
+                            filter_ids.append(contratto.id)
+                if filter_ids:
+                    contratti = contratti.filter(id__in=filter_ids)
+    
+    n_stipulati = 0
+#    n_completi = 0
+#    n_inviati = 0
+#    n_caricati = 0
+#    n_attivati = 0
+    in_tot = 0
+    out_tot = 0
+    tot_fisso = 0
+    in_tot_detail = {}
+    out_tot_detail = {}
+    n_stipulati_details ={}
+    gestori = models.Gestore.objects.all()
+    for gestore in gestori:
+        g = str(gestore)
+        in_tot_detail[g] = 0
+        out_tot_detail[g] = 0
+        n_stipulati_details[g] = 0
+    out_tot_prov_agt = 0
+    out_tot_prov_bonus_agt = 0
+    out_tot_extra_agt = 0
+    out_tot_prov_tel = 0
+    out_tot_prov_bonus_tel = 0
+    out_tot_extra_tel = 0
+    
+    if contratti.exists() and dipendente:
+        dates = contratti.values("data_stipula").distinct()
+        for date in dates:
+            contratti_day = contratti.filter(data_stipula=date["data_stipula"]).iterator()
+            daily_totals = get_daily_totals(contratti_day, date["data_stipula"]) 
+            
+            n_stipulati += daily_totals["contratti"]["stipulati"]
+            # aggoiorniamo i totali
+            in_tot += daily_totals["totali"]["entrate"]["total"]
+            if dipendente.ruolo == "agt":
+                out_tot += (daily_totals["uscite"]["prov_agt"] + 
+                            daily_totals["uscite"]["prov_bonus_agt"] +
+                            daily_totals["uscite"]["extra_agt"])
+                out_tot_extra_agt += daily_totals["uscite"]["extra_agt"]
+            else:
+                out_tot += (daily_totals["uscite"]["prov_tel"] + 
+                            daily_totals["uscite"]["prov_bonus_tel"] +
+                            daily_totals["uscite"]["extra_tel"])
+                out_tot_extra_tel += daily_totals["uscite"]["extra_tel"]
+            # aggiorniamo i dettagli dei totali
+            for gestore in gestori:
+                g = str(gestore)
+                in_tot_detail[g] += daily_totals["totali"]["entrate"]["details"][g]
+                out_tot_detail[g] += daily_totals["totali"]["uscite"]["details"][g]
+                n_stipulati_details[g] += daily_totals["contratti"]["details"][g]
+            out_tot_prov_agt += daily_totals["uscite"]["prov_agt"]
+            out_tot_prov_bonus_agt += daily_totals["uscite"]["prov_bonus_agt"]
+            out_tot_prov_tel += daily_totals["uscite"]["prov_tel"]
+            out_tot_prov_bonus_tel += daily_totals["uscite"]["prov_bonus_tel"]
+
+        # aggiungiamo il fisso
+        tot_fisso = calc_fisso(period, [dipendente,])
+        out_tot += tot_fisso
+        
+    tot_tot_detail = {}
+    for gestore in gestori:
+        g = str(gestore)
+        tot_tot_detail[g] = in_tot_detail[g] - out_tot_detail[g]
+    tot_tot_detail["fisso"] = tot_fisso
+    out_tot_detail["fisso"] = tot_fisso
+    
+    details = {}
+    if dipendente:
+        details["stipulati"] = {}
+        details["stipulati"]["tot"] = n_stipulati
+        details["stipulati"]["details"] = n_stipulati_details
+        details["economia"] = {}
+        details["economia"]["tot_uscite"] = out_tot
+        details["economia"]["tot_fisso"] = tot_tot_detail["fisso"]
+        if dipendente.ruolo == "agt":
+            details["economia"]["tot_prov"] = out_tot_prov_agt
+            details["economia"]["tot_prov_bonus"] = out_tot_prov_bonus_agt
+            details["economia"]["extra"] = out_tot_extra_agt
+        else:
+            details["economia"]["tot_prov"] = out_tot_prov_tel
+            details["economia"]["tot_prov_bonus"] = out_tot_prov_bonus_tel
+            details["economia"]["extra"] = out_tot_extra_tel
+        details["economia"]["tot_entrate"] = in_tot
+    
+    if request.is_ajax():
+        data = {"dipendente": dipendente,
+                "details": details,
+                "period": (period[0], period[1])}
+        return render_to_response(template, 
+                                  data,
+                                  context_instance=RequestContext(request))   
+    
+    filterform = forms.DetailsForm()
+    
+    data = {"dipendente": dipendente,
+            "details": details,
+            "filterform": filterform,
+            "period": (period[0], period[1])}
+    return render_to_response(template, data,
+                              context_instance=RequestContext(request))  

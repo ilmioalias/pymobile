@@ -34,7 +34,8 @@
 		<fieldset>
 		<legend>Economia</legend>
 			{% if user|get_group == "amministratore" %}
-			<a href="{% url inout %}">Entrate/Uscite</a>
+			<a href="{% url inout %}">Entrate/Uscite</a> <br />
+			<a href="{% url details %}">Dettaglio Dipendente</a>
 			{% endif %}
 		</fieldset>
 		<fieldset>
