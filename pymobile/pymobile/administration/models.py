@@ -406,6 +406,7 @@ class Contratto(models.Model):
     agente = models.ForeignKey(Dipendente, 
                                help_text="agente che ha stipulato il contratto",
                                limit_choices_to={"ruolo": "agt",})
+    gestore = models.ForeignKey(Gestore)
     piano_tariffario = models.ManyToManyField(Tariffa, 
                                               through="PianoTariffario",
                                               verbose_name="Piano tariffario",
@@ -495,12 +496,25 @@ class PianoTariffario(models.Model):
                                 help_text="gestore,profilo,tipo,fascia,servizio")
     num = models.PositiveIntegerField(verbose_name="quantità")
     opzione = models.BooleanField(blank=True, help_text="la tariffa è un opzione")
-    
+
     def __unicode__(self):
         return "{}: {}".format(self.contratto, self.tariffa)
     
     class Meta:
         verbose_name_plural = "Piani Tariffari"
+
+#class DatoIdentificativo(models.Model):
+#    piano_tariffario = models.ForeignKey(PianoTariffario)
+#    telefono = models.CharField(max_length=45, blank=True, verbose_name="numero telefonico") 
+#    aom = models.CharField(max_length=45, help_text="nome dell'operatore di portabilità")
+#    seriale = models.CharField(max_length=128, verbose_name="n. seriale SIM")
+#    label_pack = models.CharField(max_length=128, blank=True)
+#    
+#    def __unicode__(self):
+#        return "{}: {}".format(self.piano_tariffario, self.telefono)
+#    
+#    class Meta:
+#        verbose_name_plural = "Dati Identificativi"    
 
 class Obiettivo(models.Model):
     denominazione = models.CharField(max_length=45,

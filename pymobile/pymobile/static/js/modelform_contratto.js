@@ -20,7 +20,6 @@ var addTariffaForm = function(j_obj){
 		var new_lfor = lfor.replace("__prefix__", forms_count);
 		$(this).attr("for", new_lfor);
 	});
-	console.log("form.modelform select#id_pianotariffario_set-"+forms_count+"-tariffa");
     
     // aggiorniamo il numero di form
     in_tot.val(new_forms_count);
@@ -54,6 +53,10 @@ var resetTotalTariffaForm = function(){
 
 $(document).ready(function(){
 	resetTotalTariffaForm();
+	// $("form button.back"),click(function(e){
+		// e.preventDefault();
+		// history.go(-1);
+	// });
 	$("tbody.pianotariffario button.add_tariffa").click(function(e){
 		// event handler per aggiungere dinamicamente form per le tariffe
 		e.preventDefault();

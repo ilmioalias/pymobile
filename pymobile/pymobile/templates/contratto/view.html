@@ -26,7 +26,7 @@
 		{% if object.pdf_contratto %}
 		<a href="{% url get_pdf object.id %}">ottieni copia contratto</a> |
 		{% endif %}
-		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_contratto object.id %}">modifica</a> |
+		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_contratto_info object.id %}">modifica</a> |
 		<a id="del_{{ object.id }}" class="deleteobj" href="{% url del_contratto %}?id={{ object.id }}">elimina</a>
 	</fieldset>
 </div><!-- 
@@ -83,10 +83,5 @@
 			{% endif %}
 		</table>
 	</fieldset>
-<!-- 	<div class="op_detail">
-		<ul id="op_list">
-			<li><a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_contratto object.id %}">Modifica</a></li>
-			<li><a id="del_{{ object.id }}" class="deleteobj" href="{% url del_contratto %}?id={{ object.id }}">Cancella</a></li>
-		</ul>
-	</div> --></div>
+</div>
 {% endblock %}

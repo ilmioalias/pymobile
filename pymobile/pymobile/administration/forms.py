@@ -805,20 +805,22 @@ class ReferenteForm(forms.ModelForm):
         model = models.Referente
 
 class PianoTariffarioForm(forms.ModelForm): 
-
+    
     class Media:
-        js = ("js/modelform.js",)
+        js = ("js/modelform.js", "js/modelform_contratto.js",)
     
     class Meta:
         model = models.PianoTariffario
         widgets = {"tariffa": forms.Select(attrs={"class": "fk"})}
 
 class PianoTariffarioInlineFormset(forms.models.BaseInlineFormSet):   
+    
     def clean(self):
         # ci serve questo hack per fare in modo che almeno un piano tariffario,
         # all'inserimento del contratto, sia inserito
         count = 0
         for form in self.forms:
+            print(form)
             try:
                 if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
                     count += 1
@@ -833,7 +835,7 @@ class ContrattoForm(forms.ModelForm):
                                           required=False)
     
     class Media:
-        js = ("js/modelform.js", "js/modelform_contratto.js",)
+        js = ("js/modelform.js",)
     
     def clean(self):
         cdata = self.cleaned_data
