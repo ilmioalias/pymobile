@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	$(".modelform tbody.field select#id_gestore").val("tim");
+	// $(".modelform tbody.field select#id_gestore").val("tim");
 	$(".modelform tbody.field select#id_gestore").each(function(){
 		j_obj = $(this);
 		var value = j_obj.attr("value");
