@@ -6,6 +6,7 @@ from django.db.models import Q, SET_NULL
 
 import datetime
 import operator
+import md5
 
 # Create your models here.
 
@@ -258,7 +259,8 @@ class Tariffa(models.Model):
     sac = models.DecimalField(max_digits=5, decimal_places=2, default=0, 
                               help_text="provvigione 'una tantum' erogata per il "\
                               "contratto stipulato",
-                              verbose_name="provvigione per contratto/S.A.C.") 
+                              verbose_name="provvigione per contratto/S.A.C.")
+#    code = models.CharField(max_length=32, editable=False) 
     creazione = models.DateTimeField(auto_now_add=True)
     modifica = models.DateTimeField(auto_now=True) 
     
@@ -268,8 +270,7 @@ class Tariffa(models.Model):
         queries = [Q(gestore=self.gestore),
                    Q(profilo=self.profilo),
                    Q(attivo=self.attivo)]
-        
-#        if not self.pk:
+                
         if str(self.gestore) == "edison":
             if self.tipo is None:
                 queries.append(Q(tipo__isnull=True))
@@ -279,8 +280,12 @@ class Tariffa(models.Model):
                 queries.append(Q(fascia__isnull=True))
             else:
                 queries.append(Q(fascia=self.fascia)) 
-            if Tariffa.objects.filter(reduce(operator.and_, queries)).exists():
-                raise ValidationError("La tariffa è già presente nel DATABASE")
+            if not self.pk:
+                if Tariffa.objects.filter(reduce(operator.and_, queries)).exists():
+                    raise ValidationError("La tariffa è già presente nel DATABASE")
+            else:
+                if Tariffa.objects.filter(reduce(operator.and_, queries)).exclude(pk=self.pk).exists():
+                    raise ValidationError("La tariffa è già presente nel DATABASE")
         elif str(self.gestore) == "tim":
             if self.tipo is None:
                 queries.append(Q(tipo__isnull=True))
@@ -294,8 +299,12 @@ class Tariffa(models.Model):
                 queries.append(Q(servizio__isnull=True))
             else:
                 queries.append(Q(servizio=self.servizio))    
-            if Tariffa.objects.filter(reduce(operator.and_, queries)):
-                raise ValidationError("La tariffa è già presente nel DATABASE")
+            if not self.pk:
+                if Tariffa.objects.filter(reduce(operator.and_, queries)).exists():
+                    raise ValidationError("La tariffa è già presente nel DATABASE")
+            else:
+                if Tariffa.objects.filter(reduce(operator.and_, queries)).exclude(pk=self.pk).exists():
+                    raise ValidationError("La tariffa è già presente nel DATABASE")
         elif str(self.gestore) == "telecom":
             if self.tipo is None:
                 queries.append(Q(tipo__isnull=True))
@@ -309,8 +318,12 @@ class Tariffa(models.Model):
                 queries.append(Q(servizio__isnull=True))
             else:
                 queries.append(Q(servizio=self.servizio))            
-            if Tariffa.objects.filter(reduce(operator.and_, queries)).exists():
-                raise ValidationError("La tariffa è già presente nel DATABASE")                        
+            if not self.pk:
+                if Tariffa.objects.filter(reduce(operator.and_, queries)).exists():
+                    raise ValidationError("La tariffa è già presente nel DATABASE")
+            else:
+                if Tariffa.objects.filter(reduce(operator.and_, queries)).exclude(pk=self.pk).exists():
+                    raise ValidationError("La tariffa è già presente nel DATABASE")
         
         models.Model.clean(self)
     
