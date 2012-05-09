@@ -260,7 +260,6 @@ class Tariffa(models.Model):
                               help_text="provvigione 'una tantum' erogata per il "\
                               "contratto stipulato",
                               verbose_name="provvigione per contratto/S.A.C.")
-#    code = models.CharField(max_length=32, editable=False) 
     creazione = models.DateTimeField(auto_now_add=True)
     modifica = models.DateTimeField(auto_now=True) 
     
