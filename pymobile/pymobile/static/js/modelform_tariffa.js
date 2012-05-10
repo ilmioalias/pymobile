@@ -1,5 +1,5 @@
 $(document).ready(function(){
-	$(".modelform tbody.field select#id_gestore").val("tim");
+	// $(".modelform tbody.field select#id_gestore").val("tim");
 	$(".modelform tbody.field select#id_gestore").each(function(){
 		j_obj = $(this);
 		var value = j_obj.attr("value");
@@ -9,7 +9,7 @@ $(document).ready(function(){
 	});
 	$(".modelform tbody.field").on("change", "select#id_gestore", function(e){
 		j_obj = $(this);
-		var value = j_obj.attr("value");
+		var value = j_obj.attr("value").toLowerCase();
 		var form = j_obj.closest("form");
 		form.find(".hidden").closest(".modelform tbody.field").hide();
 		// if (value == "edison"){
