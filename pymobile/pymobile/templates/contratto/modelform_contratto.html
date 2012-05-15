@@ -46,21 +46,28 @@
 					{% for field in modelform.visible_fields %}
 					<tbody class="field">
 						{% if field.errors %}
-							<tr class="field_error">
-								<td></td><td>{{ field.errors|first }}</td>
-							</tr>
+						<tr class="field_error">
+							<td></td><td>{{ field.errors|first }}</td>
+						</tr>
 						{% endif %}
 						<tr class="{% if field.errors %}field_error{% endif %}" >
 							<td>{{ field.label_tag }}</td>
 							<td>
+								{% if field.label == "Gestore" and action == "mod" %}
+								<b>Non è possibile modificare il gestore</b>
+								<select id="id_gestore" name="gestore">
+									<option selected="selected" value="{{ modelform.gestore.value }}">{{ modelform.gestore.value }}</option>
+								</select>
+								{% else %}
 								{{ field }}
+								{% endif %}
 								{% if field|isdate %}
-									<input type="button" class="dateclear" value="svuota" />
+								<input type="button" class="dateclear" value="svuota" />
 					    		{% endif %}
 							    {% if field|isfk %}
-							    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_contratto_fk field.html_name %}">
-							    		<img src="{{ STATIC_URL }}/img/add.png" />
-						    		</a>
+						    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_contratto_fk field.html_name %}">
+						    		<img src="{{ STATIC_URL }}/img/add.png" />
+					    		</a>
 					    		{% endif %}
 							</td>
 						</tr>

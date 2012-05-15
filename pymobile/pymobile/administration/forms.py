@@ -561,7 +561,11 @@ class TariffaForm(forms.ModelForm):
                                       required=False)
     
     def __init__(self, *args, **kwargs):
+        gestore = kwargs.pop("gestore", None)
         forms.ModelForm.__init__(self, *args, **kwargs)
+        
+        if gestore:
+            self.fields["gestore"].widget = forms.HiddenInput()
         
         if kwargs.has_key("instance"): 
             instance = kwargs["instance"]
@@ -804,7 +808,11 @@ class ReferenteForm(forms.ModelForm):
     class Meta:
         model = models.Referente
 
-class PianoTariffarioForm(forms.ModelForm): 
+class PianoTariffarioForm(forms.ModelForm):     
+    def __init__(self, *args, **kwargs):
+        gestore = kwargs.pop("gestore", None)
+        forms.ModelForm.__init__(self, *args, **kwargs)
+        self.fields["tariffa"].queryset = models.Tariffa.objects.filter(gestore=gestore)
     
     class Media:
         js = ("js/modelform.js", "js/modelform_contratto.js",)
@@ -814,13 +822,22 @@ class PianoTariffarioForm(forms.ModelForm):
         widgets = {"tariffa": forms.Select(attrs={"class": "fk"})}
 
 class PianoTariffarioInlineFormset(forms.models.BaseInlineFormSet):   
-    
+    def __init__(self, *args, **kwargs):
+        # hack per fare in modo che sia possibile pssare il parametro "gestore"
+        self.gestore = kwargs.pop("gestore", None)
+        forms.models.BaseInlineFormSet.__init__(self, *args, **kwargs)
+            
+    def _construct_forms(self):
+        # funzione che costruisce i form
+        self.forms = []
+        for i in xrange(self.total_form_count()):
+            self.forms.append(self._construct_form(i, gestore=self.gestore))
+
     def clean(self):
         # ci serve questo hack per fare in modo che almeno un piano tariffario,
         # all'inserimento del contratto, sia inserito
         count = 0
         for form in self.forms:
-            print(form)
             try:
                 if form.cleaned_data and not form.cleaned_data.get('DELETE', False):
                     count += 1

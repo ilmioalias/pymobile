@@ -188,7 +188,9 @@ def add_object_pt(request):
             else:
                 return HttpResponseRedirect(reverse("init_contratto"))
     else:
-        formset = PianoTariffarioFormset(instance=models.Contratto())                
+        gestore = request.session["contratto"]["post"]["gestore"]
+        formset = PianoTariffarioFormset(instance=models.Contratto(), 
+                                         gestore=gestore)                
     
     data = {"action": action, "modelformset": formset,}                
     return render_to_response(template, 
@@ -250,7 +252,7 @@ def mod_object_pt(request, object_id):
         return HttpResponseRedirect(reverse("add_contratto_info"))
     
     template = "contratto/modelform_pianotariffario.html"
-    action = "add"
+    action = "mod"
     PianoTariffarioFormset = inlineformset_factory(models.Contratto, 
                                                    models.PianoTariffario, 
                                                    forms.PianoTariffarioForm,
@@ -284,7 +286,9 @@ def mod_object_pt(request, object_id):
                                                     args=[object_id,]))
     else:
         obj = get_object_or_404(models.Contratto, pk=object_id)
-        formset = PianoTariffarioFormset(instance=obj)                
+        gestore = request.session["contratto"]["post"]["gestore"]
+        formset = PianoTariffarioFormset(instance=obj, 
+                                         gestore=gestore)                
     
     data = {"action": action, "modelformset": formset, "contratto": obj}                
     return render_to_response(template, 
@@ -421,7 +425,8 @@ def add_child_object(request, field_name):
                     </script>'''.format(new_obj.pk, new_obj))
     else:
         form_class, template = get_child_form(field_name)
-        form = form_class()
+        gestore = request.session["contratto"]["post"]["gestore"]
+        form = form_class(gestore=gestore)
       
     data = {"modelform": form, "action": action,}     
     return render_to_response(template, 

@@ -1,13 +1,14 @@
 $(document).ready(function(){
 	// $(".modelform tbody.field select#id_gestore").val("tim");
-	$(".modelform tbody.field select#id_gestore").each(function(){
+	console.log($(".modelform tbody #id_gestore"));
+	$(".modelform #id_gestore").each(function(){
 		j_obj = $(this);
 		var value = j_obj.attr("value");
 		var form = j_obj.closest("form");
 		form.find(".hidden").closest(".modelform tbody.field").hide();
 		form.find("."+value).closest(".modelform tbody.field").fadeIn("slow");					
 	});
-	$(".modelform tbody.field").on("change", "select#id_gestore", function(e){
+	$(".modelform").on("change", "#id_gestore", function(e){
 		j_obj = $(this);
 		var value = j_obj.attr("value");
 		var form = j_obj.closest("form");
