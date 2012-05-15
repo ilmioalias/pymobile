@@ -6,6 +6,7 @@ import pymobile.administration.models as models
 import pymobile.administration.tables as tables
 import pymobile.administration.forms as forms
 
+from django.contrib import messages
 from django.shortcuts import render_to_response
 from django.db.models import Sum
 from django.template import RequestContext
@@ -30,13 +31,15 @@ def get_tim_telecom_points(contratti, dipendente):
         pt_tim_agt = models.PianoTariffario.objects.filter(contratto__in=contratti_agt,
             tariffa__gestore=models.Gestore.objects.get(denominazione="tim"))
         
-        sim_tot = pt_tim_agt.filter(tariffa__tipo=models.TipologiaTariffa.objects.get(denominazione="sim"),
-            opzione=False).aggregate(tot=Sum("num"))
-        sim_tot = sim_tot["tot"] if sim_tot["tot"] else 0
+        if models.TipologiaTariffa.objects.filter(denominazione="sim").exists():
+            sim_tot = pt_tim_agt.filter(tariffa__tipo=models.TipologiaTariffa.objects.get(denominazione="sim"),
+                opzione=False).aggregate(tot=Sum("num"))
+            sim_tot = sim_tot["tot"] if sim_tot["tot"] else 0
         
-        dati_tot = pt_tim_agt.filter(tariffa__tipo=models.TipologiaTariffa.objects.get(denominazione="dati"),
-            opzione=False).aggregate(tot=Sum("num"))
-        dati_tot = dati_tot["tot"] if dati_tot["tot"] else 0
+        if models.TipologiaTariffa.objects.filter(denominazione="dati").exists():
+            dati_tot = pt_tim_agt.filter(tariffa__tipo=models.TipologiaTariffa.objects.filter(denominazione="dati")[0],
+                opzione=False).aggregate(tot=Sum("num"))
+            dati_tot = dati_tot["tot"] if dati_tot["tot"] else 0
         
         opz_tot = pt_tim_agt.filter(opzione=True).aggregate(tot=Sum("num"))
         opz_tot = opz_tot["tot"] if opz_tot["tot"] else 0
@@ -50,18 +53,21 @@ def get_tim_telecom_points(contratti, dipendente):
         #TELECOM
         pt_telecom_agt = models.PianoTariffario.objects.filter(contratto__in=contratti_agt,
             tariffa__gestore=models.Gestore.objects.get(denominazione="telecom")) 
-                       
-        nip_tot = pt_telecom_agt.filter(tariffa__servizio=models.ServizioTariffa.objects.get(denominazione="nip"),
-            opzione=False).aggregate(tot=Sum("num"))
-        nip_tot = nip_tot["tot"] if nip_tot["tot"] else 0
         
-        ull_tot = pt_telecom_agt.filter(tariffa__servizio=models.ServizioTariffa.objects.get(denominazione="ull"),
-            opzione=False).aggregate(tot=Sum("num"))
-        ull_tot = ull_tot["tot"] if ull_tot["tot"] else 0
+        if models.ServizioTariffa.objects.filter(denominazione="nip").exists():
+            nip_tot = pt_telecom_agt.filter(tariffa__servizio=models.ServizioTariffa.objects.get(denominazione="nip"),
+                opzione=False).aggregate(tot=Sum("num"))
+            nip_tot = nip_tot["tot"] if nip_tot["tot"] else 0
         
-        adsl_tot = pt_telecom_agt.filter(tariffa__tipo=models.TipologiaTariffa.objects.get(denominazione="adsl"),                                                 
-            opzione=False).aggregate(tot=Sum("num"))
-        adsl_tot = adsl_tot["tot"] if adsl_tot["tot"] else 0
+        if models.ServizioTariffa.objects.filter(denominazione="ull").exists():
+            ull_tot = pt_telecom_agt.filter(tariffa__servizio=models.ServizioTariffa.objects.get(denominazione="ull"),
+                opzione=False).aggregate(tot=Sum("num"))
+            ull_tot = ull_tot["tot"] if ull_tot["tot"] else 0
+        
+        if models.TipologiaTariffa.objects.filter(denominazione="adsl").exists():
+            adsl_tot = pt_telecom_agt.filter(tariffa__tipo=models.TipologiaTariffa.objects.get(denominazione="adsl"),                                                 
+                opzione=False).aggregate(tot=Sum("num"))
+            adsl_tot = adsl_tot["tot"] if adsl_tot["tot"] else 0
         
         # calcoliamo il punteggio ricavato dai contratti
         # 1 - estraiamo una lista con quantità delle tariffe * punteggio della tariffa
@@ -125,21 +131,23 @@ def get_edison_points(contratti, dipendente):
             
     if contratti_agt.exists():
         pt_edison_agt = models.PianoTariffario.objects.filter(contratto__in=contratti_agt)
-        bus_en_tot = pt_edison_agt.filter(tariffa__tipo=models.TipologiaTariffa.objects.get(denominazione="luce"),
-                                          cliente__tipo="bus").aggregate(tot=Sum("num"))
-        bus_en_tot = bus_en_tot["tot"] if bus_en_tot["tot"] else 0
+        if models.TipologiaTariffa.objects.filter(denominazione="luce").exists():
+            bus_en_tot = pt_edison_agt.filter(tariffa__tipo=models.TipologiaTariffa.objects.get(denominazione="luce"),
+                                              cliente__tipo="bus").aggregate(tot=Sum("num"))
+            bus_en_tot = bus_en_tot["tot"] if bus_en_tot["tot"] else 0
         
-        pri_en_tot = pt_edison_agt.filter(tariffa__tipo=models.TipologiaTariffa.objects.get(denominazione="luce"),
-                                          cliente__tipo="pri").aggregate(tot=Sum("num"))
-        pri_en_tot = pri_en_tot["tot"] if pri_en_tot["tot"] else 0
+            pri_en_tot = pt_edison_agt.filter(tariffa__tipo=models.TipologiaTariffa.objects.get(denominazione="luce"),
+                                              cliente__tipo="pri").aggregate(tot=Sum("num"))
+            pri_en_tot = pri_en_tot["tot"] if pri_en_tot["tot"] else 0
         
-        bus_gas_tot = pt_edison_agt.filter(tariffa__tipo=models.TipologiaTariffa.objects.get(denominazione="gas"),
-                                           cliente__tipo="bus").aggregate(tot=Sum("num"))
-        bus_gas_tot = bus_gas_tot["tot"] if bus_gas_tot["tot"] else 0
+        if models.TipologiaTariffa.objects.filter(denominazione="gas").exists():
+            bus_gas_tot = pt_edison_agt.filter(tariffa__tipo=models.TipologiaTariffa.objects.get(denominazione="gas"),
+                                               cliente__tipo="bus").aggregate(tot=Sum("num"))
+            bus_gas_tot = bus_gas_tot["tot"] if bus_gas_tot["tot"] else 0
         
-        pri_gas_tot = pt_edison_agt.filter(tariffa__tipo=models.TipologiaTariffa.objects.get(denominazione="gas"),
-                                           cliente__tipo="pri").aggregate(tot=Sum("num"))
-        pri_gas_tot = pri_gas_tot["tot"] if pri_gas_tot["tot"] else 0               
+            pri_gas_tot = pt_edison_agt.filter(tariffa__tipo=models.TipologiaTariffa.objects.get(denominazione="gas"),
+                                               cliente__tipo="pri").aggregate(tot=Sum("num"))
+            pri_gas_tot = pri_gas_tot["tot"] if pri_gas_tot["tot"] else 0               
     
     return {"bus_en": bus_en_tot, 
             "pri_en": pri_en_tot,

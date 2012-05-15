@@ -1,0 +1,8 @@
+2012-05-14 11:31:12,961 - luigi: autenticato [admin.py > login_user > line: 38]
+2012-05-14 11:42:33,412 - luigi: aggiunto il contratto capriotti valeria - 2012-03-12 [id=1] [admin.py > mod_object_pt > line: 278]
+2012-05-14 12:37:48,202 - luigi: sessione scaduta [session.py > process_request > line: 31]
+2012-05-14 12:37:48,458 - luigi: logout [admin.py > logout_user > line: 74]
+2012-05-14 12:37:57,834 - luigi: autenticato [admin.py > login_user > line: 38]
+2012-05-14 15:58:41,948 - luigi: sessione scaduta [session.py > process_request > line: 31]
+2012-05-14 15:58:42,162 - luigi: logout [admin.py > logout_user > line: 74]
+2012-05-14 15:58:48,595 - luigi: autenticato [admin.py > login_user > line: 38]
