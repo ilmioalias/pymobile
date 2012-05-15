@@ -82,10 +82,12 @@ def add_object(request):
     if request.method == "POST":
         post_query = request.POST.copy()
         form = forms.DipendenteForm(post_query)
+        print(form.is_valid())
         
         if form.is_valid():
             dipendente = form.save(commit=False)
             formset = forms.RetribuzioneFormset(post_query, instance=dipendente)
+            print(formset.is_valid())
             if formset.is_valid():
                 new_obj = form.save()
                 formset.save()        

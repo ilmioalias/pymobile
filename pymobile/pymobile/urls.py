@@ -283,10 +283,10 @@ urlpatterns += patterns('django.views.generic.simple',
 
 # canvas
 urlpatterns += patterns('pymobile.administration.views.reports',
-                        url(r'^pymobile/statistiche/classifiche/canvas/$', 
+                        url(r'^pymobile/statistiche/classifiche/canvas/tim-telecom$', 
                             "rankings.canvas_tim_telecom", 
                             name="canvas_tim_telecom"),
-                        url(r'^pymobile/statistiche/classifiche/canvas/$', 
+                        url(r'^pymobile/statistiche/classifiche/canvas/edison$', 
                             "rankings.canvas_edison", 
                             name="canvas_edison"),)
 
