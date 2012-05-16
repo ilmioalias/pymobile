@@ -29,14 +29,6 @@ form.modelform fieldset input[type='text'].date {
     width: 100px;
 }
 
-form.modelform fieldset input[type='text'].date_start {
-    width: 100px;
-}
-
-form.modelform fieldset input[type='text'].date_end {
-    width: 100px;
-}
-
 form.modelform fieldset input[type='text'].datetime {
     width: 100px;
 }
@@ -57,22 +49,6 @@ form.modelform fieldset select {
     background-color: #ABABAB;
 }
 
-
-fieldset input[type='text'] {
-    width: 75%;
-}
-
-fieldset select {
-    width: 150px;
-}
-
-fieldset input[type='text'] {
-    width: 75%;
-}
-
-fieldset select {
-    width: 150px;
-}
 
 fieldset input[type='text'] {
     text-transform: uppercase;

@@ -393,23 +393,23 @@ def calc_provvigione(dipendente, cliente, tariffa, date):
                         res = False
                         break
                 elif k == "gestore":
-                    if tariffa.gestore != v:
+                    if tariffa.gestore.lower() != v:
                         res = False
                         break
                 elif k == "profilo":
-                    if tariffa.profilo != v:
+                    if tariffa.profilo.lower() != v:
                         res = False
                         break
                 elif k == "tipo":
-                    if tariffa.tipo != v:
+                    if tariffa.tipo.lower() != v:
                         res = False
                         break
                 elif k == "fascia":
-                    if tariffa.fascia != v:
+                    if tariffa.fascia.lower() != v:
                         res = False
                         break
                 elif k == "servizio":
-                    if tariffa.servizio != v:
+                    if tariffa.servizio.lower() != v:
                         res = False
                         break
             
