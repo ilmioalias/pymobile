@@ -17,11 +17,23 @@ fieldset input {
 	text-transform: uppercase;
 }
 
-fieldset input[type='text'] {
-    width: 75%;
+form.modelform fieldset input[type='text'] {
+    width: 50%;
 }
 
-fieldset select {
+form.modelform fieldset .ui-autocomplete-input {
+    width: 300px;
+}
+
+form.modelform fieldset input[type='text'].date {
+    width: 100px;
+}
+
+form.modelform fieldset input[type='text'].datetime {
+    width: 100px;
+}
+
+form.modelform fieldset select {
     width: 150px;
 }
 
