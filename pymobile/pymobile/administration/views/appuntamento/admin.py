@@ -284,6 +284,9 @@ def add_child_object(request, field_name):
         f = field_name.capitalize() + "Form"
         if field_name == "cliente":
             t = "appuntamento/cliente_modelform.html"
+            # per gli appuntamenti i clienti sono inseriti in un'altra tabella, 
+            # gestita da un'altra form
+            f = "ClienteAppuntamentoForm"
         elif field_name == "agente":
             t = "appuntamento/agente_modelform.html"
         elif field_name == "telefonista":

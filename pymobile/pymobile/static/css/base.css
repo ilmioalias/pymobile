@@ -59,6 +59,14 @@ form.modelform fieldset select {
 
 
 fieldset input[type='text'] {
+    width: 75%;
+}
+
+fieldset select {
+    width: 150px;
+}
+
+fieldset input[type='text'] {
     text-transform: uppercase;
 }
 

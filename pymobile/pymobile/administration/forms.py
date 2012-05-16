@@ -512,6 +512,14 @@ class ClienteForm(forms.ModelForm):
     class Meta:
         model = models.Cliente
 
+class ClienteAppuntamentoForm(forms.ModelForm):
+
+    class Media:
+        js = ("js/modelform.js",)    
+
+    class Meta:
+        model = models.ClienteAppuntamento
+
 class ClienteFilterForm(forms.ModelForm):
     BLINDATO=((0, "No"), (1, "Sì"))
     
@@ -899,7 +907,7 @@ class ContrattoForm(forms.ModelForm):
         # controlliamo se l'appuntamento selezionato è plausibile, cioè le date
         # corrispondono e il cliente è lo stesso del contratto
         appuntamento = cdata.get("appuntamento")
-        cliente = cdata.get("cliente")
+#        cliente = cdata.get("cliente")
         if appuntamento and data_stipula:
             data_appuntamento = appuntamento.data
             if data_appuntamento.date() > data_stipula:
@@ -907,12 +915,12 @@ class ContrattoForm(forms.ModelForm):
                 msg = "la data dell'appuntamento selezionato è successiva alla "\
                     "data di stipula del contratto"
                 self._errors["appuntamento"] = self.error_class([msg])
-        if appuntamento and cliente:            
-            if appuntamento.cliente != cliente:
-            # creiamo il msg di errore per il campo "data_inizo"
-                msg = "il cliente dell'appuntamento selezionato è diverso dal "\
-                    "cliente con cui si è stipulato il contratto"
-                self._errors["appuntamento"] = self.error_class([msg])
+#        if appuntamento and cliente:            
+#            if appuntamento.cliente != cliente:
+#            # creiamo il msg di errore per il campo "data_inizo"
+#                msg = "il cliente dell'appuntamento selezionato è diverso dal "\
+#                    "cliente con cui si è stipulato il contratto"
+#                self._errors["appuntamento"] = self.error_class([msg])
 
         return cdata
               

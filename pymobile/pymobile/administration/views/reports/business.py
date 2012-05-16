@@ -308,7 +308,6 @@ def inout(request):
 # calcolare il fisso
 def calc_fisso(period, dipendenti=None):
     # determiniamo i dipendenti attivi per il periodo di tempo consderato
-    print(dipendenti)
     if not dipendenti:
         dipendenti = models.Dipendente.objects.filter(Q(data_assunzione__gte=period[0],
                                                         data_assunzione__lte=period[1]) |
@@ -320,7 +319,6 @@ def calc_fisso(period, dipendenti=None):
                                                      .iterator()
     fisso_tot = 0
     for dipendente in dipendenti:
-        print("ci sono")
         retribuzioni = dipendente.retribuzionedipendente_set.filter(Q(data_inizio__gte=period[0], 
                                                                       data_inizio__lte=period[1]) |
                                                                     Q(data_fine__gte=period[0],
