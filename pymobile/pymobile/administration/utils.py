@@ -223,7 +223,7 @@ def values_from_provvigione_bonus(provvigione_bonus):
                     elif k == "blindato":
                         par[k] = int(v)
                     else:
-                        par[k] = v
+                        par[k] = v.lower()
             
             d = {"parameters": par, "provvigione": prov}            
             values.append(d)
@@ -238,7 +238,7 @@ def provvigione_bonus_from_values(values):
     for d in values:
         if d:
             for k, v in d["parameters"].iteritems():
-                provvigione_bonus += str(k) + ":" + str(v) + ","
+                provvigione_bonus += str(k) + ":" + str(v).lower() + ","
             provvigione_bonus += str(d["provvigione"]) + ";"
 
     return provvigione_bonus  

@@ -37,6 +37,19 @@ form.modelform fieldset select {
     width: 150px;
 }
 
+.field_error {
+    background-color: red;
+}
+
+.messages {
+    background-color: #9AC0CD;
+}
+
+.navigation fieldset {
+    background-color: #ABABAB;
+}
+
+
 fieldset input[type='text'] {
     text-transform: uppercase;
 }

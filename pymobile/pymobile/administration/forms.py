@@ -284,19 +284,19 @@ class RetribuzioneBaseForm(forms.ModelForm):
                         raise forms.ValidationError("il valore <b>{}</b> della chiave <b>provvigione</b> deve un numero maggiore o uguale di 0".format(v))                         
                     d["provvigione"] = v                    
                 elif k == "gestore":
-                    if not models.Gestore.objects.filter(denominazione=v).exists():
+                    if not models.Gestore.objects.filter(denominazione__iexact=v).exists():
                         raise forms.ValidationError("il gestore <b>{}</b> non esiste nel DATABASE".format(v))
                 elif k == "profilo":
-                    if not models.Tariffa.objects.filter(profilo=v).exists():
+                    if not models.Tariffa.objects.filter(profilo__iexact=v).exists():
                         raise forms.ValidationError("la tariffa <b>{}</b> non esiste nel DATABASE".format(v))
                 elif k == "tipo":
-                    if not models.TipologiaTariffa.objects.filter(denominazione=v).exists():
+                    if not models.TipologiaTariffa.objects.filter(denominazione__iexact=v).exists():
                         raise forms.ValidationError("il tipo di tariffa <b>{}</b> non esiste nel DATABASE".format(v))
                 elif k == "fascia":
-                    if not models.FasciaTariffa.objects.filter(denominazione=v).exists():
+                    if not models.FasciaTariffa.objects.filter(denominazione__iexact=v).exists():
                         raise forms.ValidationError("la fascia <b>{}</b> non esiste nel DATABASE".format(v))   
                 elif k == "servizio":
-                    if not models.ServizioTariffa.objects.filter(denominazione=v).exists():
+                    if not models.ServizioTariffa.objects.filter(denominazione__iexact=v).exists():
                         raise forms.ValidationError("il servizio <b>{}</b> non esiste nel DATABASE".format(v))
                 elif k == "blindato":
                     try:
