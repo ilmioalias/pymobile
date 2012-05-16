@@ -465,8 +465,10 @@ def mod_retribuzione(request, object_id, provvigione_id):
     if obj.principale:
         data_inizio = ""
     else:
-        data_inizio = models.RetribuzioneDipendente.objects.get(dipendente=dipendente, 
-                                                                principale=True).data_inizio.strftime("%d/%m/%Y")
+        # FIXME: questa cosa è da sistemare, questo è un fix temporaneo
+        if models.RetribuzioneDipendente.objects.filter(dipendente=dipendente, principale=True).exists():
+            data_inizio = models.RetribuzioneDipendente.objects.get(dipendente=dipendente, 
+                                                                    principale=True).data_inizio.strftime("%d/%m/%Y")
     
     data = {"tipo": "ret",
             "modelform": form, 

@@ -194,6 +194,41 @@ class Cliente(models.Model):
         ordering = ["denominazione", "cognome"]
         verbose_name_plural = "Clienti"
 
+class ClienteAppuntamento(models.Model):
+    TIPI = (("bus", "business"), ("pri", "privato"))
+    
+    denominazione= models.CharField(max_length=45, 
+                                    help_text="ragione sociale dell'impresa commerciale",
+                                    verbose_name="Ragione sociale",
+                                    blank=True)
+    cognome = models.CharField(max_length=45, blank=True, 
+                               verbose_name="cognome")
+    nome = models.CharField(max_length=45, blank=True)
+    tipo = models.CharField(max_length=3, choices=TIPI, default="pri")
+    indirizzo = models.CharField(max_length=100, blank=True)
+    residenza = models.CharField(max_length=45, blank=True, verbose_name="città")
+    email = models.EmailField(help_text="email del cliente", blank=True)
+    telefono = models.CharField(max_length=45, blank=True)
+    cellulare = models.CharField(max_length=45, blank=True)
+    fax = models.CharField(max_length=45, blank=True)
+    blindato = models.BooleanField(help_text="cliente blindato", default=False)
+    nota = models.TextField(verbose_name="nota del cliente", blank=True)
+    creazione = models.DateTimeField(auto_now_add=True)
+    modifica = models.DateTimeField(auto_now=True)
+    
+    def __unicode__(self):
+        if self.denominazione:
+            msg = "{}".format(self.denominazione)
+            if self.cognome:
+                msg += "di {} {}".format(self.cognome, self.nome)
+            return msg
+        if self.cognome:
+            return "{} {}".format(self.cognome, self.nome)
+        
+    class Meta:
+        ordering = ["denominazione", "cognome"]
+        verbose_name_plural = "Clienti"
+
 class Gestore(models.Model):
     denominazione = models.CharField(max_length=45, primary_key=True,)
     
@@ -352,7 +387,7 @@ class Appuntamento(models.Model):
     telefonista = models.ForeignKey(Dipendente, 
                                     related_name="telefonista", 
                                     limit_choices_to={"ruolo": "tel",})
-    cliente = models.ForeignKey(Cliente)
+    cliente = models.ForeignKey(ClienteAppuntamento)
     data = models.DateTimeField(verbose_name="Data e Ora")
     referente = models.ForeignKey(Referente, related_name="referente", blank=True, 
                                   null=True, on_delete=SET_NULL)
