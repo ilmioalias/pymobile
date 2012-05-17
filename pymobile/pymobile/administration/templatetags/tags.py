@@ -33,7 +33,8 @@ def isdate(field):
         if field.field.widget.attrs.has_key("class"):
             v = field.field.widget.attrs["class"]
             clss = v.split(" ")
-            if "date" in clss or "datetime" in clss:
+            if ("date" in clss or "datetime" in clss
+                or "date_start" in clss or "date_end" in clss):
                 return True
             return False
     except NameError: 

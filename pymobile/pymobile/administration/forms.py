@@ -910,8 +910,8 @@ class ContrattoForm(forms.ModelForm):
         exclude = ("piano_tariffario",)
         widgets = {"cliente": forms.Select(attrs={"class": "fk"}),
                    "agente": forms.Select(attrs={"class": "fk"}),
-                   "data_stipula": forms.DateInput(format="%d/%m/%Y", attrs={"class": "date",}),
-                   "data_scadenza": forms.DateInput(format="%d/%m/%Y", attrs={"class": "date",}),
+                   "data_stipula": forms.DateInput(format="%d/%m/%Y", attrs={"class": "date_start",}),
+                   "data_scadenza": forms.DateInput(format="%d/%m/%Y", attrs={"class": "date_end scadenza",}),
                    "data_rescissione": forms.DateInput(format="%d/%m/%Y", attrs={"class": "date",}),}      
 
 class ContrattoFilterForm(forms.ModelForm):

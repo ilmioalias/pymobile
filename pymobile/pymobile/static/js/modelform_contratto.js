@@ -20,7 +20,6 @@ var addTariffaForm = function(j_obj){
 		var new_lfor = lfor.replace("__prefix__", forms_count);
 		$(this).attr("for", new_lfor);
 	});
-	console.log("form.modelform select#id_pianotariffario_set-"+forms_count+"-tariffa");
     
     // aggiorniamo il numero di form
     in_tot.val(new_forms_count);
