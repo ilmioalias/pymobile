@@ -29,6 +29,8 @@ form.modelform fieldset input[type='text'].date {
     width: 100px;
 }
 
+<<<<<<< HEAD
+=======
 form.modelform fieldset input[type='text'].date_start {
     width: 100px;
 }
@@ -37,6 +39,7 @@ form.modelform fieldset input[type='text'].date_end {
     width: 100px;
 }
 
+>>>>>>> d2ee155... * risolti alcuni piccoli problemi e aggiunte delle funzionalità
 form.modelform fieldset input[type='text'].datetime {
     width: 100px;
 }
