@@ -41,7 +41,7 @@
 				<option value="assign">assegna</option>
 				{% endif %}
 			</select>
-			{% if user|get_group == "amministratore" %}
+			{% if user|get_group != "telefonista" %}
 				{% if agenti %}
 				<span class="assign"  style="display: none;">
 					<select id="id_assign">

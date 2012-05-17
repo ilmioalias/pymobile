@@ -96,7 +96,13 @@ var dateStartChanged = function(data_start, data_end){
 		}	
 	};
 	var oneDay = 24*60*60*1000;
-  	var earliest = new Date(fromDay+oneDay);
+	if (data_end.hasClass("scadenza")){
+		// nel caso stiamo settando la data di scadenza di un contratto
+		var earliest = new Date(fromDay);
+		earliest.setFullYear(earliest.getFullYear() + 2);
+	} else {
+		var earliest = new Date(fromDay+oneDay);	
+	};
   	earliest.setHours(0,0,0,0);
   	data_end.removeAttr("disabled").AnyTime_noPicker().AnyTime_picker({
   		earliest: earliest,
@@ -177,6 +183,8 @@ var initModelformClickHandler = function(){
 		// troviamo la data_end corrispondente alla data_start cambiata
 		var field = data_start.attr("id").replace(/inizio$/, "");
 		var data_end = $("form.modelform input.date_end").filter("#" + field + "fine");
+		if (data_end.length == 0){			var data_end = $("form.modelform input.date_end").filter("#id_data_scadenza");
+		};
 		dateStartChanged(data_start, data_end);
 	});
 	$("form.modelform select#id_cliente:visible").combobox();

@@ -171,6 +171,43 @@ def del_object(request):
                               data,
                               context_instance=RequestContext(request))
 
+def get_mail_subject(appuntamento):
+    data = appuntamento.data
+    cliente = appuntamento.cliente
+    referente = appuntamento.referente
+    tel = appuntamento.referente.telefono
+    cell = appuntamento.referente.cellulare
+    email = appuntamento.referente.email
+    indirizzo = appuntamento.indirizzo
+    nota = appuntamento.nota
+    msg = "\t- " + data.strftime("%d/%m/%Y") + ": \n"
+    msg += "\t cliente: " + str(cliente)
+    if indirizzo:
+        msg += "\t indirizzo: " + str(indirizzo)
+    else: 
+        msg += "\t indirizzo: "
+    if referente:
+        msg += "\t referente: " + str(referente)
+    else:
+        msg += "\t referente: "
+    if tel:
+        msg += "\t telefono: " + str(tel)
+    else:
+        msg += "\t telefono: "
+    if cell:
+        msg += "\t cellulare: " + str(cell)
+    else:
+        msg += "\t cellulare: "
+    if email:
+        msg += "\t email: " + str(email)
+    else:
+        msg += "\t email: "
+    if nota:
+        msg += "\t nota: " + str(nota)
+    else:
+        msg += "\t nota: "
+    return msg
+
 @login_required
 #@user_passes_test(lambda user: not u.is_telefonista(user),)
 @user_passes_test(lambda user: u.get_group(user) != "telefonista")
@@ -196,8 +233,8 @@ def assign_object(request):
                 subject = "Prossimi appuntamenti"
                 msg = "Appuntamenti assegnati:\n"
                 for appuntamento in appuntamenti:
-                    msg += "\t- {}\n".format(appuntamento)
-                msg += "\nBuon Lavoro."
+                    msg += get_mail_subject(appuntamento)
+                msg += "\n\nBuon Lavoro."
                 send_mail(subject, 
                           msg,
                           from_email,
@@ -386,8 +423,8 @@ def send_mail_to_agente(request, object_id):
             from_email = "agenzia"
             subject = "Prossimi appuntamenti"
             msg = "Appuntamenti assegnati:\n"
-            msg += "\t- {}\n".format(appuntamento)
-            msg += "\nBuon Lavoro."
+            msg += get_mail_subject(appuntamento)
+            msg += "\n\nBuon Lavoro."
             send_mail(subject, 
                       msg,
                       from_email,

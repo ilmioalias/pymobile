@@ -17,6 +17,47 @@ fieldset input {
 	text-transform: uppercase;
 }
 
+form.modelform fieldset input[type='text'] {
+    width: 50%;
+}
+
+form.modelform fieldset .ui-autocomplete-input {
+    width: 300px;
+}
+
+form.modelform fieldset input[type='text'].date {
+    width: 100px;
+}
+
+form.modelform fieldset input[type='text'].date_start {
+    width: 100px;
+}
+
+form.modelform fieldset input[type='text'].date_end {
+    width: 100px;
+}
+
+form.modelform fieldset input[type='text'].datetime {
+    width: 100px;
+}
+
+form.modelform fieldset select {
+    width: 150px;
+}
+
+.field_error {
+    background-color: red;
+}
+
+.messages {
+    background-color: #9AC0CD;
+}
+
+.navigation fieldset {
+    background-color: #ABABAB;
+}
+
+
 fieldset input[type='text'] {
     text-transform: uppercase;
 }

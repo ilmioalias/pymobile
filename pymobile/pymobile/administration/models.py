@@ -376,7 +376,9 @@ class Appuntamento(models.Model):
                                    verbose_name="Gestore mobile del contatto")
     gestore_fisso = models.CharField(max_length=45, 
                                      blank=True, 
-                                     verbose_name="Gestore fisso del contatto")    
+                                     verbose_name="Gestore fisso del contatto")
+    indirizzo = models.CharField(max_length=150, 
+                                 blank=True,)    
     nota = models.TextField(blank=True)
     agente = models.ForeignKey(Dipendente, 
                                related_name="agente", 
