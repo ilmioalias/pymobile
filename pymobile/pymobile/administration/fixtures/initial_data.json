@@ -45,6 +45,15 @@
         }
     }, 
     {
+        "pk": 23, 
+        "model": "contenttypes.contenttype", 
+        "fields": {
+            "model": "datopianotariffario", 
+            "name": "dato piano tariffario", 
+            "app_label": "administration"
+        }
+    }, 
+    {
         "pk": 9, 
         "model": "contenttypes.contenttype", 
         "fields": {
@@ -99,7 +108,7 @@
         }
     }, 
     {
-        "pk": 23, 
+        "pk": 24, 
         "model": "contenttypes.contenttype", 
         "fields": {
             "model": "obiettivo", 
@@ -204,6 +213,14 @@
             "model": "utente", 
             "name": "utente", 
             "app_label": "administration"
+        }
+    }, 
+    {
+        "pk": "be349f59505454964f1d7b7ce934b1f2", 
+        "model": "sessions.session", 
+        "fields": {
+            "expire_date": "2012-06-04 12:44:15", 
+            "session_data": "MGRkMTA1NDQyZTg4NDk4NjIyODM1MDMwODRiNGY0YWM2MmJkMTYyZjqAAn1xAShVDWxhc3RfYWN0\naXZpdHljZGF0ZXRpbWUKZGF0ZXRpbWUKcQJVCgfcBRUMLA8BKsGFUnEDVQ1fYXV0aF91c2VyX2lk\nigEBVRJfYXV0aF91c2VyX2JhY2tlbmRVKWRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9k\nZWxCYWNrZW5kdS4=\n"
         }
     }, 
     {
@@ -365,6 +382,33 @@
         }
     }, 
     {
+        "pk": 67, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "add_datopianotariffario", 
+            "name": "Can add dato piano tariffario", 
+            "content_type": 23
+        }
+    }, 
+    {
+        "pk": 68, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "change_datopianotariffario", 
+            "name": "Can change dato piano tariffario", 
+            "content_type": 23
+        }
+    }, 
+    {
+        "pk": 69, 
+        "model": "auth.permission", 
+        "fields": {
+            "codename": "delete_datopianotariffario", 
+            "name": "Can delete dato piano tariffario", 
+            "content_type": 23
+        }
+    }, 
+    {
         "pk": 25, 
         "model": "auth.permission", 
         "fields": {
@@ -446,30 +490,30 @@
         }
     }, 
     {
-        "pk": 67, 
+        "pk": 70, 
         "model": "auth.permission", 
         "fields": {
             "codename": "add_obiettivo", 
             "name": "Can add obiettivo", 
-            "content_type": 23
+            "content_type": 24
         }
     }, 
     {
-        "pk": 68, 
+        "pk": 71, 
         "model": "auth.permission", 
         "fields": {
             "codename": "change_obiettivo", 
             "name": "Can change obiettivo", 
-            "content_type": 23
+            "content_type": 24
         }
     }, 
     {
-        "pk": 69, 
+        "pk": 72, 
         "model": "auth.permission", 
         "fields": {
             "codename": "delete_obiettivo", 
             "name": "Can delete obiettivo", 
-            "content_type": 23
+            "content_type": 24
         }
     }, 
     {
@@ -884,14 +928,14 @@
             "is_active": true, 
             "is_superuser": true, 
             "is_staff": true, 
-            "last_login": "2012-05-16 11:24:39", 
+            "last_login": "2012-05-21 12:41:58", 
             "groups": [
                 1
             ], 
             "user_permissions": [], 
-            "password": "sha1$5a97a$ab196e0cde9a6159177f9a58e739f145438a7dad", 
+            "password": "sha1$5b18f$1eadf1aecf22566bd0fcac58424becda6dbadad3", 
             "email": "luigi_curzi@yahoo.it", 
-            "date_joined": "2012-05-16 11:24:39"
+            "date_joined": "2012-05-21 12:41:05"
         }
     }
 ]

@@ -7,7 +7,6 @@ var addTariffaForm = function(j_obj){
     // creiamo la nuova form da aggiungere
 	var new_form = j_obj.closest("tr").next("tr").clone(true);
 	new_form.find(":input").each(function(){
-		console.log($(this));
 		var id = $(this).attr("id");
 		var new_id = id.replace("__prefix__", forms_count);
 		$(this).attr("id", new_id);
@@ -51,12 +50,47 @@ var resetTotalTariffaForm = function(){
 	$("#id_pianotariffario_set-TOTAL_FORMS").attr("value", n_trs);
 };
 
+var addDatoPTForm = function(j_obj){
+	var last_tr = j_obj.closest("tr");
+	var in_tot = $("#id_datopianotariffario_set-TOTAL_FORMS");
+	var forms_count = in_tot.attr("value");
+	var new_forms_count = parseInt(forms_count) + 1;
+    // creiamo la nuova form da aggiungere
+	// var new_form = j_obj.closest("tr").next("tr").clone(true);
+	var new_form = $("#empty_pianotariffario").clone(true);
+	new_form.find(":input").each(function(){
+		var id = $(this).attr("id");
+		var new_id = id.replace("__prefix__", forms_count);
+		$(this).attr("id", new_id);
+		var name = $(this).attr("name");
+		var new_name = name.replace("__prefix__", forms_count);
+		$(this).attr("name", new_name);
+	});
+	new_form.find("label").each(function(){
+		var lfor = $(this).attr("for");
+		var new_lfor = lfor.replace("__prefix__", forms_count);
+		$(this).attr("for", new_lfor);
+	});
+    
+    // aggiorniamo il numero di form
+    in_tot.val(new_forms_count);
+    
+    // inseriamo la nuova form
+    $("<tr><td></td></tr>").insertAfter(last_tr).fadeIn(1000);
+	new_form.hide().insertAfter(last_tr).fadeIn(1000);
+};
+
 $(document).ready(function(){
 	resetTotalTariffaForm();
 	// $("form button.back"),click(function(e){
 		// e.preventDefault();
 		// history.go(-1);
 	// });
+	$("tbody.pianotariffario a#add_datopianotariffario").click(function(e){
+		// event handler per aggiungere dinamicamente form per le tariffe
+		e.preventDefault();
+		addDatoPTForm($(this));		     
+	});	
 	$("tbody.pianotariffario button.add_tariffa").click(function(e){
 		// event handler per aggiungere dinamicamente form per le tariffe
 		e.preventDefault();

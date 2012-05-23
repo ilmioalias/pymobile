@@ -165,6 +165,12 @@ def add_object_pt(request):
                                                    formset = forms.PianoTariffarioInlineFormset,
                                                    can_delete=False,
                                                    extra=1,)
+    
+    DatoPianoTariffarioFormset = inlineformset_factory(models.PianoTariffario, 
+                                                       models.DatoPianoTariffario, 
+                                                       forms.DatoPianoTariffarioForm,
+                                                       can_delete=False,
+                                                       extra=1,)
         
     if request.method == "POST":
         post_query = request.POST.copy()
@@ -189,10 +195,11 @@ def add_object_pt(request):
                 return HttpResponseRedirect(reverse("init_contratto"))
     else:
         gestore = request.session["contratto"]["post"]["gestore"]
-        formset = PianoTariffarioFormset(instance=models.Contratto(), 
+        PTformset = PianoTariffarioFormset(instance=models.Contratto(), 
                                          gestore=gestore)                
-    
-    data = {"action": action, "modelformset": formset,}                
+        DatoPTFormset = DatoPianoTariffarioFormset(instance=models.PianoTariffario()) 
+     
+    data = {"action": action, "ptmodelformset": PTformset, "datoptmodelformset": DatoPTFormset}                
     return render_to_response(template, 
                               data,
                               context_instance=RequestContext(request))
@@ -425,8 +432,11 @@ def add_child_object(request, field_name):
                     </script>'''.format(new_obj.pk, new_obj))
     else:
         form_class, template = get_child_form(field_name)
-        gestore = request.session["contratto"]["post"]["gestore"]
-        form = form_class(gestore=gestore)
+        if field_name == "tariffa":
+            gestore = request.session["contratto"]["post"]["gestore"]
+            form = form_class(gestore=gestore)
+        else:
+            form = form_class()
       
     data = {"modelform": form, "action": action,}     
     return render_to_response(template, 

@@ -547,7 +547,7 @@ def details(request):
                                   data,
                                   context_instance=RequestContext(request))   
     
-    filterform = forms.DetailsForm()
+    filterform = forms.DetailsFilterForm()
     
     data = {"dipendente": dipendente,
             "details": details,

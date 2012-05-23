@@ -44,7 +44,7 @@
 	<form id="filter_reporttable_form" action=".">
 		<fieldset class="filter_reporttable_fieldset">
 		<legend>Filtro</legend>
-			<table>				
+			<table id="filter_modeltable">				
 				{% for field in filterform.visible_fields %}
 				<tbody>
 					<tr><td><b>{{ field.label_tag }}</b></td><td>{{ field }}</td></tr>

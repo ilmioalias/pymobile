@@ -2,7 +2,7 @@
 
 {% block extrahead %}
 <title>PYMOBILE | Contratti</title>
-{{ modelformset.media }} 
+{{ ptmodelformset.media }} 
 {% endblock %}
 
 {% block header %} 
@@ -31,17 +31,18 @@
 			<fieldset class="modelform_fieldset">
 			<legend><b>Dati Contratto: Piano Tariffario (pagina 2)</b></legend>					
 				{% csrf_token %}
-				{{ modelformset.management_form }}						
+				{{ ptmodelformset.management_form }}						
+				{{ datoptmodelformset.management_form }}
 				<table>
-					{% if modelformset.non_form_errors %}
+					{% if ptmodelformset.non_form_errors %}
 	  				<tbody>
 						<tr class="field_error">
-							<td colspan="2">{{ modelformset.non_form_errors|first }}</td>
+							<td colspan="2">{{ ptmodelformset.non_form_errors|first }}</td>
 						</tr>
 					</tbody>
 					{% endif %}
 					<tbody class="field pianotariffario">
-			  			{% for pt_form in modelformset.forms %}
+			  			{% for pt_form in ptmodelformset.forms %}
 			  			<tr>
 			  				<td>
 		  					{% for hidden_field in pt_form.hidden_fields %}
@@ -80,6 +81,47 @@
 										{% endif %}
 									</tbody>
 							  		{% endfor %}
+							  		<tbody>
+							  			<tr>
+		  									<td>Aggiungi dati identificativi 
+		  										<a id="add_datopianotariffario" href="#">
+		  											<img src="{{ STATIC_URL }}/img/add.png" />
+	  											</a>
+				    						</td>
+						  					<td style="display: none" id="empty_datopianotariffario">
+								  				{% for hidden_field in datoptmodelformset.empty_form.hidden_fields %}
+												{{ hidden_field }}
+												{% endfor %}				
+									  			<table>
+										  			{% for pt_field in datoptmodelformset.empty_form.visible_fields %}
+													<tbody class="field">
+														{% if pt_field.errors %}
+														<tr class="field_error">
+															<td></td><td>{{ pt_field.errors|first }}</td>
+														</tr>
+														{% endif %}
+														<tr class="{% if pt_field.errors %}field_error{% endif %}" >
+															<td>{{ pt_field.label_tag }}</td>
+															<td>
+																{{ pt_field }}
+															    {% if pt_field|isfk %}
+															    	<a id="add_{{ pt_field.auto_id }}" class="add_subform" href="{% url add_contratto_fk "tariffa" %}">
+															    		<img src="{{ STATIC_URL }}/img/add.png" />
+														    		</a>
+													    		{% endif %}												
+															</td>
+														</tr>
+														{% if pt_field.help_text %}
+														<tr class="field_help">
+															<td></td><td>{{ pt_field.help_text }}</td>
+														</tr>
+														{% endif %}
+													</tbody>
+											  		{% endfor %}
+											  	</table>
+										  	</td>
+						  				</tr>
+							  		</tbody>
 							  	</table>
 						  	</td>
 			  			</tr>
@@ -88,11 +130,11 @@
 		  				<!-- inseriamo un form vuoto usato per aggiungere dinamicamente un altro form --> 
 		  				<tr style="display: none">
 		  					<td>
-				  				{% for hidden_field in modelformset.empty_form.hidden_fields %}
+				  				{% for hidden_field in ptmodelformset.empty_form.hidden_fields %}
 								{{ hidden_field }}
 								{% endfor %}				
 					  			<table>
-						  			{% for pt_field in modelformset.empty_form.visible_fields %}
+						  			{% for pt_field in ptmodelformset.empty_form.visible_fields %}
 									<tbody class="field">
 										{% if pt_field.errors %}
 										<tr class="field_error">
@@ -117,6 +159,49 @@
 										{% endif %}
 									</tbody>
 							  		{% endfor %}
+							  		<tbody>
+							  			<tr>
+		  									<td>Aggiungi dati identificativi 
+		  										<a class="add_dati_identificativi">
+		  											<img src="{{ STATIC_URL }}/img/add.png" />
+	  											</a>
+				    						</td>
+			  							</tr>
+			  							<tr style="display: none">
+						  					<td>
+								  				{% for hidden_field in datoptmodelformset.empty_form.hidden_fields %}
+												{{ hidden_field }}
+												{% endfor %}				
+									  			<table>
+										  			{% for pt_field in datoptmodelformset.empty_form.visible_fields %}
+													<tbody class="field">
+														{% if pt_field.errors %}
+														<tr class="field_error">
+															<td></td><td>{{ pt_field.errors|first }}</td>
+														</tr>
+														{% endif %}
+														<tr class="{% if pt_field.errors %}field_error{% endif %}" >
+															<td>{{ pt_field.label_tag }}</td>
+															<td>
+																{{ pt_field }}
+															    {% if pt_field|isfk %}
+															    	<a id="add_{{ pt_field.auto_id }}" class="add_subform" href="{% url add_contratto_fk "tariffa" %}">
+															    		<img src="{{ STATIC_URL }}/img/add.png" />
+														    		</a>
+													    		{% endif %}												
+															</td>
+														</tr>
+														{% if pt_field.help_text %}
+														<tr class="field_help">
+															<td></td><td>{{ pt_field.help_text }}</td>
+														</tr>
+														{% endif %}
+													</tbody>
+											  		{% endfor %}
+											  	</table>
+										  	</td>
+						  				</tr>
+							  		</tbody>
 							  	</table>
 						  	</td>
 		  				</tr>

@@ -197,12 +197,16 @@ class DipendenteForm(forms.ModelForm):
 class TelefonistaForm(DipendenteForm):
     
     class Meta(DipendenteForm.Meta):
-        widgets = {"ruolo": forms.HiddenInput(attrs={"value": "tel"})}
+        widgets = {"ruolo": forms.HiddenInput(attrs={"value": "tel"}),
+                   "data_assunzione": forms.DateInput(format="%d/%m/%Y", attrs={"class": "date",}),
+                   "data_licenziamento": forms.DateInput(format="%d/%m/%Y", attrs={"class": "date",}),}
 
 class AgenteForm(DipendenteForm):
         
     class Meta(DipendenteForm.Meta):
-        widgets = {"ruolo": forms.HiddenInput(attrs={"value": "agt"})}
+        widgets = {"ruolo": forms.HiddenInput(attrs={"value": "agt"}),
+                   "data_assunzione": forms.DateInput(format="%d/%m/%Y", attrs={"class": "date",}),
+                   "data_licenziamento": forms.DateInput(format="%d/%m/%Y", attrs={"class": "date",}),}
 
 class DipendenteFilterForm(forms.ModelForm):
     ATTIVO=((0, "No"), (1, "Sì"))
@@ -690,7 +694,7 @@ class ServizioTariffaFilterForm(forms.ModelForm):
         model = models.ServizioTariffa
 
 class AppuntamentoForm(forms.ModelForm):
-    telefonista = forms.ModelChoiceField(queryset=models.Dipendente.objects.all(),
+    telefonista = forms.ModelChoiceField(queryset=models.Dipendente.objects.filter(ruolo="tel"),
                                          widget=forms.Select(attrs={"class": "fk", }),)
     
     def __init__(self, *args, **kwargs):
@@ -854,6 +858,14 @@ class PianoTariffarioInlineFormset(forms.models.BaseInlineFormSet):
         if count < 1:
             raise forms.ValidationError("è necessario aggiungere almeno un piano tariffario "\
                                         "per ogni contratto inserito")
+
+class DatoPianoTariffarioForm(forms.ModelForm):
+
+    class Media:
+        js = ("js/modelform.js",)
+        
+    class Meta:
+        model = models.DatoPianoTariffario
         
 class ContrattoForm(forms.ModelForm):
     appuntamento = forms.ModelChoiceField(queryset=models.Appuntamento.objects.filter(contratto__isnull=True),
@@ -1119,7 +1131,10 @@ class CanvasFilterForm(forms.Form):
     periodo = forms.ChoiceField(choices=CHOICHES, initial="")
     agente = forms.ModelMultipleChoiceField(queryset=models.Dipendente.objects.filter(ruolo="agt"),
                                             label="Selezione Agenti")
-
+    
+    class Media:
+        js = ("js/filterform.js",)
+    
 class InOutFilterForm(forms.Form):
     CHOICHES=(("", ""), ("yesterday", "ieri"), ("today", "oggi"), ("month", "mese"), 
               ("quarter", "quarto"), ("year", "anno"), ("manual", "ricerca manuale"))
@@ -1132,7 +1147,10 @@ class InOutFilterForm(forms.Form):
     gestore = forms.ModelMultipleChoiceField(queryset=models.Gestore.objects.all(),
                                              label="Selezione Gestori")
 
-class DetailsForm(forms.Form):
+    class Media:
+        js = ("js/filterform.js",)
+
+class DetailsFilterForm(forms.Form):
     CHOICHES=(("", ""), ("yesterday", "ieri"), ("today", "oggi"), ("month", "mese"), 
               ("quarter", "quarto"), ("year", "anno"), ("manual", "ricerca manuale"))
     
@@ -1141,6 +1159,9 @@ class DetailsForm(forms.Form):
                                             label="Selezione Dipendente")
 #    gestore = forms.ModelMultipleChoiceField(queryset=models.Gestore.objects.all(),
 #                                             label="Selezione Gestori")
+    
+    class Media:
+        js = ("js/filterform.js",)
 
 class ObiettivoForm(forms.ModelForm):
     anno_inizio = forms.ChoiceField(choices=[("", "")], 

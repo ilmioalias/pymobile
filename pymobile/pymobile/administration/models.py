@@ -165,7 +165,7 @@ class Cliente(models.Model):
                                verbose_name="cognome")
     nome = models.CharField(max_length=45, blank=True)
     tipo = models.CharField(max_length=3, choices=TIPI, default="pri")
-    partiva_codfisc = models.CharField(max_length=11, unique=True, 
+    partiva_codfisc = models.CharField(max_length=13, unique=True, 
                                        verbose_name="part. iva / cod. fisc.")
     indirizzo = models.CharField(max_length=100, blank=True)
     residenza = models.CharField(max_length=45, blank=True, verbose_name="città")
@@ -552,18 +552,22 @@ class PianoTariffario(models.Model):
     class Meta:
         verbose_name_plural = "Piani Tariffari"
 
-#class DatoIdentificativo(models.Model):
-#    piano_tariffario = models.ForeignKey(PianoTariffario)
-#    telefono = models.CharField(max_length=45, blank=True, verbose_name="numero telefonico") 
-#    aom = models.CharField(max_length=45, help_text="nome dell'operatore di portabilità")
-#    seriale = models.CharField(max_length=128, verbose_name="n. seriale SIM")
-#    label_pack = models.CharField(max_length=128, blank=True)
-#    
-#    def __unicode__(self):
-#        return "{}: {}".format(self.piano_tariffario, self.telefono)
-#    
-#    class Meta:
-#        verbose_name_plural = "Dati Identificativi"    
+class DatoPianoTariffario(models.Model):
+    piano_tariffario = models.ForeignKey(PianoTariffario)
+    telefono = models.CharField(max_length=45, 
+                                blank=True, 
+                                verbose_name="numero telefonico") 
+    aom = models.CharField(max_length=45, 
+                           help_text="nome dell'operatore di portabilità", 
+                           blank=True)
+    seriale = models.CharField(max_length=128, verbose_name="n. seriale SIM")
+    label_pack = models.CharField(max_length=128, blank=True)
+    
+    def __unicode__(self):
+        return "{}: {}".format(self.piano_tariffario, self.telefono)
+    
+    class Meta:
+        verbose_name_plural = "Dati Identificativi"    
 
 class Obiettivo(models.Model):
     denominazione = models.CharField(max_length=45,
