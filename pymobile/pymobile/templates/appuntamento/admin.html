@@ -37,7 +37,7 @@
 			<span>se selezionati:</span> 
 			<select class="modeltable_actions">
 				<option value="delete">elimina</option>
-				{% if user|get_group == "amministratore" %}
+				{% if user|get_group != "telefonista" %}
 				<option value="assign">assegna</option>
 				{% endif %}
 			</select>
