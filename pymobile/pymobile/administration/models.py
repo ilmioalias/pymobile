@@ -165,7 +165,7 @@ class Cliente(models.Model):
                                verbose_name="cognome")
     nome = models.CharField(max_length=45, blank=True)
     tipo = models.CharField(max_length=3, choices=TIPI, default="pri")
-    partiva_codfisc = models.CharField(max_length=13, unique=True, 
+    partiva_codfisc = models.CharField(max_length=45, unique=True, 
                                        verbose_name="part. iva / cod. fisc.")
     indirizzo = models.CharField(max_length=100, blank=True)
     residenza = models.CharField(max_length=45, blank=True, verbose_name="città")
