@@ -57,7 +57,7 @@ var addDatoPTForm = function(j_obj){
 	var new_forms_count = parseInt(forms_count) + 1;
     // creiamo la nuova form da aggiungere
 	// var new_form = j_obj.closest("tr").next("tr").clone(true);
-	var new_form = $("#empty_pianotariffario").clone(true);
+	var new_form = $("#empty_datopianotariffario").clone(true);
 	new_form.find(":input").each(function(){
 		var id = $(this).attr("id");
 		var new_id = id.replace("__prefix__", forms_count);
@@ -76,7 +76,7 @@ var addDatoPTForm = function(j_obj){
     in_tot.val(new_forms_count);
     
     // inseriamo la nuova form
-    $("<tr><td></td></tr>").insertAfter(last_tr).fadeIn(1000);
+    // $("<tr><td>").insertAfter(last_tr).fadeIn(1000);
 	new_form.hide().insertAfter(last_tr).fadeIn(1000);
 };
 
