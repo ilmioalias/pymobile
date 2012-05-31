@@ -1,0 +1,103 @@
+{% extends "base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Contratti</title>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/modelform_contratto.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/modelform.js"></script>
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Contratti | {% if action == "add" %}Aggiungi{% else %}Modifica{% endif %} Contratto</h2>
+{% endblock %}
+
+{% block content %}
+{% load tags %}
+<div class="navigation">
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../../">home</a> &gt;
+		<a href="{% url init_contratto %}">amministrazione contratti</a> &gt;
+		{% if action == "add" %}
+		<a href=".">aggiungi contratto: dati identificativi (pagina 3)</a>
+		{% endif %}
+		{% if action == "mod" %}
+		<a href="{% url view_contratto contratto.pk %}">{{ contratto }}</a> &gt;
+		<a href=".">modifica contratto: dati identificativi (pagina 3)</a>
+		{% endif %} 
+	</fieldset>
+</div>
+<div class="modelform_div">
+	<form class="modelform" action="." method="POST" enctype="multipart/form-data">
+		<div class="modelform_fieldset_div">
+			<fieldset class="modelform_fieldset">
+			<legend><b>Dati Contratto: Dati Identificativi (pagina 3)</b></legend>					
+				{% csrf_token %}
+				{% for info, formset in dati_formsets %}
+				<table>
+					<tbody class="formset_info">
+						<tr>
+							<td colspan="3">{{ formset.management_form }}</td>
+						</tr>
+					</tbody>	
+					<tbody>
+						<tr>
+							<td>Tariffa: {{ info.tariffa }}</td>
+							<td>Quantit&agrave;: {{ info.num }}</td>
+							<td>Opzione: {% if info.opzione == 1 %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" />{% endif %}</td>
+						</tr>
+					</tbody>
+			  		<tbody>
+			  			<tr>
+							<td colspan="3">Aggiungi dati identificativi 
+								<a id="add_datopianotariffario" href="#">
+									<img src="{{ STATIC_URL }}/img/add.png" />
+								</a>
+    						</td>
+						</tr>
+					</tbody>
+					<tbody class="empty_datopianotariffario" style="display: none">
+		  				{% for hidden_field in formset.empty_form.hidden_fields %}
+		  				<tr>
+							<td colspan="3">{{ hidden_field }}</td>
+						</tr>
+						{% endfor %}				
+			  			{% for pt_field in formset.empty_form.visible_fields %}
+						{% if pt_field.errors %}
+						<tr class="field_error">
+							<td></td><td>{{ pt_field.errors|first }}</td>
+						</tr>
+						{% endif %}
+						<tr class="{% if pt_field.errors %}field_error{% endif %}" >
+							<td>{{ pt_field.label_tag }}</td>
+							<td>
+								{{ pt_field }}
+							    {% if pt_field|isfk %}
+							    	<a id="add_{{ pt_field.auto_id }}" class="add_subform" href="{% url add_contratto_fk "tariffa" %}">
+							    		<img src="{{ STATIC_URL }}/img/add.png" />
+						    		</a>
+					    		{% endif %}												
+							</td>
+							<td>
+							</td>
+						</tr>
+						{% if pt_field.help_text %}
+						<tr class="field_help">
+							<td></td><td>{{ pt_field.help_text }}</td><td></td>
+						</tr>
+						{% endif %}
+				  		{% endfor %}
+			  		</tbody>				
+				</table>
+				{% endfor %}
+			</fieldset>
+		</div>
+		<div class="submitrow">
+			<input type="submit" class="modelform_save" value="salva" />
+			{% if action == "add" %}
+			<input type="button" class="modelform_save_and_add" value="salva e aggiungi un altro contratto" />
+			{% endif %}
+			<button class="cancel">annulla</button>
+		</div>
+	</form>
+</div>
+{% endblock %}

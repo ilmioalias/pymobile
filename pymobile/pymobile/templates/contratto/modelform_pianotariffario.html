@@ -32,7 +32,7 @@
 			<legend><b>Dati Contratto: Piano Tariffario (pagina 2)</b></legend>					
 				{% csrf_token %}
 				{{ ptmodelformset.management_form }}						
-				{{ datoptmodelformset.management_form }}
+<!-- 				{{ datoptmodelformset.management_form }} -->
 				<table>
 					{% if ptmodelformset.non_form_errors %}
 	  				<tbody>
@@ -81,52 +81,13 @@
 										{% endif %}
 									</tbody>
 							  		{% endfor %}
-							  		<tbody>
-							  			<tr>
-		  									<td colspan="2">Aggiungi dati identificativi 
-		  										<a id="add_datopianotariffario" href="#">
-		  											<img src="{{ STATIC_URL }}/img/add.png" />
-	  											</a>
-				    						</td>
-										</tr>
-									</tbody>
-									<tbody id="empty_datopianotariffario" style="display: none">
-						  				{% for hidden_field in datoptmodelformset.empty_form.hidden_fields %}
-						  				<tr>
-											<td colspan="2">{{ hidden_field }}</td>
-										</tr>
-										{% endfor %}				
-							  			{% for pt_field in datoptmodelformset.empty_form.visible_fields %}
-										{% if pt_field.errors %}
-										<tr class="field_error">
-											<td></td><td>{{ pt_field.errors|first }}</td>
-										</tr>
-										{% endif %}
-										<tr class="{% if pt_field.errors %}field_error{% endif %}" >
-											<td>{{ pt_field.label_tag }}</td>
-											<td>
-												{{ pt_field }}
-											    {% if pt_field|isfk %}
-											    	<a id="add_{{ pt_field.auto_id }}" class="add_subform" href="{% url add_contratto_fk "tariffa" %}">
-											    		<img src="{{ STATIC_URL }}/img/add.png" />
-										    		</a>
-									    		{% endif %}												
-											</td>
-										</tr>
-										{% if pt_field.help_text %}
-										<tr class="field_help">
-											<td></td><td>{{ pt_field.help_text }}</td>
-										</tr>
-										{% endif %}
-								  		{% endfor %}
-							  		</tbody>
 							  	</table>
 						  	</td>
 			  			</tr>
 	  					{% endfor %}
 		  				<tr><td><button class="add_tariffa" value="add">aggiungi</button></td></tr>
 		  				<!-- inseriamo un form vuoto usato per aggiungere dinamicamente un altro form --> 
-		  				<tr style="display: none">
+		  				<tr class="empty_form" style="display: none">
 		  					<td>
 				  				{% for hidden_field in ptmodelformset.empty_form.hidden_fields %}
 								{{ hidden_field }}
@@ -157,45 +118,6 @@
 										{% endif %}
 									</tbody>
 							  		{% endfor %}
-							  		<tbody>
-							  			<tr>
-		  									<td colspan="2">Aggiungi dati identificativi 
-		  										<a id="add_datopianotariffario" href="#">
-		  											<img src="{{ STATIC_URL }}/img/add.png" />
-	  											</a>
-				    						</td>
-			  							</tr>
-							  		</tbody>
-									<tbody id="empty_datopianotariffario" style="display: none">
-						  				{% for hidden_field in datoptmodelformset.empty_form.hidden_fields %}
-						  				<tr>
-											<td colspan="2">{{ hidden_field }}</td>
-										</tr>
-										{% endfor %}				
-							  			{% for pt_field in datoptmodelformset.empty_form.visible_fields %}
-										{% if pt_field.errors %}
-										<tr class="field_error">
-											<td></td><td>{{ pt_field.errors|first }}</td>
-										</tr>
-										{% endif %}
-										<tr class="{% if pt_field.errors %}field_error{% endif %}" >
-											<td>{{ pt_field.label_tag }}</td>
-											<td>
-												{{ pt_field }}
-											    {% if pt_field|isfk %}
-											    	<a id="add_{{ pt_field.auto_id }}" class="add_subform" href="{% url add_contratto_fk "tariffa" %}">
-											    		<img src="{{ STATIC_URL }}/img/add.png" />
-										    		</a>
-									    		{% endif %}												
-											</td>
-										</tr>
-										{% if pt_field.help_text %}
-										<tr class="field_help">
-											<td></td><td>{{ pt_field.help_text }}</td>
-										</tr>
-										{% endif %}
-								  		{% endfor %}
-							  		</tbody>
 							  	</table>
 						  	</td>
 		  				</tr>
@@ -204,11 +126,7 @@
 			</fieldset>
 		</div>
 		<div class="submitrow">
-			<input type="submit" class="modelform_save" value="salva" />
-			{% if action == "add" %}
-			<input type="button" class="modelform_save_and_add" value="salva e aggiungi un altro contratto" />
-			{% endif %}
-<!-- 			<button class="back">indietro</button> -->
+			<input type="submit" class="modelform_save" value="avanti" />
 			<button class="cancel">annulla</button>
 		</div>
 	 </form>

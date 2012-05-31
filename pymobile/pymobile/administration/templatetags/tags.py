@@ -140,3 +140,7 @@ def get_pdf(contratto):
         return contratto.pdf_contratto
     else:
         return ""
+
+@register.filter(name="get_formset")
+def get_formset(formsets, k):
+    return formsets[int(k)]
