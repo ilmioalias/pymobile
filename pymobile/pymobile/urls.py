@@ -68,6 +68,9 @@ INFO_DIP={"template_name": "dipendente/view.html",
 # cliente
 INFO_CLI={"template_name": "cliente/view.html", 
           "queryset": models.Cliente.objects.all()}
+# cliente appuntamento
+INFO_CLIAPP={"template_name": "clienteAppuntamnto/view.html", 
+          "queryset": models.ClienteAppuntamento.objects.all()}
 # appuntamento
 INFO_APP={"template_name": "appuntamento/view.html", 
           "queryset": models.Appuntamento.objects.all()}
@@ -202,6 +205,25 @@ urlpatterns += patterns('pymobile.administration.views',
                             object_detail, 
                             INFO_CLI, 
                             name="view_cliente"),)
+
+# cliente appuntamento
+urlpatterns += patterns('pymobile.administration.views',
+                        url(r'^pymobile/cliente_app/$', 
+                            "cliente.admin.init", 
+                            name="init_cliente"),
+                        url(r'^pymobile/cliente_app/add/$', 
+                            "cliente.admin.add_object", 
+                            name="add_cliente"),
+                        url(r'^pymobile/cliente_app/mod/(?P<object_id>\d+)/$', 
+                            "cliente.admin.mod_object", 
+                            name="mod_cliente"),
+                        url(r'^pymobile/cliente_app/del/$', 
+                            "cliente.admin.del_object", 
+                            name="del_cliente"),
+                        url(r'^pymobile/cliente_app/(?P<object_id>\d+)/$', 
+                            object_detail, 
+                            INFO_CLIAPP, 
+                            name="view_clienteAppuntamento"),)
 
 # appuntamento
 urlpatterns += patterns('pymobile.administration.views',

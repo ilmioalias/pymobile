@@ -22,12 +22,18 @@ var closeSubModelform = function(win, newId, newOpt){
 	    var elem_id = win.name.replace("^", "add_");
 	    var elem = $("#" + elem_id);
 	    if (elem){
-	        var o = new Option(newOpt, newId, true);
-	        elem.append(o);
-	        var autocomplete = elem.next(".ui-autocomplete-input");
-	        if (autocomplete){
-	        	autocomplete.attr("value", newOpt);
-	        };
+	    	if (elem.is("select")){
+		        var o = new Option(newOpt, newId, true);
+		        elem.append(o);
+		        elem.attr("disabled", "disabled");
+		        var autocomplete = elem.next(".ui-autocomplete-input");
+		        if (autocomplete){
+		        	autocomplete.attr("value", newOpt);
+		        };
+	       	} else if (elem.is("input:hidden")){
+		        $("span#id_span_cliente").text(newOpt);
+		        elem.attr("value", newId);
+	       	};
 	    };		
 	};
     win.close();

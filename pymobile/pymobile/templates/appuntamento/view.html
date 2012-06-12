@@ -52,7 +52,7 @@
 					</a>
 				</td>
 			</tr>
-			<tr><td>Cliente</td><td><a href="{% url view_cliente object.cliente.pk %}">{{ object.cliente }}</a></td></tr>
+			<tr><td>Cliente</td><td><a href="{% url view_clienteAppuntamento object.cliente.pk %}">{{ object.cliente }}</a></td></tr>
 			<tr>
 				<td>Referente</td>
 				<td>{% if object.referente %}<a href="{% url view_referente object.pk object.referente.pk %}">{{ object.referente }}</a>{% endif %}</td>

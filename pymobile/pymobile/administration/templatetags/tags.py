@@ -140,3 +140,10 @@ def get_pdf(contratto):
         return contratto.pdf_contratto
     else:
         return ""
+
+@register.filter(name="get_cliente_app")
+def get_cliente_app(cliente):
+    if cliente:
+        return cliente.__unicode__()
+    else:
+        return ""

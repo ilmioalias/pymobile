@@ -686,8 +686,10 @@ class ServizioTariffaFilterForm(forms.ModelForm):
         model = models.ServizioTariffa
 
 class AppuntamentoForm(forms.ModelForm):
-    telefonista = forms.ModelChoiceField(queryset=models.Dipendente.objects.all(),
-                                         widget=forms.Select(attrs={"class": "fk", }),)
+#    telefonista = forms.ModelChoiceField(queryset=models.Dipendente.objects.filter(ruolo="tel"),
+#                                         widget=forms.Select(attrs={"class": "fk", }),)
+#    cliente = forms.CharField(widget=forms.TextInput(attrs={"class": "fk", 
+#                                                            "readonly": "readonly"}))
     
     def __init__(self, *args, **kwargs):
         # questo hack ci serve nel caso in cui sia connesso un telefonista,
@@ -726,7 +728,7 @@ class AppuntamentoForm(forms.ModelForm):
 
     class Meta:
         model = models.Appuntamento
-        widgets = {#"telefonista": forms.Select(attrs={"class": "fk", }),
+        widgets = {"telefonista": forms.Select(attrs={"class": "fk", }),
                    "cliente": forms.Select(attrs={"class": "fk", }),
                    "referente": forms.Select(attrs={"class": "fk", }),
                    "agente": forms.Select(attrs={"class": "fk", }),

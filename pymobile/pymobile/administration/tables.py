@@ -229,7 +229,7 @@ class AppuntamentoTable(tables.Table):
         </table>
     '''
         
-    cliente = tables.LinkColumn("view_cliente", args=[A("cliente.pk")],)
+    cliente = tables.LinkColumn("view_clienteAppuntamento", args=[A("cliente.pk")],)
     telefonista = tables.LinkColumn("view_dipendente", args=[A("telefonista.pk")])
     agente = tables.TemplateColumn(TMP_AGT)
     referente = tables.TemplateColumn(TMP_REF)

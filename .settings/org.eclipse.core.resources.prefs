@@ -1,4 +1,4 @@
-#Thu May 17 09:47:51 CEST 2012
+#Thu May 31 15:53:13 CEST 2012
 eclipse.preferences.version=1
 encoding//pymobile/pymobile/administration/admin.py=utf-8
 encoding//pymobile/pymobile/administration/forms.py=utf-8
@@ -9,6 +9,7 @@ encoding//pymobile/pymobile/administration/utils.py=utf-8
 encoding//pymobile/pymobile/administration/views/account/admin.py=utf-8
 encoding//pymobile/pymobile/administration/views/appuntamento/admin.py=utf-8
 encoding//pymobile/pymobile/administration/views/cliente/admin.py=utf-8
+encoding//pymobile/pymobile/administration/views/clienteAppuntamento/admin.py=utf-8
 encoding//pymobile/pymobile/administration/views/contratto/admin.py=utf-8
 encoding//pymobile/pymobile/administration/views/dipendente/admin.py=utf-8
 encoding//pymobile/pymobile/administration/views/home.py=utf-8
