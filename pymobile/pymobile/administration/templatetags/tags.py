@@ -147,3 +147,11 @@ def get_cliente_app(cliente):
         return cliente.__unicode__()
     else:
         return ""
+
+@register.filter(name="get_referente")
+def get_referente(referente):
+    if referente:
+        return referente.__unicode__()
+    else:
+        return ""
+

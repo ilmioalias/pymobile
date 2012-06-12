@@ -59,21 +59,33 @@
 											{% if action == "add" %}
 											<span id="id_span_cliente">Aggiungi cliente</span>
 											{% else %}
-											<span id="id_span_cliente">{{ appuntamento.cliente.denominazione }}</span>
+											<span id="id_span_cliente">{{ appuntamento.cliente|get_cliente_app }}</span>
 											{% endif %}
 											<input type="hidden" id="id_cliente" value="" name="cliente"/>
 											<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_fk field.html_name %}">
 								    			<img src="{{ STATIC_URL }}/img/add.png" />
 							    			</a>
 										{% else %}
-											{{ field }}
-											{% if field|isdate %}
-												<input type="button" class="dateclear" value="svuota" />
-								    		{% endif %}
-										    {% if field|isfk %}
-										    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_fk field.html_name %}">
-										    		<img src="{{ STATIC_URL }}/img/add.png" />
-									    		</a>
+											{% if field.label = "Referente" %}
+												{% if action == "add" %}
+												<span id="id_span_referente">Aggiungi referente</span>
+												{% else %}
+												<span id="id_span_referente">{{ appuntamento.refrente|get_referente }}</span>
+												{% endif %}
+												<input type="hidden" id="id_referente" value="" name="referente"/>
+												<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_fk field.html_name %}">
+									    			<img src="{{ STATIC_URL }}/img/add.png" />
+								    			</a>
+							    			{% else %}
+												{{ field }}
+												{% if field|isdate %}
+													<input type="button" class="dateclear" value="svuota" />
+									    		{% endif %}
+											    {% if field|isfk %}
+											    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_fk field.html_name %}">
+											    		<img src="{{ STATIC_URL }}/img/add.png" />
+										    		</a>
+									    		{% endif %}
 								    		{% endif %}
 							    		{% endif %}
 									</td>
@@ -108,14 +120,26 @@
 							    			<img src="{{ STATIC_URL }}/img/add.png" />
 						    			</a>
 									{% else %}
-										{{ field }}
-										{% if field|isdate %}
-											<input type="button" class="dateclear" value="svuota" />
-							    		{% endif %}
-									    {% if field|isfk %}
-									    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_fk field.html_name %}">
-									    		<img src="{{ STATIC_URL }}/img/add.png" />
-								    		</a>
+										{% if field.label = "Referente" %}
+											{% if action == "add" %}
+											<span id="id_span_referente">Aggiungi referente</span>
+											{% else %}
+											<span id="id_span_referente">{{ appuntamento.refrente|get_referente }}</span>
+											{% endif %}
+											<input type="hidden" id="id_referente" value="" name="referente"/>
+											<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_fk field.html_name %}">
+								    			<img src="{{ STATIC_URL }}/img/add.png" />
+							    			</a>
+						    			{% else %}
+											{{ field }}
+											{% if field|isdate %}
+												<input type="button" class="dateclear" value="svuota" />
+								    		{% endif %}
+										    {% if field|isfk %}
+										    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_fk field.html_name %}">
+										    		<img src="{{ STATIC_URL }}/img/add.png" />
+									    		</a>
+								    		{% endif %}
 							    		{% endif %}
 						    		{% endif %}
 								</td>

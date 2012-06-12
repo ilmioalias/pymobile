@@ -31,7 +31,7 @@ var closeSubModelform = function(win, newId, newOpt){
 		        	autocomplete.attr("value", newOpt);
 		        };
 	       	} else if (elem.is("input:hidden")){
-		        $("span#id_span_cliente").text(newOpt);
+		        $("span#id_span_"+elem.attr("name")).text(newOpt);
 		        elem.attr("value", newId);
 	       	};
 	    };		

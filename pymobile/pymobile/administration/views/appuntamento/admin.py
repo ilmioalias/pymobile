@@ -175,9 +175,10 @@ def get_mail_subject(appuntamento):
     data = appuntamento.data
     cliente = appuntamento.cliente
     referente = appuntamento.referente
-    tel = appuntamento.referente.telefono
-    cell = appuntamento.referente.cellulare
-    email = appuntamento.referente.email
+    if not referente is None:
+        tel = appuntamento.referente.telefono
+        cell = appuntamento.referente.cellulare
+        email = appuntamento.referente.email
     indirizzo = appuntamento.indirizzo
     nota = appuntamento.nota
     msg = "\t- " + data.strftime("%d/%m/%Y") + ": \n"
