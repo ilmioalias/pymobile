@@ -176,38 +176,76 @@ def get_mail_subject(appuntamento):
     cliente = appuntamento.cliente
     referente = appuntamento.referente
     if not referente is None:
-        tel = appuntamento.referente.telefono
-        cell = appuntamento.referente.cellulare
-        email = appuntamento.referente.email
+        tel_ref = appuntamento.referente.telefono
+        cell_ref = appuntamento.referente.cellulare
+        email_ref = appuntamento.referente.email
     if not appuntamento.cliente.indirizzo is None:
         indirizzo = appuntamento.cliente.indirizzo
     nota = appuntamento.nota
-    msg = "\t- " + data.strftime("%d/%m/%Y") + ": \n"
-    msg += "\t cliente: " + str(cliente)
+    g_fisso = appuntamento.gestore_fisso
+    g_mob = appuntamento.gestore_mob
+    tel_cliente = cliente.telefono
+    cell_cliente = cliente.cellulare
+    blindato = cliente.blindato
+    fax_cliente = cliente.fax
+    email_cliente = cliente.email
+    num_sim = appuntamento.num_sim
+    msg = "\t- " + data.strftime("%d/%m/%Y") + ":"
+    msg += "\n\tcliente: " + str(cliente)
+    if blindato:
+        msg += " [blindato]"
+    if tel_cliente:
+        msg += "\n\ttelefono cliente: " + str(tel_cliente)
+    else:
+        msg += "\n\ttelefono cliente: "
+    if cell_cliente:
+        msg += "\n\tcellulare cliente: " + str(cell_cliente)
+    else:
+        msg += "\n\tcellulare cliente: "
+    if email_cliente:
+        msg += "\n\temail cliente: " + str(email_cliente)
+    else:
+        msg += "\n\temail cliente: "
+    if fax_cliente:
+        msg += "\n\tfax cliente: " + str(fax_cliente)
+    else:
+        msg += "\n\tfax cliente: "
     if indirizzo:
-        msg += "\t indirizzo: " + str(indirizzo)
+        msg += "\n\tindirizzo: " + str(indirizzo)
     else: 
-        msg += "\t indirizzo: "
+        msg += "\n\tindirizzo: "
     if referente:
-        msg += "\t referente: " + str(referente)
+        msg += "\n\treferente: " + str(referente)
     else:
-        msg += "\t referente: "
-    if tel:
-        msg += "\t telefono: " + str(tel)
+        msg += "\n\treferente: "
+    if tel_ref:
+        msg += "\n\ttelefono referente: " + str(tel_ref)
     else:
-        msg += "\t telefono: "
-    if cell:
-        msg += "\t cellulare: " + str(cell)
+        msg += "\n\ttelefono referente: "
+    if cell_ref:
+        msg += "\n\tcellulare referente: " + str(cell_ref)
     else:
-        msg += "\t cellulare: "
-    if email:
-        msg += "\t email: " + str(email)
+        msg += "\n\tcellulare referente: "
+    if email_ref:
+        msg += "\n\temail referente: " + str(email_ref)
     else:
-        msg += "\t email: "
+        msg += "\n\temail referente: "
+    if g_fisso:
+        msg += "\n\tgestore fisso: " + str(g_fisso)
+    else:
+        msg += "\n\tgestore fisso: "
+    if g_mob:
+        msg += "\n\tgestore mobile: " + str(g_mob)
+    else:
+        msg += "\n\tgestore mobile: "
+    if num_sim:
+        msg += "\n\tnumero di sim: " + str(num_sim)
+    else:
+        msg += "\n\tnumero di sim: "
     if nota:
-        msg += "\t nota: " + str(nota)
+        msg += "\n\tnota: " + str(nota)
     else:
-        msg += "\t nota: "
+        msg += "\n\tnota: "
     return msg
 
 @login_required
