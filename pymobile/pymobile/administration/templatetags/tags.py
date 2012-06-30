@@ -146,7 +146,6 @@ def get_pdf(contratto):
     else:
         return ""
 
-<<<<<<< HEAD
 @register.filter(name="get_cliente_app")
 def get_cliente_app(cliente):
     if cliente:
@@ -161,8 +160,6 @@ def get_referente(referente):
     else:
         return ""
 
-=======
 @register.filter(name="get_formset")
 def get_formset(formsets, k):
     return formsets[int(k)]
->>>>>>> master

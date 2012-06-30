@@ -34,12 +34,12 @@ def login_user(request):
         if user is not None:
             if user.is_active:
                 auth.login(request, user)
-                
                 logger.debug("{}: autenticato".format(user))
                 messages.add_message(request, messages.SUCCESS, 'Benvenuto {}'.format(user))
                 # Redirect to a success page.
                 # FIXME: usare "next_page"?!
-                url = reverse("home")    
+                url = reverse("home")
+                print(url)
                 return HttpResponseRedirect(url)
             else:
                 logger.debug("{}: ha tentato a autenticarsi [account non più attivo]".format(user))

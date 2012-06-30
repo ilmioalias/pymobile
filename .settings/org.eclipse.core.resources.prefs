@@ -1,11 +1,11 @@
-#Sat Jun 30 22:21:37 CEST 2012
+#Sat Jun 30 22:58:29 CEST 2012
 =\=\=\=\=\=\=
 <<<<<<<=HEAD
 >>>>>>>=master
 eclipse.preferences.version=1
 encoding//pymobile/pymobile/administration/admin.py=utf-8
-encoding//pymobile/pymobile/administration/forms.py=UTF-8
-encoding//pymobile/pymobile/administration/models.py=UTF-8
+encoding//pymobile/pymobile/administration/forms.py=utf-8
+encoding//pymobile/pymobile/administration/models.py=utf-8
 encoding//pymobile/pymobile/administration/tables.py=utf-8
 encoding//pymobile/pymobile/administration/templatetags/tags.py=utf-8
 encoding//pymobile/pymobile/administration/utils.py=utf-8
