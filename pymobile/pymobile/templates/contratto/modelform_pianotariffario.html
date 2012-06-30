@@ -67,11 +67,11 @@
 											<td>{{ pt_field.label_tag }}</td>
 											<td>
 												{{ pt_field }}
-											    {% if pt_field|isfk %}
+											    <!-- {% if pt_field|isfk %}
 											    	<a id="add_{{ pt_field.auto_id }}" class="add_subform" href="{% url add_contratto_fk "tariffa" %}">
 											    		<img src="{{ STATIC_URL }}/img/add.png" />
 										    		</a>
-									    		{% endif %}													
+									    		{% endif %} -->													
 											</td>
 										</tr>
 										{% if pt_field.help_text %}

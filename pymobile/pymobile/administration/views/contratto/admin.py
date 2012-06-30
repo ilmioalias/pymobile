@@ -246,7 +246,7 @@ def add_object_pt(request):
     else:
         gestore = request.session["contratto"]["post"]["gestore"]
         pt_formset = PianoTariffarioFormset(instance=models.Contratto(), 
-                                            gestore=gestore,)                
+                                            gestore=gestore,)               
 #        dati_formset = DatoPianoTariffarioFormset(instance=models.PianoTariffario(),) 
      
     data = {"action": action, "ptmodelformset": pt_formset,}# "datoptmodelformset": dati_formset}                
@@ -316,6 +316,7 @@ def add_object_dati(request):
                     valid = True
                 else:
                     valid = False
+            print(valid)
             if valid:
                 new_obj = form.save()
                 pt_formset.save()
@@ -330,7 +331,7 @@ def add_object_dati(request):
                     return HttpResponseRedirect(reverse("init_contratto"))
             else:
                 # FIXME: sistemare il caso di errori
-                pass
+                messages.add_message(request, messages.ERROR, 'Errore nell\'inserimento dati')
 #                dati_formsets = [(request.session["pianotariffario"]["info"][i], formsets) 
 #                                 for i in xrange(len(formsets))]    
     
@@ -442,14 +443,14 @@ def mod_object_pt(request, object_id):
 @login_required
 #@user_passes_test(lambda user: not u.is_telefonista(user),)
 @user_passes_test(lambda user: u.get_group(user) != "telefonista")
-def mod_object_dati(request):  
+def mod_object_dati(request, object_id):  
     if not request.session["contratto"]:
         return HttpResponseRedirect(reverse("add_contratto_info"))
     if not request.session["pianotariffario"]:
         return HttpResponseRedirect(reverse("add_contratto_info"))
     
     template = "contratto/modelform_informazioni.html"
-    action = "add"
+    action = "mod"
     
     DatoPianoTariffarioFormset = inlineformset_factory(models.PianoTariffario, 
                                                        models.DatoPianoTariffario, 
@@ -461,6 +462,7 @@ def mod_object_dati(request):
 #    dati_formsets = [(request.session["pianotariffario"]["info"][k],
 #                      DatoPianoTariffarioFormset(instance=models.PianoTariffario(), prefix=str(k),),)
 #                     for k in request.session["pianotariffario"]["info"].iterkeys()]
+    print(request.session["pianotariffario"])
     for k in request.session["pianotariffario"]["info"].iterkeys():
         formset = DatoPianoTariffarioFormset(instance=models.PianoTariffario(),
                                              prefix=str(k),)
@@ -516,9 +518,7 @@ def mod_object_dati(request):
             else:
                 # FIXME: sistemare il caso di errori
                 pass
-#                dati_formsets = [(request.session["pianotariffario"]["info"][i], formsets) 
-#                                 for i in xrange(len(formsets))]    
-    
+            
     data = {"action": action, 
             "pianotariffario": request.session["pianotariffario"]["info"],
             "dati_formsets": dati_formsets,}                

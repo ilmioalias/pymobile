@@ -63,6 +63,11 @@ def get_pt(contratto):
     pt = models.PianoTariffario.objects.filter(contratto=contratto)
     return pt
 
+@register.filter(name="get_pt_dati")
+def get_pt_dati(piano_tariffario):
+    dati = models.DatoPianoTariffario.objects.filter(piano_tariffario=piano_tariffario)
+    return dati
+
 @register.filter(name="get_pt_tariffa")
 def get_pt_tariffa(pk):
     tariffa = models.Tariffa.objects.get(pianotariffario=pk)

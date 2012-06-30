@@ -270,11 +270,11 @@ class ContrattoTable(tables.Table):
     cliente = tables.LinkColumn("view_cliente", args=[A("cliente.pk")],)
     agente = tables.LinkColumn("view_dipendente", args=[A("agente.pk")])
     piano_tariffario = tables.TemplateColumn(TMP_PT, orderable=False, verbose_name="Piano tariffario")
-    completo = BooleanColumn()
-    inviato = BooleanColumn()
-    caricato = BooleanColumn()
-    rifiutato = BooleanColumn()
-    attivato = BooleanColumn()
+#    completo = BooleanColumn()
+#    inviato = BooleanColumn()
+#    caricato = BooleanColumn()
+#    rifiutato = BooleanColumn()
+#    attivato = BooleanColumn()
     selection = tables.CheckBoxColumn(accessor=A('pk'),
                                       attrs=tables.Attrs({"class": "selection"}), 
                                       orderable=False,)

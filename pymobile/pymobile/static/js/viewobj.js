@@ -39,6 +39,7 @@ $(document).ready(function(){
 		e.preventDefault();
 		sendMail($(this));
 	});
+	$("#tabs").tabs();
 	// $(".modifyobj").click(function(e){
 		// e.preventDefault();
 		// modifyObj($(this));

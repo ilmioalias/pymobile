@@ -238,7 +238,7 @@ def assign_object(request):
                 send_mail(subject, 
                           msg,
                           from_email,
-                          [to_email,], 
+                          [to_email,],
                           fail_silently=False,)              
                 
                 logger.debug("{}: assegnati gli appuntamenti {} e inviata mail all'agente {}"

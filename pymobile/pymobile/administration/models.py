@@ -475,62 +475,62 @@ class Contratto(models.Model):
                                         verbose_name="Data di rescissione",
                                         null=True)
     pdf_contratto = models.FileField(upload_to="contratti/%Y/%m/", blank=True, null=True)
-    completo = models.BooleanField(default=False, 
-                                   help_text="contratto completato")
-    data_completato = models.DateField(blank=True, 
-                                           verbose_name="data completamento",
-                                           editable=False, null=True)
-    inviato = models.BooleanField(default=False, 
-                                  help_text="contratto inviato")
-    data_inviato = models.DateField(blank=True, 
-                                    verbose_name="data di invio",
-                                    editable=False, null=True)
-    caricato = models.BooleanField(default=False, 
-                                   help_text="contratto caricato")
-    data_caricato = models.DateField(blank=True, 
-                                     verbose_name="data del caricamento",
-                                     editable=False, null=True)
-    rifiutato = models.BooleanField(default=False, 
-                                   help_text="contratto rifiutato")
-    data_rifiutato = models.DateField(blank=True, 
-                                      verbose_name="data del rifiuto",
-                                      editable=False, null=True)
-    attivato = models.BooleanField(default=False, 
-                                   help_text="contratto attivato")
-    data_attivato = models.DateField(blank=True, 
-                                     verbose_name="data dell'attivazione",
-                                     editable=False, null=True)
+#    completo = models.BooleanField(default=False, 
+#                                   help_text="contratto completato")
+#    data_completato = models.DateField(blank=True, 
+#                                           verbose_name="data completamento",
+#                                           editable=False, null=True)
+#    inviato = models.BooleanField(default=False, 
+#                                  help_text="contratto inviato")
+#    data_inviato = models.DateField(blank=True, 
+#                                    verbose_name="data di invio",
+#                                    editable=False, null=True)
+#    caricato = models.BooleanField(default=False, 
+#                                   help_text="contratto caricato")
+#    data_caricato = models.DateField(blank=True, 
+#                                     verbose_name="data del caricamento",
+#                                     editable=False, null=True)
+#    rifiutato = models.BooleanField(default=False, 
+#                                   help_text="contratto rifiutato")
+#    data_rifiutato = models.DateField(blank=True, 
+#                                      verbose_name="data del rifiuto",
+#                                      editable=False, null=True)
+#    attivato = models.BooleanField(default=False, 
+#                                   help_text="contratto attivato")
+#    data_attivato = models.DateField(blank=True, 
+#                                     verbose_name="data dell'attivazione",
+#                                     editable=False, null=True)
     nota = models.TextField(blank=True)
     creazione = models.DateTimeField(auto_now_add=True)
     modifica = models.DateTimeField(auto_now=True)         
     
-    def clean(self): 
-        if not self.completo and self.data_completato:
-            self.data_completato = None
-        elif self.completo and not self.data_completato:
-            self.data_completato = datetime.datetime.now()
-        
-        if not self.inviato and self.data_inviato:
-            self.data_inviato = None
-        elif self.inviato and not self.data_inviato:
-            self.data_inviato = datetime.datetime.now()
-        
-        if not self.caricato and self.data_caricato:
-            self.data_caricato = None
-        elif self.caricato and not self.data_caricato:
-            self.data_caricato = datetime.datetime.now()
-        
-        if not self.rifiutato and self.data_rifiutato:
-            self.data_rifiutato = None
-        elif self.rifiutato and not self.data_rifiutato:
-            self.data_rifiutato = datetime.datetime.now()
-        
-        if not self.attivato and self.data_attivato:
-            self.data_attivato = None
-        elif self.attivato and not self.data_attivato:
-            self.data_attivato = datetime.datetime.now()      
-        
-        models.Model.clean(self)   
+#    def clean(self): 
+#        if not self.completo and self.data_completato:
+#            self.data_completato = None
+#        elif self.completo and not self.data_completato:
+#            self.data_completato = datetime.datetime.now()
+#        
+#        if not self.inviato and self.data_inviato:
+#            self.data_inviato = None
+#        elif self.inviato and not self.data_inviato:
+#            self.data_inviato = datetime.datetime.now()
+#        
+#        if not self.caricato and self.data_caricato:
+#            self.data_caricato = None
+#        elif self.caricato and not self.data_caricato:
+#            self.data_caricato = datetime.datetime.now()
+#        
+#        if not self.rifiutato and self.data_rifiutato:
+#            self.data_rifiutato = None
+#        elif self.rifiutato and not self.data_rifiutato:
+#            self.data_rifiutato = datetime.datetime.now()
+#        
+#        if not self.attivato and self.data_attivato:
+#            self.data_attivato = None
+#        elif self.attivato and not self.data_attivato:
+#            self.data_attivato = datetime.datetime.now()      
+#        
+#        models.Model.clean(self)   
     
     def __unicode__(self):
         return "{} - {}".format(self.cliente, self.data_stipula)
@@ -560,8 +560,62 @@ class DatoPianoTariffario(models.Model):
     aom = models.CharField(max_length=45, 
                            help_text="nome dell'operatore di portabilità", 
                            blank=True)
-    seriale = models.CharField(max_length=128, verbose_name="n. seriale SIM")
+    seriale = models.CharField(max_length=128, verbose_name="n. seriale SIM", 
+                               blank=True)
     label_pack = models.CharField(max_length=128, blank=True)
+    completo = models.BooleanField(default=False, 
+                                   help_text="contratto completato")
+    data_completato = models.DateField(blank=True, 
+                                           verbose_name="data completamento",
+                                           editable=False, null=True)
+    inviato = models.BooleanField(default=False, 
+                                  help_text="contratto inviato")
+    data_inviato = models.DateField(blank=True, 
+                                    verbose_name="data di invio",
+                                    editable=False, null=True)
+    caricato = models.BooleanField(default=False, 
+                                   help_text="contratto caricato")
+    data_caricato = models.DateField(blank=True, 
+                                     verbose_name="data del caricamento",
+                                     editable=False, null=True)
+    rifiutato = models.BooleanField(default=False, 
+                                   help_text="contratto rifiutato")
+    data_rifiutato = models.DateField(blank=True, 
+                                      verbose_name="data del rifiuto",
+                                      editable=False, null=True)
+    attivato = models.BooleanField(default=False, 
+                                   help_text="contratto attivato")
+    data_attivato = models.DateField(blank=True, 
+                                     verbose_name="data dell'attivazione",
+                                     editable=False, null=True)
+    def clean(self): 
+        if not self.completo and self.data_completato:
+            self.data_completato = None
+        elif self.completo and not self.data_completato:
+            self.data_completato = datetime.datetime.now()
+        
+        if not self.inviato and self.data_inviato:
+            self.data_inviato = None
+        elif self.inviato and not self.data_inviato:
+            self.data_inviato = datetime.datetime.now()
+        
+        if not self.caricato and self.data_caricato:
+            self.data_caricato = None
+        elif self.caricato and not self.data_caricato:
+            self.data_caricato = datetime.datetime.now()
+        
+        if not self.rifiutato and self.data_rifiutato:
+            self.data_rifiutato = None
+        elif self.rifiutato and not self.data_rifiutato:
+            self.data_rifiutato = datetime.datetime.now()
+        
+        if not self.attivato and self.data_attivato:
+            self.data_attivato = None
+        elif self.attivato and not self.data_attivato:
+            self.data_attivato = datetime.datetime.now()      
+        
+        models.Model.clean(self)   
+
     
     def __unicode__(self):
         return "{}: {}".format(self.piano_tariffario, self.telefono)
