@@ -1,6 +1,11 @@
 $(document).ready(function(){
 	// $(".modelform tbody.field select#id_gestore").val("tim");
+<<<<<<< HEAD
 	$(".modelform tbody.field select#id_gestore").each(function(){
+=======
+	console.log($(".modelform tbody #id_gestore"));
+	$(".modelform #id_gestore").each(function(){
+>>>>>>> master
 		j_obj = $(this);
 		// lowercase necessario perché il nome del gestore è inserito maiuscolo
 		var value = j_obj.attr("value").toLowerCase();
@@ -8,7 +13,7 @@ $(document).ready(function(){
 		form.find(".hidden").closest(".modelform tbody.field").hide();
 		form.find("."+value).closest(".modelform tbody.field").fadeIn("slow");					
 	});
-	$(".modelform tbody.field").on("change", "select#id_gestore", function(e){
+	$(".modelform").on("change", "#id_gestore", function(e){
 		j_obj = $(this);
 		// lowercase necessario perché il nome del gestore è inserito maiuscolo
 		var value = j_obj.attr("value").toLowerCase();

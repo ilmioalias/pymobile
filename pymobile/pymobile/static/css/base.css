@@ -146,6 +146,37 @@ table#filter_modeltable table td {
 	border-style: hidden;
 }
 
+div#filter_reporttable_div {
+    width: 100%;
+}
+
+fieldset.filter_reporttable_fieldset td {
+    font-size: 90%;
+    font-family:"Arial";
+}
+
+
+table#filter_reporttable {
+    border-width: 1px;
+    border-spacing: 2px;
+    border-style: hidden;
+    border-color: white;
+    border-collapse: collapse;
+    background-color: white;    
+}
+
+table#filter_reporttable td {
+    border-width: 1px;
+    padding: 1px;
+    border-style: solid;
+    border-color: gray;
+    background-color: white;
+}
+
+table#filter_reporttable table td {
+    border-style: hidden;
+}
+
 /* CONTENT */
 #content {
 	float: left;

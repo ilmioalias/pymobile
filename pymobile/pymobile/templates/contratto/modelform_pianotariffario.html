@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block extrahead %}
+<title>PYMOBILE | Contratti</title>
+{{ ptmodelformset.media }} 
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Contratti | {% if action == "add" %}Aggiungi{% else %}Modifica{% endif %} Contratto</h2>
+{% endblock %}
+
+{% block content %}
+{% load tags %}
+<div class="navigation">
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../../">home</a> &gt;
+		<a href="{% url init_contratto %}">amministrazione contratti</a> &gt;
+		{% if action == "add" %}
+		<a href=".">aggiungi contratto: piano tariffario (pagina 2)</a>
+		{% endif %}
+		{% if action == "mod" %}
+		<a href="{% url view_contratto contratto.pk %}">{{ contratto }}</a> &gt;
+		<a href=".">modifica contratto: piano tariffario (pagina 2)</a>
+		{% endif %} 
+	</fieldset>
+</div>
+<div class="modelform_div">
+	<form class="modelform" action="." method="POST" enctype="multipart/form-data"> 
+		<div class="modelform_fieldset_div">
+			<fieldset class="modelform_fieldset">
+			<legend><b>Dati Contratto: Piano Tariffario (pagina 2)</b></legend>					
+				{% csrf_token %}
+				{{ ptmodelformset.management_form }}						
+<!-- 				{{ datoptmodelformset.management_form }} -->
+				<table>
+					{% if ptmodelformset.non_form_errors %}
+	  				<tbody>
+						<tr class="field_error">
+							<td colspan="2">{{ ptmodelformset.non_form_errors|first }}</td>
+						</tr>
+					</tbody>
+					{% endif %}
+					<tbody class="field pianotariffario">
+			  			{% for pt_form in ptmodelformset.forms %}
+			  			<tr>
+			  				<td>
+		  					{% for hidden_field in pt_form.hidden_fields %}
+							{{ hidden_field }}
+							{% endfor %}
+				  				 <table> 
+					  				{% if pt_form.non_field_errors %}
+					  				<tbody>
+										<tr class="field_error">
+											<td colspan="2">{{ pt_form.non_field_errors|first }}</td>
+										</tr>
+									</tbody>					
+									{% endif %}
+						  			{% for pt_field in pt_form.visible_fields %}
+									<tbody class="field">
+										{% if pt_field.errors %}
+										<tr class="field_error">
+											<td></td><td>{{ pt_field.errors|first }}</td>
+										</tr>
+										{% endif %}
+										<tr class="{% if pt_field.errors %}field_error{% endif %}" >
+											<td>{{ pt_field.label_tag }}</td>
+											<td>
+												{{ pt_field }}
+											    <!-- {% if pt_field|isfk %}
+											    	<a id="add_{{ pt_field.auto_id }}" class="add_subform" href="{% url add_contratto_fk "tariffa" %}">
+											    		<img src="{{ STATIC_URL }}/img/add.png" />
+										    		</a>
+									    		{% endif %} -->													
+											</td>
+										</tr>
+										{% if pt_field.help_text %}
+										<tr class="field_help">
+											<td></td><td>{{ pt_field.help_text }}</td>
+										</tr>
+										{% endif %}
+									</tbody>
+							  		{% endfor %}
+							  	</table>
+						  	</td>
+			  			</tr>
+	  					{% endfor %}
+		  				<tr><td><button class="add_tariffa" value="add">aggiungi</button></td></tr>
+		  				<!-- inseriamo un form vuoto usato per aggiungere dinamicamente un altro form --> 
+		  				<tr class="empty_form" style="display: none">
+		  					<td>
+				  				{% for hidden_field in ptmodelformset.empty_form.hidden_fields %}
+								{{ hidden_field }}
+								{% endfor %}				
+					  			<table>
+						  			{% for pt_field in ptmodelformset.empty_form.visible_fields %}
+									<tbody class="field">
+										{% if pt_field.errors %}
+										<tr class="field_error">
+											<td></td><td>{{ pt_field.errors|first }}</td>
+										</tr>
+										{% endif %}
+										<tr class="{% if pt_field.errors %}field_error{% endif %}" >
+											<td>{{ pt_field.label_tag }}</td>
+											<td>
+												{{ pt_field }}
+											    {% if pt_field|isfk %}
+											    	<a id="add_{{ pt_field.auto_id }}" class="add_subform" href="{% url add_contratto_fk "tariffa" %}">
+											    		<img src="{{ STATIC_URL }}/img/add.png" />
+										    		</a>
+									    		{% endif %}												
+											</td>
+										</tr>
+										{% if pt_field.help_text %}
+										<tr class="field_help">
+											<td></td><td>{{ pt_field.help_text }}</td>
+										</tr>
+										{% endif %}
+									</tbody>
+							  		{% endfor %}
+							  	</table>
+						  	</td>
+		  				</tr>
+	  				</tbody>
+				</table>
+			</fieldset>
+		</div>
+		<div class="submitrow">
+			<input type="submit" class="modelform_save" value="avanti" />
+			<button class="cancel">annulla</button>
+		</div>
+	 </form>
+</div>
+{% endblock %}

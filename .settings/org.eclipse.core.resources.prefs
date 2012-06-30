@@ -1,8 +1,11 @@
-#Thu May 31 15:53:13 CEST 2012
+#Sat Jun 30 22:21:37 CEST 2012
+=\=\=\=\=\=\=
+<<<<<<<=HEAD
+>>>>>>>=master
 eclipse.preferences.version=1
 encoding//pymobile/pymobile/administration/admin.py=utf-8
-encoding//pymobile/pymobile/administration/forms.py=utf-8
-encoding//pymobile/pymobile/administration/models.py=utf-8
+encoding//pymobile/pymobile/administration/forms.py=UTF-8
+encoding//pymobile/pymobile/administration/models.py=UTF-8
 encoding//pymobile/pymobile/administration/tables.py=utf-8
 encoding//pymobile/pymobile/administration/templatetags/tags.py=utf-8
 encoding//pymobile/pymobile/administration/utils.py=utf-8
@@ -20,3 +23,4 @@ encoding//pymobile/pymobile/administration/views/reports/rankings.py=utf-8
 encoding//pymobile/pymobile/administration/views/tariffa/admin.py=utf-8
 encoding//pymobile/pymobile/middleware/session.py=utf-8
 encoding//pymobile/pymobile/settings.py=utf-8
+encoding//pymobile/pymobile/static/css/base.css=UTF-8

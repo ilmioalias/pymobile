@@ -34,6 +34,7 @@ pip-log.txt
 # project directories to ignore
 media/
 logs/*
+fixtures/*
 !.gitignore
 
 # django

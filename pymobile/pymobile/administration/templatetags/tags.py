@@ -63,6 +63,11 @@ def get_pt(contratto):
     pt = models.PianoTariffario.objects.filter(contratto=contratto)
     return pt
 
+@register.filter(name="get_pt_dati")
+def get_pt_dati(piano_tariffario):
+    dati = models.DatoPianoTariffario.objects.filter(piano_tariffario=piano_tariffario)
+    return dati
+
 @register.filter(name="get_pt_tariffa")
 def get_pt_tariffa(pk):
     tariffa = models.Tariffa.objects.get(pianotariffario=pk)
@@ -141,6 +146,7 @@ def get_pdf(contratto):
     else:
         return ""
 
+<<<<<<< HEAD
 @register.filter(name="get_cliente_app")
 def get_cliente_app(cliente):
     if cliente:
@@ -155,3 +161,8 @@ def get_referente(referente):
     else:
         return ""
 
+=======
+@register.filter(name="get_formset")
+def get_formset(formsets, k):
+    return formsets[int(k)]
+>>>>>>> master

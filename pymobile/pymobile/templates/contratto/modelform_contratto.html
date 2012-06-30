@@ -1,0 +1,90 @@
+{% extends "base.html" %}      
+
+{% block extrahead %}
+<title>PYMOBILE | Contratti</title>
+{{ modelform.media }} 
+{% endblock %}
+
+{% block header %} 
+<h2>Amministrazione Contratti | {% if action == "add" %}Aggiungi{% else %}Modifica{% endif %} Contratto</h2>
+{% endblock %}
+
+{% block content %}
+{% load tags %}
+<div class="navigation">
+	<fieldset>
+	<legend>Sei qui</legend>
+		<a href="../../">home</a> &gt;
+		<a href="{% url init_contratto %}">amministrazione contratti</a> &gt;
+		{% if action == "add" %}
+		<a href=".">aggiungi contratto: informazioni (pagina 1)</a>
+		{% endif %}
+		{% if action == "mod" %}
+		<a href="{% url view_contratto contratto.pk %}">{{ contratto }}</a> &gt;
+		<a href=".">modifica contratto: informazioni (pagina 1)</a>
+		{% endif %} 
+	</fieldset>
+</div>
+<div class="modelform_div">
+	<form class="modelform" action="." method="POST" enctype="multipart/form-data">
+		<div class="modelform_fieldset_div">
+			<fieldset class="modelform_fieldset">
+			<legend><b>Dati Contratto: Informazioni (pagina 1)</b></legend>					
+				{% csrf_token %}
+				{{ modelformset.management_form }}
+				{% for hidden_field in modelform.hidden_fields %}
+				   {{ hidden_field }}
+				{% endfor %}						
+				<table>	
+					{% if modelform.non_field_errors %}
+					<tbody>
+						<tr class="field_error">
+							<td colspan="2">{{ modelform.non_field_errors|first }}</td>
+						</tr>					
+					</tbody>
+					{% endif %}					
+					{% for field in modelform.visible_fields %}
+					<tbody class="field">
+						{% if field.errors %}
+						<tr class="field_error">
+							<td></td><td>{{ field.errors|first }}</td>
+						</tr>
+						{% endif %}
+						<tr class="{% if field.errors %}field_error{% endif %}" >
+							<td>{{ field.label_tag }}</td>
+							<td>
+								{% if field.label == "Gestore" and action == "mod" %}
+								<b>Non è possibile modificare il gestore</b>
+								<select id="id_gestore" name="gestore">
+									<option selected="selected" value="{{ modelform.gestore.value }}">{{ modelform.gestore.value }}</option>
+								</select>
+								{% else %}
+								{{ field }}
+								{% endif %}
+								{% if field|isdate %}
+								<input type="button" class="dateclear" value="svuota" />
+					    		{% endif %}
+							    {% if field|isfk %}
+						    	<a id="add_{{ field.auto_id }}" class="add_subform" href="{% url add_contratto_fk field.html_name %}">
+						    		<img src="{{ STATIC_URL }}/img/add.png" />
+					    		</a>
+					    		{% endif %}
+							</td>
+						</tr>
+						{% if field.help_text %}
+							<tr class="field_help">
+								<td></td><td>{{ field.help_text }}</td>
+							</tr>
+						{% endif %}
+					</tbody>
+					{% endfor %}				
+				</table>
+			</fieldset>
+		</div>
+		<div class="submitrow">
+			<input type="submit" class="modelform_save" value="avanti" />
+			<button class="cancel">annulla</button>
+		</div>
+	</form>
+</div>
+{% endblock %}

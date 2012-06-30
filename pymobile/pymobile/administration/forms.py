@@ -814,16 +814,31 @@ class ReferenteForm(forms.ModelForm):
     class Meta:
         model = models.Referente
 
-class PianoTariffarioForm(forms.ModelForm): 
-
+class PianoTariffarioForm(forms.ModelForm):     
+    def __init__(self, *args, **kwargs):
+        gestore = kwargs.pop("gestore", None)
+        forms.ModelForm.__init__(self, *args, **kwargs)
+        self.fields["tariffa"].queryset = models.Tariffa.objects.filter(gestore=gestore)
+    
     class Media:
-        js = ("js/modelform.js",)
+        js = ("js/modelform.js", "js/modelform_contratto.js",)
     
     class Meta:
         model = models.PianoTariffario
         widgets = {"tariffa": forms.Select(attrs={"class": "fk"})}
 
 class PianoTariffarioInlineFormset(forms.models.BaseInlineFormSet):   
+    def __init__(self, *args, **kwargs):
+        # hack per fare in modo che sia possibile pssare il parametro "gestore"
+        self.gestore = kwargs.pop("gestore", None)
+        forms.models.BaseInlineFormSet.__init__(self, *args, **kwargs)
+            
+    def _construct_forms(self):
+        # funzione che costruisce i form
+        self.forms = []
+        for i in xrange(self.total_form_count()):
+            self.forms.append(self._construct_form(i, gestore=self.gestore))
+
     def clean(self):
         # ci serve questo hack per fare in modo che almeno un piano tariffario,
         # all'inserimento del contratto, sia inserito
@@ -837,13 +852,21 @@ class PianoTariffarioInlineFormset(forms.models.BaseInlineFormSet):
         if count < 1:
             raise forms.ValidationError("è necessario aggiungere almeno un piano tariffario "\
                                         "per ogni contratto inserito")
+
+class DatoPianoTariffarioForm(forms.ModelForm):
+
+    class Media:
+        js = ("js/modelform.js",)
+        
+    class Meta:
+        model = models.DatoPianoTariffario
         
 class ContrattoForm(forms.ModelForm):
     appuntamento = forms.ModelChoiceField(queryset=models.Appuntamento.objects.filter(contratto__isnull=True),
                                           required=False)
     
     class Media:
-        js = ("js/modelform.js", "js/modelform_contratto.js",)
+        js = ("js/modelform.js",)
     
     def clean(self):
         cdata = self.cleaned_data
@@ -1102,7 +1125,10 @@ class CanvasFilterForm(forms.Form):
     periodo = forms.ChoiceField(choices=CHOICHES, initial="")
     agente = forms.ModelMultipleChoiceField(queryset=models.Dipendente.objects.filter(ruolo="agt"),
                                             label="Selezione Agenti")
-
+    
+    class Media:
+        js = ("js/filterform.js",)
+    
 class InOutFilterForm(forms.Form):
     CHOICHES=(("", ""), ("yesterday", "ieri"), ("today", "oggi"), ("month", "mese"), 
               ("quarter", "quarto"), ("year", "anno"), ("manual", "ricerca manuale"))
@@ -1115,7 +1141,10 @@ class InOutFilterForm(forms.Form):
     gestore = forms.ModelMultipleChoiceField(queryset=models.Gestore.objects.all(),
                                              label="Selezione Gestori")
 
-class DetailsForm(forms.Form):
+    class Media:
+        js = ("js/filterform.js",)
+
+class DetailsFilterForm(forms.Form):
     CHOICHES=(("", ""), ("yesterday", "ieri"), ("today", "oggi"), ("month", "mese"), 
               ("quarter", "quarto"), ("year", "anno"), ("manual", "ricerca manuale"))
     
@@ -1124,6 +1153,9 @@ class DetailsForm(forms.Form):
                                             label="Selezione Dipendente")
 #    gestore = forms.ModelMultipleChoiceField(queryset=models.Gestore.objects.all(),
 #                                             label="Selezione Gestori")
+    
+    class Media:
+        js = ("js/filterform.js",)
 
 class ObiettivoForm(forms.ModelForm):
     anno_inizio = forms.ChoiceField(choices=[("", "")], 

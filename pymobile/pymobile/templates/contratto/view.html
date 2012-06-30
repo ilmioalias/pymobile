@@ -4,7 +4,11 @@
 
 {% block extrahead %}
 <title>PYMOBILE | Contratto</title>
-<script type="text/javascript" src="{{ STATIC_URL }}/js/viewobj.js"></script>
+<!-- <script type="text/javascript" >
+	$(function() {
+		$("#tabs").tabs();
+	});
+</script> --><script type="text/javascript" src="{{ STATIC_URL }}/js/viewobj.js"></script>
 {% endblock %}
 
 {% block header %} 
@@ -26,7 +30,7 @@
 		{% if object.pdf_contratto %}
 		<a href="{% url get_pdf object.id %}">ottieni copia contratto</a> |
 		{% endif %}
-		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_contratto object.id %}">modifica</a> |
+<!-- 		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_contratto_info object.id %}">modifica</a> | -->
 		<a id="del_{{ object.id }}" class="deleteobj" href="{% url del_contratto %}?id={{ object.id }}">elimina</a>
 	</fieldset>
 </div><!-- 
@@ -38,7 +42,81 @@
 	</ul>
 </div> -->
 <div class="div_detail">
-	<fieldset>
+	<div id="tabs">
+		<ul>
+			<li><a href="#tabs-1">Dati Contratto</a></li>
+			<li><a href="#tabs-2">Piano Tariffario</a></li>
+			<li><a href="#tabs-3">Dati Aggiuntivi</a></li>
+		</ul>
+		<div id="tabs-1">
+			<fieldset>
+				<table class="table_detail">
+					<tr><td>Data stipula</td><td>{{ object.data_stipula }}</td></tr>
+					<tr><td>Data scadenza</td><td>{{ object.data_scadenza }}</td></tr>
+					<tr><td>Data rescissione</td><td>{% if object.data_rescissione %}{{ object.data_rescissione }}{% endif %}</td></tr>
+					<tr><td>Cliente</td><td><a href="{% url view_cliente object.cliente.pk %}">{{ object.cliente }}</a></td></tr>
+					<tr><td>Agente</td><td><a href="{% url view_dipendente object.agente.pk %}">{{ object.agente }}</a></td></tr>
+					<tr>
+						<td>Appuntamento</td>
+						<td>{% if object.appuntamento %}
+							<a href="{% url view_appuntamento object.appuntamento.pk %}">
+								{{ object.appuntamento }}</a>
+							{% endif %}
+						</td>
+					</tr>
+					{% if object.pdf_contratto %}
+					<tr><td colspan="2">Copia del contratto caricata sul Server</td></tr>
+					{% else %}
+					<tr><td colspan="2">Copia del contratto non ancora caricata sul Server</td></tr>
+					{% endif %}
+					{% if object.nota %}
+					<tr><td>Nota</td><td>{{ object.nota }}</td></tr>
+					{% endif %}
+				</table>
+			</fieldset>			
+		</div>
+		<div id="tabs-2">
+			<fieldset>
+				<table class="table_detail">
+					{% for pt in object|get_pt%}
+					<tr><td>Tariffa</td><td><a href="{% url view_tariffa pt|get_pt_tariffa_pk %}">{{ pt|get_pt_tariffa }}</a></td></tr>
+					<tr><td>Quantità</td><td>{{ pt.num }}</td></tr>
+					<tr><td>Opzione</td><td>{% if pt.opzione %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" />{% endif %}</td></tr>
+					{% endfor %}
+				</table>
+			</fieldset>			
+		</div>
+		<div id="tabs-3">
+			<fieldset>
+				<table class="table_detail">
+					{% for pt in object|get_pt%}
+						<tr><td>Tariffa</td><td><a href="{% url view_tariffa pt|get_pt_tariffa_pk %}">{{ pt|get_pt_tariffa }}</a></td></tr>
+						<tr><td>Quantità</td><td>{{ pt.num }}</td></tr>
+						<tr><td>Opzione</td><td>{% if pt.opzione %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" />{% endif %}</td></tr>
+						<tr>
+							<td colspan="2">
+								<table>
+								{% for dato in pt|get_pt_dati %}
+								<tr><td>Numero Telefonico</td><td>{{ dato.telefono }}</td></tr>
+								<tr><td>AOM</td><td>{{ dato.aom }}</td></tr>
+								<tr><td>Seriale</td><td>{{ dato.seriale }}</td></tr>
+								<tr><td>Label Pack</td><td>{{ dato.label_pack }}</td></tr>
+								<tr><td>Completato</td><td>{% if dato.completo %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" /> [{{ dato.data_completato }}]{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
+								<tr><td>Inviato</td><td>{% if dato.inviato %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" /> [{{ dato.data_inviato }}]{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
+								<tr><td>Caricato</td><td>{% if dato.caricato %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" /> [{{ dato.data_caricato }}]{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
+								<tr><td>Rifiutato</td><td>{% if dato.rifiutato %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" /> [{{ dato.data_rifiutato }}]{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
+								<tr><td>Attivato</td><td>{% if dato.attivato %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" /> [{{ dato.data_attivato }}]{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
+								<tr><td colspan="2"><hr /></td></tr>
+								{% endfor %}
+								</table>
+							</td>
+						</tr>
+					{% endfor %}
+				</table>
+			</fieldset>
+		</div>
+	</div>
+<!-- 	<fieldset>
 	<legend>Dati Contratto</legend>
 		<table class="table_detail">stipula
 			<tr><td>Data stipula</td><td>{{ object.data_stipula }}</td></tr>
@@ -82,11 +160,6 @@
 			<tr><td>Nota</td><td>{{ object.nota }}</td></tr>
 			{% endif %}
 		</table>
-	</fieldset>
-<!-- 	<div class="op_detail">
-		<ul id="op_list">
-			<li><a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_contratto object.id %}">Modifica</a></li>
-			<li><a id="del_{{ object.id }}" class="deleteobj" href="{% url del_contratto %}?id={{ object.id }}">Cancella</a></li>
-		</ul>
-	</div> --></div>
+	</fieldset> -->
+</div>
 {% endblock %}

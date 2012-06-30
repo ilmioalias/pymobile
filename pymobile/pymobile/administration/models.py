@@ -293,7 +293,7 @@ class Tariffa(models.Model):
     sac = models.DecimalField(max_digits=5, decimal_places=2, default=0, 
                               help_text="provvigione 'una tantum' erogata per il "\
                               "contratto stipulato",
-                              verbose_name="provvigione per contratto/S.A.C.") 
+                              verbose_name="provvigione per contratto/S.A.C.")
     creazione = models.DateTimeField(auto_now_add=True)
     modifica = models.DateTimeField(auto_now=True) 
     
@@ -303,8 +303,7 @@ class Tariffa(models.Model):
         queries = [Q(gestore=self.gestore),
                    Q(profilo=self.profilo),
                    Q(attivo=self.attivo)]
-        
-#        if not self.pk:
+                
         if str(self.gestore) == "edison":
             if self.tipo is None:
                 queries.append(Q(tipo__isnull=True))
@@ -314,8 +313,12 @@ class Tariffa(models.Model):
                 queries.append(Q(fascia__isnull=True))
             else:
                 queries.append(Q(fascia=self.fascia)) 
-            if Tariffa.objects.filter(reduce(operator.and_, queries)).exists():
-                raise ValidationError("La tariffa è già presente nel DATABASE")
+            if not self.pk:
+                if Tariffa.objects.filter(reduce(operator.and_, queries)).exists():
+                    raise ValidationError("La tariffa è già presente nel DATABASE")
+            else:
+                if Tariffa.objects.filter(reduce(operator.and_, queries)).exclude(pk=self.pk).exists():
+                    raise ValidationError("La tariffa è già presente nel DATABASE")
         elif str(self.gestore) == "tim":
             if self.tipo is None:
                 queries.append(Q(tipo__isnull=True))
@@ -329,8 +332,12 @@ class Tariffa(models.Model):
                 queries.append(Q(servizio__isnull=True))
             else:
                 queries.append(Q(servizio=self.servizio))    
-            if Tariffa.objects.filter(reduce(operator.and_, queries)):
-                raise ValidationError("La tariffa è già presente nel DATABASE")
+            if not self.pk:
+                if Tariffa.objects.filter(reduce(operator.and_, queries)).exists():
+                    raise ValidationError("La tariffa è già presente nel DATABASE")
+            else:
+                if Tariffa.objects.filter(reduce(operator.and_, queries)).exclude(pk=self.pk).exists():
+                    raise ValidationError("La tariffa è già presente nel DATABASE")
         elif str(self.gestore) == "telecom":
             if self.tipo is None:
                 queries.append(Q(tipo__isnull=True))
@@ -344,8 +351,12 @@ class Tariffa(models.Model):
                 queries.append(Q(servizio__isnull=True))
             else:
                 queries.append(Q(servizio=self.servizio))            
-            if Tariffa.objects.filter(reduce(operator.and_, queries)).exists():
-                raise ValidationError("La tariffa è già presente nel DATABASE")                        
+            if not self.pk:
+                if Tariffa.objects.filter(reduce(operator.and_, queries)).exists():
+                    raise ValidationError("La tariffa è già presente nel DATABASE")
+            else:
+                if Tariffa.objects.filter(reduce(operator.and_, queries)).exclude(pk=self.pk).exists():
+                    raise ValidationError("La tariffa è già presente nel DATABASE")
         
         models.Model.clean(self)
     
@@ -443,6 +454,7 @@ class Contratto(models.Model):
     agente = models.ForeignKey(Dipendente, 
                                help_text="agente che ha stipulato il contratto",
                                limit_choices_to={"ruolo": "agt",})
+    gestore = models.ForeignKey(Gestore)
     piano_tariffario = models.ManyToManyField(Tariffa, 
                                               through="PianoTariffario",
                                               verbose_name="Piano tariffario",
@@ -462,6 +474,94 @@ class Contratto(models.Model):
                                         verbose_name="Data di rescissione",
                                         null=True)
     pdf_contratto = models.FileField(upload_to="contratti/%Y/%m/", blank=True, null=True)
+#    completo = models.BooleanField(default=False, 
+#                                   help_text="contratto completato")
+#    data_completato = models.DateField(blank=True, 
+#                                           verbose_name="data completamento",
+#                                           editable=False, null=True)
+#    inviato = models.BooleanField(default=False, 
+#                                  help_text="contratto inviato")
+#    data_inviato = models.DateField(blank=True, 
+#                                    verbose_name="data di invio",
+#                                    editable=False, null=True)
+#    caricato = models.BooleanField(default=False, 
+#                                   help_text="contratto caricato")
+#    data_caricato = models.DateField(blank=True, 
+#                                     verbose_name="data del caricamento",
+#                                     editable=False, null=True)
+#    rifiutato = models.BooleanField(default=False, 
+#                                   help_text="contratto rifiutato")
+#    data_rifiutato = models.DateField(blank=True, 
+#                                      verbose_name="data del rifiuto",
+#                                      editable=False, null=True)
+#    attivato = models.BooleanField(default=False, 
+#                                   help_text="contratto attivato")
+#    data_attivato = models.DateField(blank=True, 
+#                                     verbose_name="data dell'attivazione",
+#                                     editable=False, null=True)
+    nota = models.TextField(blank=True)
+    creazione = models.DateTimeField(auto_now_add=True)
+    modifica = models.DateTimeField(auto_now=True)         
+    
+#    def clean(self): 
+#        if not self.completo and self.data_completato:
+#            self.data_completato = None
+#        elif self.completo and not self.data_completato:
+#            self.data_completato = datetime.datetime.now()
+#        
+#        if not self.inviato and self.data_inviato:
+#            self.data_inviato = None
+#        elif self.inviato and not self.data_inviato:
+#            self.data_inviato = datetime.datetime.now()
+#        
+#        if not self.caricato and self.data_caricato:
+#            self.data_caricato = None
+#        elif self.caricato and not self.data_caricato:
+#            self.data_caricato = datetime.datetime.now()
+#        
+#        if not self.rifiutato and self.data_rifiutato:
+#            self.data_rifiutato = None
+#        elif self.rifiutato and not self.data_rifiutato:
+#            self.data_rifiutato = datetime.datetime.now()
+#        
+#        if not self.attivato and self.data_attivato:
+#            self.data_attivato = None
+#        elif self.attivato and not self.data_attivato:
+#            self.data_attivato = datetime.datetime.now()      
+#        
+#        models.Model.clean(self)   
+    
+    def __unicode__(self):
+        return "{} - {}".format(self.cliente, self.data_stipula)
+       
+    class Meta:
+        verbose_name_plural = "Contratti"
+        ordering=["-data_stipula", "-data_scadenza"]
+            
+class PianoTariffario(models.Model):
+    contratto = models.ForeignKey(Contratto)
+    tariffa = models.ForeignKey(Tariffa,
+                                help_text="gestore,profilo,tipo,fascia,servizio")
+    num = models.PositiveIntegerField(verbose_name="quantità")
+    opzione = models.BooleanField(blank=True, help_text="la tariffa è un opzione")
+
+    def __unicode__(self):
+        return "{}: {}".format(self.contratto, self.tariffa)
+    
+    class Meta:
+        verbose_name_plural = "Piani Tariffari"
+
+class DatoPianoTariffario(models.Model):
+    piano_tariffario = models.ForeignKey(PianoTariffario)
+    telefono = models.CharField(max_length=45, 
+                                blank=True, 
+                                verbose_name="numero telefonico") 
+    aom = models.CharField(max_length=45, 
+                           help_text="nome dell'operatore di portabilità", 
+                           blank=True)
+    seriale = models.CharField(max_length=128, verbose_name="n. seriale SIM", 
+                               blank=True)
+    label_pack = models.CharField(max_length=128, blank=True)
     completo = models.BooleanField(default=False, 
                                    help_text="contratto completato")
     data_completato = models.DateField(blank=True, 
@@ -487,10 +587,6 @@ class Contratto(models.Model):
     data_attivato = models.DateField(blank=True, 
                                      verbose_name="data dell'attivazione",
                                      editable=False, null=True)
-    nota = models.TextField(blank=True)
-    creazione = models.DateTimeField(auto_now_add=True)
-    modifica = models.DateTimeField(auto_now=True)         
-    
     def clean(self): 
         if not self.completo and self.data_completato:
             self.data_completato = None
@@ -518,26 +614,13 @@ class Contratto(models.Model):
             self.data_attivato = datetime.datetime.now()      
         
         models.Model.clean(self)   
+
     
     def __unicode__(self):
-        return "{} - {}".format(self.cliente, self.data_stipula)
-       
-    class Meta:
-        verbose_name_plural = "Contratti"
-        ordering=["-data_stipula", "-data_scadenza"]
-            
-class PianoTariffario(models.Model):
-    contratto = models.ForeignKey(Contratto)
-    tariffa = models.ForeignKey(Tariffa,
-                                help_text="gestore,profilo,tipo,fascia,servizio")
-    num = models.PositiveIntegerField(verbose_name="quantità")
-    opzione = models.BooleanField(blank=True, help_text="la tariffa è un opzione")
-    
-    def __unicode__(self):
-        return "{}: {}".format(self.contratto, self.tariffa)
+        return "{}: {}".format(self.piano_tariffario, self.telefono)
     
     class Meta:
-        verbose_name_plural = "Piani Tariffari"
+        verbose_name_plural = "Dati Identificativi"    
 
 class Obiettivo(models.Model):
     denominazione = models.CharField(max_length=45,
