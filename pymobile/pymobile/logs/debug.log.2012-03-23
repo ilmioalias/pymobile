@@ -1,4 +1,0 @@
-2012-03-23 12:51:38,957 - salva: ha intenzione di eliminare gli account ['marina'] [admin.py > del_object > line: 200]
-2012-03-23 12:56:22,601 - salva: ha intenzione di eliminare i contratti [('capriotti valeria - 2012-03-12', 'id=1'), ('A.V. Costruzioni di Valacchi Andrea e C. Sas - 2012-03-01', 'id=2')] [admin.py > del_object > line: 181]
-2012-03-23 12:56:22,931 - salva: ha intenzione di eliminare i contratti [('capriotti valeria - 2012-03-12', 'id=1'), ('A.V. Costruzioni di Valacchi Andrea e C. Sas - 2012-03-01', 'id=2')] [admin.py > del_object > line: 181]
-2012-03-23 12:57:01,508 - salva: ha intenzione di eliminare i contratti [('capriotti valeria - 2012-03-12', 'id=1'), ('A.V. Costruzioni di Valacchi Andrea e C. Sas - 2012-03-01', 'id=2')] [admin.py > del_object > line: 181]
