@@ -4,11 +4,7 @@
 
 {% block extrahead %}
 <title>PYMOBILE | Contratto</title>
-<!-- <script type="text/javascript" >
-	$(function() {
-		$("#tabs").tabs();
-	});
-</script> --><script type="text/javascript" src="{{ STATIC_URL }}/js/viewobj.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/viewobj.js"></script>
 {% endblock %}
 
 {% block header %} 
@@ -30,7 +26,9 @@
 		{% if object.pdf_contratto %}
 		<a href="{% url get_pdf object.id %}">ottieni copia contratto</a> |
 		{% endif %}
-<!-- 		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_contratto_info object.id %}">modifica</a> | -->
+		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_contratto_info object.id %}">modifica informazioni</a> |
+		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_contratto_pt object.id %}">modifica pianotarriffario</a> |
+		<a id="mod_{{ object.id }}" class="modifyobj" href="{% url mod_contratto_dati object.id %}">modifica dati identificativi</a> |
 		<a id="del_{{ object.id }}" class="deleteobj" href="{% url del_contratto %}?id={{ object.id }}">elimina</a>
 	</fieldset>
 </div><!-- 

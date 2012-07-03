@@ -21,7 +21,7 @@
 		{% endif %}
 		{% if action == "mod" %}
 		<a href="{% url view_contratto contratto.pk %}">{{ contratto }}</a> &gt;
-		<a href=".">modifica contratto: piano tariffario (pagina 2)</a>
+		<a href=".">modifica contratto: piano tariffario</a>
 		{% endif %} 
 	</fieldset>
 </div>
@@ -29,10 +29,9 @@
 	<form class="modelform" action="." method="POST" enctype="multipart/form-data"> 
 		<div class="modelform_fieldset_div">
 			<fieldset class="modelform_fieldset">
-			<legend><b>Dati Contratto: Piano Tariffario (pagina 2)</b></legend>					
+			<legend><b>Dati Contratto: Piano Tariffario {% if action == "add" %}(pagina 2){% endif %}</b></legend>					
 				{% csrf_token %}
 				{{ ptmodelformset.management_form }}						
-<!-- 				{{ datoptmodelformset.management_form }} -->
 				<table>
 					{% if ptmodelformset.non_form_errors %}
 	  				<tbody>
@@ -126,7 +125,12 @@
 			</fieldset>
 		</div>
 		<div class="submitrow">
+			{% if action == "mod" %}
+			<input type="submit" class="modelform_save" value="salva" />
+			{% endif %}
+			{% if action == "add" %}
 			<input type="submit" class="modelform_save" value="avanti" />
+			{% endif %}
 			<button class="cancel">annulla</button>
 		</div>
 	 </form>

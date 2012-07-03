@@ -816,6 +816,7 @@ class ReferenteForm(forms.ModelForm):
 
 class PianoTariffarioForm(forms.ModelForm):     
     def __init__(self, *args, **kwargs):
+        print(args, kwargs)
         gestore = kwargs.pop("gestore", None)
         forms.ModelForm.__init__(self, *args, **kwargs)
         self.fields["tariffa"].queryset = models.Tariffa.objects.filter(gestore=gestore)
@@ -838,7 +839,10 @@ class PianoTariffarioInlineFormset(forms.models.BaseInlineFormSet):
         self.forms = []
         for i in xrange(self.total_form_count()):
             self.forms.append(self._construct_form(i, gestore=self.gestore))
-
+    
+#    def _construct_form(self, *args, **kwargs):
+#        forms.models.BaseInlineFormSet._construct_form(self, *args, **kwargs)
+    
     def clean(self):
         # ci serve questo hack per fare in modo che almeno un piano tariffario,
         # all'inserimento del contratto, sia inserito
@@ -856,7 +860,7 @@ class PianoTariffarioInlineFormset(forms.models.BaseInlineFormSet):
 class DatoPianoTariffarioForm(forms.ModelForm):
 
     class Media:
-        js = ("js/modelform.js",)
+        js = ("js/modelform.js", "js/modelform_contratto.js",)
         
     class Meta:
         model = models.DatoPianoTariffario

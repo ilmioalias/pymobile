@@ -22,7 +22,7 @@
 		{% endif %}
 		{% if action == "mod" %}
 		<a href="{% url view_contratto contratto.pk %}">{{ contratto }}</a> &gt;
-		<a href=".">modifica contratto: dati identificativi (pagina 3)</a>
+		<a href=".">modifica contratto: dati identificativi</a>
 		{% endif %} 
 	</fieldset>
 </div>
@@ -30,7 +30,7 @@
 	<form class="modelform" action="." method="POST" enctype="multipart/form-data">
 		<div class="modelform_fieldset_div">
 			<fieldset class="modelform_fieldset">
-			<legend><b>Dati Contratto: Dati Identificativi (pagina 3)</b></legend>					
+			<legend><b>Dati Contratto: Dati Identificativi {% if action == "add" %}(pagina 3){% endif %}</b></legend>					
 				{% csrf_token %}
 				{% for info, formset in dati_formsets %}
 				<table>
@@ -45,6 +45,46 @@
 							<td>Quantit&agrave;: {{ info.num }}</td>
 							<td>Opzione: {% if info.opzione == 1 %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" />{% endif %}</td>
 						</tr>
+					</tbody>
+					<tbody class="field pianotariffario">
+			  			{% for form in formset.forms %}
+			  			<tr>
+			  				<td>
+		  					{% for hidden_field in form.hidden_fields %}
+							{{ hidden_field }}
+							{% endfor %}
+				  				 <table> 
+					  				{% if form.non_field_errors %}
+					  				<tbody>
+										<tr class="field_error">
+											<td colspan="2">{{ form.non_field_errors|first }}</td>
+										</tr>
+									</tbody>					
+									{% endif %}
+						  			{% for field in form.visible_fields %}
+									<tbody class="field">
+										{% if field.errors %}
+										<tr class="field_error">
+											<td></td><td>{{ field.errors|first }}</td>
+										</tr>
+										{% endif %}
+										<tr class="{% if pt_field.errors %}field_error{% endif %}" >
+											<td>{{ field.label_tag }}</td>
+											<td>
+												{{ field }}													
+											</td>
+										</tr>
+										{% if field.help_text %}
+										<tr class="field_help">
+											<td></td><td>{{ field.help_text }}</td>
+										</tr>
+										{% endif %}
+									</tbody>
+							  		{% endfor %}
+							  	</table>
+						  	</td>
+			  			</tr>
+	  					{% endfor %}
 					</tbody>
 			  		<tbody>
 			  			<tr>
