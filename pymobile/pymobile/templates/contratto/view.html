@@ -99,11 +99,12 @@
 								<tr><td>AOM</td><td>{{ dato.aom }}</td></tr>
 								<tr><td>Seriale</td><td>{{ dato.seriale }}</td></tr>
 								<tr><td>Label Pack</td><td>{{ dato.label_pack }}</td></tr>
-								<tr><td>Completato</td><td>{% if dato.completo %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" /> [{{ dato.data_completato }}]{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
+								<tr><td>Completo</td><td>{% if dato.completo %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" /> [{{ dato.data_completo }}]{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
 								<tr><td>Inviato</td><td>{% if dato.inviato %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" /> [{{ dato.data_inviato }}]{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
 								<tr><td>Caricato</td><td>{% if dato.caricato %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" /> [{{ dato.data_caricato }}]{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
 								<tr><td>Rifiutato</td><td>{% if dato.rifiutato %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" /> [{{ dato.data_rifiutato }}]{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
 								<tr><td>Attivato</td><td>{% if dato.attivato %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" /> [{{ dato.data_attivato }}]{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
+								<tr><td>Pagato</td><td>{% if dato.pagato %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" /> [{{ dato.data_pagato }}]{% else %}<img src="{{ STATIC_URL }}/img/checkbox_false.png" />{% endif %}</td></tr>
 								<tr><td colspan="2"><hr /></td></tr>
 								{% endfor %}
 								</table>

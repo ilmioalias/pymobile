@@ -2,7 +2,7 @@
 
 {% block extrahead %}
 <title>PYMOBILE | Contratti</title>
-<script type="text/javascript" src="{{ STATIC_URL }}/js/modelform_contratto.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}/js/modelform_contratto_dati.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}/js/modelform.js"></script>
 {% endblock %}
 
@@ -33,27 +33,33 @@
 			<legend><b>Dati Contratto: Dati Identificativi {% if action == "add" %}(pagina 3){% endif %}</b></legend>					
 				{% csrf_token %}
 				{% for info, formset in dati_formsets %}
-				<table>
-					<tbody class="formset_info">
+				<table class="formset_table">	
+					<tbody>
+						<tr>
+							<tdcolspan="3">
+								Tariffa: {{ info.tariffa }} <br />
+								Quantit&agrave;: {{ info.num }} <br />
+								Opzione: {% if info.opzione == 1 %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" />{% endif %}
+							</td>
+						</tr>
+					</tbody>
+					<tbody class="formset_management">
 						<tr>
 							<td colspan="3">{{ formset.management_form }}</td>
 						</tr>
-					</tbody>	
-					<tbody>
-						<tr>
-							<td>Tariffa: {{ info.tariffa }}</td>
-							<td>Quantit&agrave;: {{ info.num }}</td>
-							<td>Opzione: {% if info.opzione == 1 %}<img src="{{ STATIC_URL }}/img/checkbox_true.png" />{% endif %}</td>
-						</tr>
 					</tbody>
-					<tbody class="field pianotariffario">
+					<tbody class="forms">
 			  			{% for form in formset.forms %}
 			  			<tr>
 			  				<td>
-		  					{% for hidden_field in form.hidden_fields %}
-							{{ hidden_field }}
-							{% endfor %}
-				  				 <table> 
+				  				 <table class="form_table">
+				  				 	<tbody>
+					  				 	{% for hidden_field in form.hidden_fields %}
+						  				<tr>
+											<td colspan="3">{{ hidden_field }}</td>
+										</tr>
+										{% endfor %}
+									</tbody>				
 					  				{% if form.non_field_errors %}
 					  				<tbody>
 										<tr class="field_error">
@@ -95,38 +101,48 @@
     						</td>
 						</tr>
 					</tbody>
-					<tbody class="empty_datopianotariffario" style="display: none">
-		  				{% for hidden_field in formset.empty_form.hidden_fields %}
-		  				<tr>
-							<td colspan="3">{{ hidden_field }}</td>
-						</tr>
-						{% endfor %}				
-			  			{% for pt_field in formset.empty_form.visible_fields %}
-						{% if pt_field.errors %}
-						<tr class="field_error">
-							<td></td><td>{{ pt_field.errors|first }}</td>
-						</tr>
-						{% endif %}
-						<tr class="{% if pt_field.errors %}field_error{% endif %}" >
-							<td>{{ pt_field.label_tag }}</td>
+					<tbody>
+						<tr>
 							<td>
-								{{ pt_field }}
-							    {% if pt_field|isfk %}
-							    	<a id="add_{{ pt_field.auto_id }}" class="add_subform" href="{% url add_contratto_fk "tariffa" %}">
-							    		<img src="{{ STATIC_URL }}/img/add.png" />
-						    		</a>
-					    		{% endif %}												
-							</td>
-							<td>
+								<table class="empty_form" style="display: none">
+							  		<tbody>
+					  				 	{% for hidden_field in formset.empty_form.hidden_fields %}
+						  				<tr>
+											<td colspan="3">{{ hidden_field }}</td>
+										</tr>
+										{% endfor %}
+									</tbody>				
+					  				{% if formset.empty_form.non_field_errors %}
+					  				<tbody>
+										<tr class="field_error">
+											<td colspan="2">{{ formset.empty_form.non_field_errors|first }}</td>
+										</tr>
+									</tbody>					
+									{% endif %}
+						  			{% for field in formset.empty_form.visible_fields %}
+									<tbody class="field">
+										{% if field.errors %}
+										<tr class="field_error">
+											<td></td><td>{{ field.errors|first }}</td>
+										</tr>
+										{% endif %}
+										<tr class="{% if pt_field.errors %}field_error{% endif %}" >
+											<td>{{ field.label_tag }}</td>
+											<td>
+												{{ field }}													
+											</td>
+										</tr>
+										{% if field.help_text %}
+										<tr class="field_help">
+											<td></td><td>{{ field.help_text }}</td>
+										</tr>
+										{% endif %}
+									</tbody>
+							  		{% endfor %}
+							  	</table>
 							</td>
 						</tr>
-						{% if pt_field.help_text %}
-						<tr class="field_help">
-							<td></td><td>{{ pt_field.help_text }}</td><td></td>
-						</tr>
-						{% endif %}
-				  		{% endfor %}
-			  		</tbody>				
+					</tbody>
 				</table>
 				{% endfor %}
 			</fieldset>

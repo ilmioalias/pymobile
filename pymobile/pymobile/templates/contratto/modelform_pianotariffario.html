@@ -102,12 +102,12 @@
 										<tr class="{% if pt_field.errors %}field_error{% endif %}" >
 											<td>{{ pt_field.label_tag }}</td>
 											<td>
-												{{ pt_field }}
+												{{ pt_field }}<!-- 
 											    {% if pt_field|isfk %}
 											    	<a id="add_{{ pt_field.auto_id }}" class="add_subform" href="{% url add_contratto_fk "tariffa" %}">
 											    		<img src="{{ STATIC_URL }}/img/add.png" />
 										    		</a>
-									    		{% endif %}												
+									    		{% endif %} -->												
 											</td>
 										</tr>
 										{% if pt_field.help_text %}
@@ -129,7 +129,8 @@
 			<input type="submit" class="modelform_save" value="salva" />
 			{% endif %}
 			{% if action == "add" %}
-			<input type="submit" class="modelform_save" value="avanti" />
+			<input type="submit" class="modelform_save" value="salva" />
+			<input type="button" class="modelform_save_and_add" value="salva e aggiungi dati identificativi" />
 			{% endif %}
 			<button class="cancel">annulla</button>
 		</div>

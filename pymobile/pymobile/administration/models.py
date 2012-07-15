@@ -564,7 +564,7 @@ class DatoPianoTariffario(models.Model):
     label_pack = models.CharField(max_length=128, blank=True)
     completo = models.BooleanField(default=False, 
                                    help_text="contratto completato")
-    data_completato = models.DateField(blank=True, 
+    data_completo = models.DateField(blank=True, 
                                            verbose_name="data completamento",
                                            editable=False, null=True)
     inviato = models.BooleanField(default=False, 
@@ -587,11 +587,16 @@ class DatoPianoTariffario(models.Model):
     data_attivato = models.DateField(blank=True, 
                                      verbose_name="data dell'attivazione",
                                      editable=False, null=True)
+    pagato = models.BooleanField(default=False, 
+                                   help_text="contratto attivato")
+    data_pagato = models.DateField(blank=True, 
+                                     verbose_name="data dell'attivazione",
+                                     editable=False, null=True)
     def clean(self): 
-        if not self.completo and self.data_completato:
-            self.data_completato = None
-        elif self.completo and not self.data_completato:
-            self.data_completato = datetime.datetime.now()
+        if not self.completo and self.data_completo:
+            self.data_completo = None
+        elif self.completo and not self.data_completo:
+            self.data_completo = datetime.datetime.now()
         
         if not self.inviato and self.data_inviato:
             self.data_inviato = None
@@ -613,6 +618,10 @@ class DatoPianoTariffario(models.Model):
         elif self.attivato and not self.data_attivato:
             self.data_attivato = datetime.datetime.now()      
         
+        if not self.attivato and self.data_attivato:
+            self.data_attivato = None
+        elif self.attivato and not self.data_attivato:
+            self.data_attivato = datetime.datetime.now() 
         models.Model.clean(self)   
 
     

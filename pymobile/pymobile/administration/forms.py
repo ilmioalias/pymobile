@@ -816,13 +816,12 @@ class ReferenteForm(forms.ModelForm):
 
 class PianoTariffarioForm(forms.ModelForm):     
     def __init__(self, *args, **kwargs):
-        print(args, kwargs)
         gestore = kwargs.pop("gestore", None)
         forms.ModelForm.__init__(self, *args, **kwargs)
         self.fields["tariffa"].queryset = models.Tariffa.objects.filter(gestore=gestore)
     
     class Media:
-        js = ("js/modelform.js", "js/modelform_contratto.js",)
+        js = ("js/modelform.js", "js/modelform_contratto_pt.js",)
     
     class Meta:
         model = models.PianoTariffario
@@ -860,7 +859,7 @@ class PianoTariffarioInlineFormset(forms.models.BaseInlineFormSet):
 class DatoPianoTariffarioForm(forms.ModelForm):
 
     class Media:
-        js = ("js/modelform.js", "js/modelform_contratto.js",)
+        js = ("js/modelform.js", "js/modelform_contratto_dati.js",)
         
     class Meta:
         model = models.DatoPianoTariffario

@@ -112,38 +112,29 @@ def init(request):
 def add_object_info(request):  
     template = "contratto/modelform_info.html"
     action = "add"
-#    PianoTariffarioFormset = inlineformset_factory(models.Contratto, 
-#                                                   models.PianoTariffario, 
-#                                                   forms.PianoTariffarioForm,
-#                                                   formset = forms.PianoTariffarioInlineFormset,
-#                                                   can_delete=False,
-#                                                   extra=1,)
         
     if request.method == "POST":
         form = forms.ContrattoForm(request.POST, request.FILES)
         
         if form.is_valid():
-            request.session["contratto"] = {"post": {}, "files": {}}
-            for k, v in request.POST.iteritems():
-                request.session["contratto"]["post"][k] = v
-            for k, v in request.FILES.iteritems():
-                request.session["contratto"]["files"][k] = v
+#            request.session["contratto"] = {"post": {}, "files": {}}
+#            for k, v in request.POST.iteritems():
+#                request.session["contratto"]["post"][k] = v
+#            for k, v in request.FILES.iteritems():
+#                request.session["contratto"]["files"][k] = v
             
-#            contratto = form.save(commit=False)
-#            formset = PianoTariffarioFormset(post_query, instance=contratto)
-#            
-#            if formset.is_valid():
+            new_obj = form.save()
                 
-                
-#                logger.debug("{}: aggiunto il contratto {} [id={}]"
-#                             .format(request.user, new_obj, new_obj.id))
-#                messages.add_message(request, messages.SUCCESS, 'Contratto aggiunto')
-            return HttpResponseRedirect(reverse("add_contratto_pt"))
-#        else:
-#            formset = PianoTariffarioFormset(post_query)
+            logger.debug("{}: aggiunto informazioni per il contratto {} [id={}]"\
+                         .format(request.user, new_obj, new_obj.id))
+            messages.add_message(request, messages.SUCCESS, 'Informazioni contratto aggiunte')
+            if request.POST.has_key("add_another"):
+                return HttpResponseRedirect(reverse("add_contratto_pt",
+                                                    args=[new_obj.id,]))
+            else:
+                return HttpResponseRedirect(reverse("init_contratto"))
     else:
         form = forms.ContrattoForm()
-#        formset = PianoTariffarioFormset(instance=models.Contratto())                
     
     data = {"modelform": form, "action": action,}                
     return render_to_response(template, 
@@ -153,12 +144,15 @@ def add_object_info(request):
 @login_required
 #@user_passes_test(lambda user: not u.is_telefonista(user),)
 @user_passes_test(lambda user: u.get_group(user) != "telefonista")
-def add_object_pt(request):  
-    if not request.session["contratto"]:
-        return HttpResponseRedirect(reverse("add_contratto_info"))
+def add_object_pt(request, object_id):  
+#    if not request.session["contratto"]:
+#        return HttpResponseRedirect(reverse("add_contratto_info"))
     
     template = "contratto/modelform_pianotariffario.html"
     action = "add"
+    
+    obj = get_object_or_404(models.Contratto, pk=object_id)
+    gestore = obj.gestore
     PianoTariffarioFormset = inlineformset_factory(models.Contratto, 
                                                    models.PianoTariffario, 
                                                    forms.PianoTariffarioForm,
@@ -168,42 +162,52 @@ def add_object_pt(request):
         
     if request.method == "POST":
         post_query = request.POST.copy()
-        session = request.session
-        
-        form = forms.ContrattoForm(session["contratto"]["post"], 
-                                   session["contratto"]["files"])
-        contratto = form.save(commit=False)
-        gestore = request.session["contratto"]["post"]["gestore"]
+#        session = request.session
+
+#        form = forms.ContrattoForm(session["contratto"]["post"], 
+#                                   session["contratto"]["files"])
+#        contratto = form.save(commit=False)
+#        gestore = request.session["contratto"]["post"]["gestore"]
         pt_formset = PianoTariffarioFormset(post_query, 
-                                            instance=contratto,
+                                            instance=obj,
                                             gestore=gestore,)
         if pt_formset.is_valid():
             # memorizziamo i valori del POST che poi utlizzeremo per salvare i dati del
             # piano tariffario nel database; inoltre memorizziamo anche le informazioni
             # per le varie tariffe scelte.
-            request.session["pianotariffario"] = {"post": {},"info": {}}
-            for k, v in request.POST.iteritems():
-                request.session["pianotariffario"]["post"][k] = v
-            num_forms = int(request.POST["pianotariffario_set-TOTAL_FORMS"])
-            for i in xrange(num_forms):
-                tariffa = request.POST["pianotariffario_set-" + str(i) + "-tariffa"]
-                if not tariffa:
-                    break
-                num = request.POST["pianotariffario_set-" + str(i) + "-num"]
-                if request.POST.has_key("pianotariffario_set-" + str(i) + "-opzione"):
-                    opzione = 1
-                else:
-                    opzione = 0
-                request.session["pianotariffario"]["info"][i] = {"tariffa": models.Tariffa.objects.get(pk=tariffa),
-                                                                 "num": num,
-                                                                 "opzione": opzione,}
+#            request.session["pianotariffario"] = {"post": {},"info": {}}
+#            for k, v in request.POST.iteritems():
+#                request.session["pianotariffario"]["post"][k] = v
+#            num_forms = int(request.POST["pianotariffario_set-TOTAL_FORMS"])
+#            for i in xrange(num_forms):
+#                tariffa = request.POST["pianotariffario_set-" + str(i) + "-tariffa"]
+#                if not tariffa:
+#                    break
+#                num = request.POST["pianotariffario_set-" + str(i) + "-num"]
+#                if request.POST.has_key("pianotariffario_set-" + str(i) + "-opzione"):
+#                    opzione = 1
+#                else:
+#                    opzione = 0
+#            request.session["pianotariffario"]["info"][i] = {"tariffa": models.Tariffa.objects.get(pk=tariffa),
+#                                                             "num": num,
+#                                                             "opzione": opzione,}
             
-            return HttpResponseRedirect(reverse("add_contratto_dati"))    
+            pt_formset.save()
+            logger.debug("{}: aggiunto piano tariffario per il contratto {} [id={}]"\
+                         .format(request.user, obj, obj.id))
+            messages.add_message(request, messages.SUCCESS, 'Piano tariffario contratto aggiunto')
+            if request.POST.has_key("add_another"):
+                return HttpResponseRedirect(reverse("add_contratto_dati",
+                                                    args=[obj.id,]))
+            else:
+                return HttpResponseRedirect(reverse("init_contratto"))
+            
+#            return HttpResponseRedirect(reverse("add_contratto_dati"))    
     else:
-        gestore = request.session["contratto"]["post"]["gestore"]
-        pt_formset = PianoTariffarioFormset(instance=models.Contratto(), 
+#        gestore = request.session["contratto"]["post"]["gestore"]
+        pt_formset = PianoTariffarioFormset(instance=obj, 
                                             gestore=gestore,)               
-    data = {"action": action, "ptmodelformset": pt_formset,}# "datoptmodelformset": dati_formset}                
+    data = {"action": action, "ptmodelformset": pt_formset,}                
     return render_to_response(template, 
                               data,
                               context_instance=RequestContext(request))
@@ -211,15 +215,16 @@ def add_object_pt(request):
 @login_required
 #@user_passes_test(lambda user: not u.is_telefonista(user),)
 @user_passes_test(lambda user: u.get_group(user) != "telefonista")
-def add_object_dati(request):  
-    if not request.session["contratto"]:
-        return HttpResponseRedirect(reverse("add_contratto_info"))
-    if not request.session["pianotariffario"]:
-        return HttpResponseRedirect(reverse("add_contratto_info"))
+def add_object_dati(request, object_id):  
+#    if not request.session["contratto"]:
+#        return HttpResponseRedirect(reverse("add_contratto_info"))
+#    if not request.session["pianotariffario"]:
+#        return HttpResponseRedirect(reverse("add_contratto_info"))
     
     template = "contratto/modelform_dati.html"
     action = "add"
     
+    obj = get_object_or_404(models.Contratto, pk=object_id)
     DatoPianoTariffarioFormset = inlineformset_factory(models.PianoTariffario, 
                                                        models.DatoPianoTariffario, 
                                                        forms.DatoPianoTariffarioForm,
@@ -230,66 +235,68 @@ def add_object_dati(request):
 #    dati_formsets = [(request.session["pianotariffario"]["info"][k],
 #                      DatoPianoTariffarioFormset(instance=models.PianoTariffario(), prefix=str(k),),)
 #                     for k in request.session["pianotariffario"]["info"].iterkeys()]
-    for k in request.session["pianotariffario"]["info"].iterkeys():
-        formset = DatoPianoTariffarioFormset(instance=models.PianoTariffario(),
-                                             prefix=str(k),)
-        dati_formsets.append((request.session["pianotariffario"]["info"][k], formset))
-    
+    pts = models.PianoTariffario.objects.filter(contratto=obj)
+#    for pt in request.session["pianotariffario"]["info"].iterkeys():
+#        formset = DatoPianoTariffarioFormset(instance=models.PianoTariffario(),
+#                                             prefix=str(k),)
+#        dati_formsets.append((request.session["pianotariffario"]["info"][k], formset))
+    for pt in pts:
+        i = pt.id
+        formset = DatoPianoTariffarioFormset(instance=pt,
+                                             prefix=str(i),)
+        dati_formsets.append((pt, formset))
 #    print(request.session["pianotariffario"]["info"])
 #    print(dati_formsets)
-    PianoTariffarioFormset = inlineformset_factory(models.Contratto, 
-                                                   models.PianoTariffario, 
-                                                   forms.PianoTariffarioForm,
-                                                   formset = forms.PianoTariffarioInlineFormset,
-                                                   can_delete=False,
-                                                   extra=1,)
+#    PianoTariffarioFormset = inlineformset_factory(models.Contratto, 
+#                                                   models.PianoTariffario, 
+#                                                   forms.PianoTariffarioForm,
+#                                                   formset = forms.PianoTariffarioInlineFormset,
+#                                                   can_delete=False,
+#                                                   extra=1,)
         
     if request.method == "POST":
         post_query = request.POST.copy()
-        session = request.session
-        form = forms.ContrattoForm(session["contratto"]["post"], 
-                                   session["contratto"]["files"])
-        contratto = form.save(commit=False)
-        gestore = request.session["contratto"]["post"]["gestore"]
-        pt_formset = PianoTariffarioFormset(request.session["pianotariffario"]["post"], 
-                                            instance=contratto,
-                                            gestore=gestore,)
+#        session = request.session
+#        form = forms.ContrattoForm(session["contratto"]["post"], 
+#                                   session["contratto"]["files"])
+#        contratto = form.save(commit=False)
+#        gestore = request.session["contratto"]["post"]["gestore"]
+#        pt_formset = PianoTariffarioFormset(request.session["pianotariffario"]["post"], 
+#                                            instance=contratto,
+#                                            gestore=gestore,)
         
-        if pt_formset.is_valid():
-            pts = pt_formset.save(commit=False)
-            i = 0
-            valid = False
-            formsets = []
-            for pt in pts:
-                formset = DatoPianoTariffarioFormset(post_query,
-                                                     instance=pt,
-                                                     prefix=str(i),)
-                i += 1
-                formsets.append(formset)
-                if formset.is_valid():
-                    valid = True
-                else:
-                    valid = False
-            if valid:
-                new_obj = form.save()
-                pt_formset.save()
-                for formset in formsets:
-                    formset.save()
-                logger.debug("{}: aggiunto il contratto {} [id={}]"
-                             .format(request.user, new_obj, new_obj.id))
-                messages.add_message(request, messages.SUCCESS, 'Contratto aggiunto')
-                if request.POST.has_key("add_another"):              
-                    return HttpResponseRedirect(reverse("add_contratto_info")) 
-                else:
-                    return HttpResponseRedirect(reverse("init_contratto"))
+#        if pt_formset.is_valid():
+#            pts = pt_formset.save(commit=False)
+#            valid = False
+        formsets = []
+        for pt in pts:
+            i = pt.id
+            formset = DatoPianoTariffarioFormset(post_query,
+                                                 instance=pt,
+                                                 prefix=str(i),)
+            formsets.append(formset)
+            if formset.is_valid():
+                valid = True
             else:
-                # FIXME: sistemare il caso di errori
-                messages.add_message(request, messages.ERROR, 'Errore nell\'inserimento dati')
-#                dati_formsets = [(request.session["pianotariffario"]["info"][i], formsets) 
-#                                 for i in xrange(len(formsets))]    
+                valid = False
+        if valid:
+#                new_obj = form.save()
+#                pt_formset.save()
+            for formset in formsets:
+                formset.save()
+            logger.debug("{}: aggiunti dati identificativ per il contratto {} [id={}]"
+                         .format(request.user, obj, obj.id))
+            messages.add_message(request, messages.SUCCESS, 'Dati identificativi contratto aggiunti')
+            if request.POST.has_key("add_another"):              
+                return HttpResponseRedirect(reverse("add_contratto_info")) 
+            else:
+                return HttpResponseRedirect(reverse("init_contratto"))
+        else:
+            # FIXME: sistemare il caso di errori
+            messages.add_message(request, messages.ERROR, 'Errore nell\'inserimento dati')
     
     data = {"action": action, 
-            "pianotariffario": request.session["pianotariffario"]["info"],
+            #"pianotariffario": pts,
             "dati_formsets": dati_formsets,}                
     return render_to_response(template, 
                               data,
@@ -359,11 +366,11 @@ def mod_object_pt(request, object_id):
                                                    models.PianoTariffario, 
                                                    forms.PianoTariffarioForm,
                                                    formset = forms.PianoTariffarioInlineFormset,
-                                                   can_delete=False,
+                                                   can_delete=True,
                                                    extra=0,)
     if request.method == "POST":
         post_query = request.POST.copy()
-        session = request.session
+        #session = request.session
         
 #        form = forms.ContrattoForm(post_query,
 #                                   instance=obj)
@@ -433,7 +440,9 @@ def mod_object_dati(request, object_id):
     #print(request.session["pianotariffario"])
     pts = models.PianoTariffario.objects.filter(contratto=obj)
     for pt in pts:
-        formset = DatoPianoTariffarioFormset(instance=pt,)
+        i = pt.id
+        formset = DatoPianoTariffarioFormset(instance=pt,
+                                             prefix=str(i),)
         dati_formsets.append((pt, formset))
 #        dati_formsets.append((request.session["pianotariffario"]["info"][k], formset))
 #    for k in request.session["pianotariffario"]["info"].iterkeys():
@@ -462,13 +471,12 @@ def mod_object_dati(request, object_id):
 #        if pt_formset.is_valid():
 #        pts = pt_formset.save(commit=False)
         pts = models.PianoTariffario.objects.filter(contratto=obj)
-        i = 0
-        valid = False
         formsets = []
         for pt in pts:
+            i = pt.id
             formset = DatoPianoTariffarioFormset(post_query,
-                                                 instance=pt,)
-            i += 1
+                                                 instance=pt,
+                                                 prefix=str(i),)
             formsets.append(formset)
             if formset.is_valid():
                 valid = True
@@ -493,7 +501,6 @@ def mod_object_dati(request, object_id):
             messages.add_message(request, messages.ERROR, 'Errore nell\'inserimento dati')
 #                pass
     
-    print(dati_formsets)        
     data = {"action": action, 
 #            "pianotariffario": request.session["pianotariffario"]["info"],
             "dati_formsets": dati_formsets,
