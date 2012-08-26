@@ -118,6 +118,7 @@ def mod_object(request, object_id):
         post_query = request.POST.copy()
         obj = get_object_or_404(models.Appuntamento, pk=object_id)
         form = forms.AppuntamentoForm(post_query, instance=obj)
+        print(post_query)
     
         if form.is_valid():
             appuntamento = form.save()

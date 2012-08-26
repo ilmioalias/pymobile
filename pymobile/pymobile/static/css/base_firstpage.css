@@ -1,24 +1,16 @@
 @CHARSET "UTF-8";
-#header {
-    padding: 0px;
-    border: 0px;
-    height: 75px;
-    width: auto;
-}
-#header h2 {
+#header h2{
 	text-align:center;
 	width: auto;
-	font-size: 200%;
-	font-family:"Arial Narrow"; 
 }
 
 /* GENERAL */
 body
 {
-    background-image:url('../img/logo75.png');
+    background-image:url('../img/logo250.png');
     background-color:#EBFFEB;
     background-repeat: no-repeat;
-    background-position: right top; 
+    background-position: center top; 
 } 
 
 input, select, button {

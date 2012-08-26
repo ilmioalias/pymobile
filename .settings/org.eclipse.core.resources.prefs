@@ -1,4 +1,4 @@
-#Sat Jun 30 22:58:29 CEST 2012
+#Sun Aug 26 21:57:44 CEST 2012
 =\=\=\=\=\=\=
 <<<<<<<=HEAD
 >>>>>>>=master
@@ -23,4 +23,4 @@ encoding//pymobile/pymobile/administration/views/reports/rankings.py=utf-8
 encoding//pymobile/pymobile/administration/views/tariffa/admin.py=utf-8
 encoding//pymobile/pymobile/middleware/session.py=utf-8
 encoding//pymobile/pymobile/settings.py=utf-8
-encoding//pymobile/pymobile/static/css/base.css=UTF-8
+encoding//pymobile/pymobile/static/css/base_firstpage.css=UTF-8
