@@ -173,81 +173,36 @@ def del_object(request):
                               context_instance=RequestContext(request))
 
 def get_mail_subject(appuntamento):
-    data = appuntamento.data
-    cliente = appuntamento.cliente
-    referente = appuntamento.referente
-    if not referente is None:
-        tel_ref = appuntamento.referente.telefono
-        cell_ref = appuntamento.referente.cellulare
-        email_ref = appuntamento.referente.email
-    if not appuntamento.cliente.indirizzo is None:
-        indirizzo = appuntamento.cliente.indirizzo
-    nota = appuntamento.nota
-    g_fisso = appuntamento.gestore_fisso
-    g_mob = appuntamento.gestore_mob
-    tel_cliente = cliente.telefono
-    cell_cliente = cliente.cellulare
-    blindato = cliente.blindato
-    fax_cliente = cliente.fax
-    email_cliente = cliente.email
-    num_sim = appuntamento.num_sim
-    msg = "\t- " + data.strftime("%d/%m/%Y") + ":"
-    msg += "\n\tcliente: " + str(cliente)
-    if blindato:
-        msg += " [blindato]"
-    if tel_cliente:
-        msg += "\n\ttelefono cliente: " + str(tel_cliente)
-    else:
-        msg += "\n\ttelefono cliente: "
-    if cell_cliente:
-        msg += "\n\tcellulare cliente: " + str(cell_cliente)
-    else:
-        msg += "\n\tcellulare cliente: "
-    if email_cliente:
-        msg += "\n\temail cliente: " + str(email_cliente)
-    else:
-        msg += "\n\temail cliente: "
-    if fax_cliente:
-        msg += "\n\tfax cliente: " + str(fax_cliente)
-    else:
-        msg += "\n\tfax cliente: "
-    if indirizzo:
-        msg += "\n\tindirizzo: " + str(indirizzo)
-    else: 
-        msg += "\n\tindirizzo: "
-    if referente:
-        msg += "\n\treferente: " + str(referente)
-    else:
-        msg += "\n\treferente: "
-    if tel_ref:
-        msg += "\n\ttelefono referente: " + str(tel_ref)
-    else:
-        msg += "\n\ttelefono referente: "
-    if cell_ref:
-        msg += "\n\tcellulare referente: " + str(cell_ref)
-    else:
-        msg += "\n\tcellulare referente: "
-    if email_ref:
-        msg += "\n\temail referente: " + str(email_ref)
-    else:
-        msg += "\n\temail referente: "
-    if g_fisso:
-        msg += "\n\tgestore fisso: " + str(g_fisso)
-    else:
-        msg += "\n\tgestore fisso: "
-    if g_mob:
-        msg += "\n\tgestore mobile: " + str(g_mob)
-    else:
-        msg += "\n\tgestore mobile: "
-    if num_sim:
-        msg += "\n\tnumero di sim: " + str(num_sim)
-    else:
-        msg += "\n\tnumero di sim: "
-    if nota:
-        msg += "\n\tnota: " + str(nota)
-    else:
-        msg += "\n\tnota: "
-    return msg
+    msg = []
+    msg.extend(["--- Appuntamento---"])
+    msg.extend(["\n\tdata e ora: ", appuntamento.data.strftime("%d/%m/%Y"), ":"])
+    if appuntamento.cliente:
+        cliente = appuntamento.cliente
+        msg.extend(["\n--- Cliente ---"])
+        msg.extend(["\n\tcliente: ", str(cliente)])
+        if cliente.blindato:
+            msg.append(" [blindato]")
+        msg.extend(["\n\ttipo: ", str(cliente.tipo)])
+        msg.extend(["\n\ttelefono cliente: ", str(cliente.telefono)])
+        msg.extend(["\n\tcellulare cliente: ", str(cliente.cellulare)])
+        msg.extend(["\n\temail cliente: ", str(cliente.email)])
+        msg.extend(["\n\tfax cliente: ", str(cliente.fax)])
+        msg.extend(["\n\tindirizzo: ", str(cliente.indirizzo)])
+        msg.extend(["\n\tindirizzo: ", str(cliente.residenza)])       
+    if appuntamento.referente:
+        referente = appuntamento.referente
+        msg.extend(["\n--- Referente ---"])
+        msg.extend(["\n\treferente: ", str(referente)])
+        msg.extend(["\n\tqualifica: ", str(referente.qualifica)])
+        msg.extend(["\n\ttelefono referente: ", str(referente.telefono)])
+        msg.extend(["\n\tcellulare referente: ", str(referente.cellulare)])
+        msg.extend(["\n\temail referente: ", str(referente.email)])
+    msg.extend(["\n--- Appuntamento---"])
+    msg.extend(["\n\tgestore fisso: ", str(appuntamento.gestore_fisso)])
+    msg.extend(["\n\tgestore mobile: ", str(appuntamento.gestore_mob)])
+    msg.extend(["\n\tnumero di sim: ", str(appuntamento.num_sim)])
+    msg.extend(["\n\tnota: ", str(appuntamento.nota)])    
+    return ''.join(msg)
 
 @login_required
 #@user_passes_test(lambda user: not u.is_telefonista(user),)
