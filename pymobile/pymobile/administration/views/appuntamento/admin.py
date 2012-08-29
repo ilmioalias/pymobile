@@ -175,7 +175,7 @@ def del_object(request):
 def get_mail_subject(appuntamento):
     msg = []
     msg.extend(["--- Appuntamento---"])
-    msg.extend(["\n\tdata e ora: ", appuntamento.data.strftime("%d/%m/%Y, %H:%M"), ":"])
+    msg.extend(["\n\tdata e ora: ", appuntamento.data.strftime("%d/%m/%Y, %H:%M")])
     if appuntamento.cliente:
         cliente = appuntamento.cliente
         msg.extend(["\n--- Cliente ---"])
