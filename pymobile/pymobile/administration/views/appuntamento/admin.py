@@ -175,7 +175,7 @@ def del_object(request):
 def get_mail_subject(appuntamento):
     msg = []
     msg.extend(["--- Appuntamento---"])
-    msg.extend(["\n\tdata e ora: ", appuntamento.data.strftime("%d/%m/%Y"), ":"])
+    msg.extend(["\n\tdata e ora: ", appuntamento.data.strftime("%d/%m/%Y, %H:%M"), ":"])
     if appuntamento.cliente:
         cliente = appuntamento.cliente
         msg.extend(["\n--- Cliente ---"])
@@ -188,7 +188,7 @@ def get_mail_subject(appuntamento):
         msg.extend(["\n\temail cliente: ", str(cliente.email)])
         msg.extend(["\n\tfax cliente: ", str(cliente.fax)])
         msg.extend(["\n\tindirizzo: ", str(cliente.indirizzo)])
-        msg.extend(["\n\tindirizzo: ", str(cliente.residenza)])       
+        msg.extend(["\n\tcittà: ", str(cliente.residenza)])       
     if appuntamento.referente:
         referente = appuntamento.referente
         msg.extend(["\n--- Referente ---"])
@@ -197,7 +197,7 @@ def get_mail_subject(appuntamento):
         msg.extend(["\n\ttelefono referente: ", str(referente.telefono)])
         msg.extend(["\n\tcellulare referente: ", str(referente.cellulare)])
         msg.extend(["\n\temail referente: ", str(referente.email)])
-    msg.extend(["\n--- Appuntamento---"])
+    msg.extend(["\n--- Informazioni---"])
     msg.extend(["\n\tgestore fisso: ", str(appuntamento.gestore_fisso)])
     msg.extend(["\n\tgestore mobile: ", str(appuntamento.gestore_mob)])
     msg.extend(["\n\tnumero di sim: ", str(appuntamento.num_sim)])
