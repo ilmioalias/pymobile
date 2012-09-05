@@ -770,7 +770,7 @@ class AppuntamentoTelefonistaForm(forms.ModelForm):
 
 class AppuntamentoFilterForm(forms.ModelForm):    
     # FIXME: aggiungere tasto mail dopo assegnazione
-    RICHIAMARE=((0, "No"), (1, "Sì"))  
+    RICHIAMARE=((0, u"No"), (1, u"Sì"))  
     richiamare = forms.MultipleChoiceField(choices=RICHIAMARE, 
                                            label="Da richiamare",
                                            initial=[0, 1],
