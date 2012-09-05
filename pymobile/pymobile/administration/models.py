@@ -137,7 +137,9 @@ class RetribuzioneDipendente(models.Model):
                 prov = "{}€ per contratto".format(str(self.provvigione_contratto))
             if self.provvigione_bonus:
                 prov += " + provvigione bonus"
-            return "da {} a {}: {}".format(self.data_inizio, self.data_fine, prov)
+            return "da {} a {}: {}".format(self.data_inizio.strftime("%d/%m/%Y"), 
+                                           self.data_fine.strftime("%d/%m/%Y"), 
+                                           prov)
         else:
             prov = "fisso={}".format(self.fisso)
             if self.dipendente.ruolo == "agt": 
@@ -146,7 +148,8 @@ class RetribuzioneDipendente(models.Model):
                 prov += " + {}€ per contratto".format(str(self.provvigione_contratto))
             if self.provvigione_bonus:
                 prov += " + provvigione bonus"
-            return "da {}: {}".format(self.data_inizio, prov)  
+            return "da {}: {}".format(self.data_inizio.strftime("%d/%m/%Y"), 
+                                      prov)  
         
     class Meta:
         verbose_name_plural = "Retribuzuioni Dipendenti"
@@ -532,7 +535,7 @@ class Contratto(models.Model):
 #        models.Model.clean(self)   
     
     def __unicode__(self):
-        return "{} - {}".format(self.cliente, self.data_stipula)
+        return "{} - {}".format(self.cliente, self.data_stipula.strftime("%d/%m/%Y"))
        
     class Meta:
         verbose_name_plural = "Contratti"
