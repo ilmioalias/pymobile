@@ -41,3 +41,4 @@ fixtures/*
 *.log
 *.pot
 local_settings.py
+*.log.*
