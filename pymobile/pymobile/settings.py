@@ -198,6 +198,8 @@ EMAIL_PORT=587
 EMAIL_HOST_USER="servermobiltime@gmail.com"
 EMAIL_HOST_PASSWORD="mobiltime2012"
 EMAIL_USE_TLS=True
+SERVER_EMAIL = 'django@my-domain.com'
+
 
 # Authentication
 AUTH_PROFILE_MODULE = 'administration.Dipendente'
