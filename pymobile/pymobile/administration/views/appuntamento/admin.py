@@ -165,7 +165,8 @@ def del_object(request):
     ids = query_get.getlist("id")      
     objs = models.Appuntamento.objects.filter(id__in=ids)
     
-    logger.debug("{}: ha intenzione di eliminare gli appuntamenti {}".format(request.user, [str(obj) for obj in objs]))
+    logger.debug("{}: ha intenzione di eliminare gli appuntamenti "
+                 "{}".format(request.user, [str(obj) for obj in objs]))
     
     data = {"objs": objs}
     return render_to_response(template,
