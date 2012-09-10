@@ -174,34 +174,34 @@ def del_object(request):
 
 def get_mail_subject(appuntamento):
     msg = []
-    msg.extend(["--- Appuntamento---"])
-    msg.extend(["\n\tdata e ora: ", appuntamento.data.strftime("%d/%m/%Y, %H:%M")])
+    msg.append("--- Appuntamento---")
+    msg.append("\n\tdata e ora: {}".format(appuntamento.data.strftime("%d/%m/%Y, %H:%M")))
     if appuntamento.cliente:
         cliente = appuntamento.cliente
-        msg.extend(["\n--- Cliente ---"])
-        msg.extend(["\n\tcliente: ", str(cliente)])
+        msg.append("\n--- Cliente ---")
+        msg.append("\n\tcliente: {}".format(cliente))
         if cliente.blindato:
             msg.append(" [blindato]")
-        msg.extend(["\n\ttipo: ", str(cliente.tipo)])
-        msg.extend(["\n\ttelefono cliente: ", str(cliente.telefono)])
-        msg.extend(["\n\tcellulare cliente: ", str(cliente.cellulare)])
-        msg.extend(["\n\temail cliente: ", str(cliente.email)])
-        msg.extend(["\n\tfax cliente: ", str(cliente.fax)])
-        msg.extend(["\n\tindirizzo: ", str(cliente.indirizzo)])
-        msg.extend(["\n\tcittà: ", str(cliente.residenza)])       
+        msg.append("\n\ttipo: {}".format(cliente.tipo))
+        msg.append("\n\ttelefono cliente: {}".format(cliente.telefono))
+        msg.append("\n\tcellulare cliente: {}".format(cliente.cellulare))
+        msg.append("\n\temail cliente: {}".format(cliente.email))
+        msg.append("\n\tfax cliente: {}".format(cliente.fax))
+        msg.append("\n\tindirizzo: {}".format(cliente.indirizzo))
+        msg.append("\n\tcittà: {}".format(cliente.residenza))       
     if appuntamento.referente:
         referente = appuntamento.referente
-        msg.extend(["\n--- Referente ---"])
-        msg.extend(["\n\treferente: ", str(referente)])
-        msg.extend(["\n\tqualifica: ", str(referente.qualifica)])
-        msg.extend(["\n\ttelefono referente: ", str(referente.telefono)])
-        msg.extend(["\n\tcellulare referente: ", str(referente.cellulare)])
-        msg.extend(["\n\temail referente: ", str(referente.email)])
-    msg.extend(["\n--- Informazioni---"])
-    msg.extend(["\n\tgestore fisso: ", str(appuntamento.gestore_fisso)])
-    msg.extend(["\n\tgestore mobile: ", str(appuntamento.gestore_mob)])
-    msg.extend(["\n\tnumero di sim: ", str(appuntamento.num_sim)])
-    msg.extend(["\n\tnota: ", str(appuntamento.nota)])    
+        msg.append("\n--- Referente ---")
+        msg.append("\n\treferente: {}".format(referente))
+        msg.append("\n\tqualifica: {}".format(referente.qualifica))
+        msg.append("\n\ttelefono referente: {}".format(referente.telefono))
+        msg.append("\n\tcellulare referente: {}".format(referente.cellulare))
+        msg.append("\n\temail referente: {}".format(referente.email))
+    msg.append("\n--- Informazioni---")
+    msg.append("\n\tgestore fisso: {}".format(appuntamento.gestore_fisso))
+    msg.append("\n\tgestore mobile: {}".format(appuntamento.gestore_mob))
+    msg.append("\n\tnumero di sim: {}".format(appuntamento.num_sim))
+    msg.append("\n\tnota: {}".format(appuntamento.nota))    
     return ''.join(msg)
 
 @login_required
