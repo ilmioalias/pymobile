@@ -56,7 +56,7 @@ class Dipendente(models.Model):
         if self.data_licenziamento:
             msg += "[{} - {}]".format(self.data_assunzione.strftime("%d/%m/%Y"), 
                                       self.data_licenziamento.strftime("%d/%m/%Y"))
-        return msg
+        return unicode(msg, "utf-8")
 #        return "%s %s" % (self.cognome, self.nome)
     
     class Meta:
@@ -137,9 +137,9 @@ class RetribuzioneDipendente(models.Model):
                 prov = "{}€ per contratto".format(str(self.provvigione_contratto))
             if self.provvigione_bonus:
                 prov += " + provvigione bonus"
-            return "da {} a {}: {}".format(self.data_inizio.strftime("%d/%m/%Y"), 
-                                           self.data_fine.strftime("%d/%m/%Y"), 
-                                           prov)
+            msg = "da {} a {}: {}".format(self.data_inizio.strftime("%d/%m/%Y"), 
+                                          self.data_fine.strftime("%d/%m/%Y"), 
+                                          prov)
         else:
             prov = "fisso={}".format(self.fisso)
             if self.dipendente.ruolo == "agt": 
@@ -148,8 +148,9 @@ class RetribuzioneDipendente(models.Model):
                 prov += " + {}€ per contratto".format(str(self.provvigione_contratto))
             if self.provvigione_bonus:
                 prov += " + provvigione bonus"
-            return "da {}: {}".format(self.data_inizio.strftime("%d/%m/%Y"), 
-                                      prov)  
+            msg = "da {}: {}".format(self.data_inizio.strftime("%d/%m/%Y"), 
+                                     prov)  
+        return unicode(msg, "utf-8")
         
     class Meta:
         verbose_name_plural = "Retribuzuioni Dipendenti"
@@ -185,14 +186,17 @@ class Cliente(models.Model):
             msg = "{}".format(self.denominazione)
             if self.cognome:
                 msg += "di {} {}".format(self.cognome, self.nome)
-            return msg
+            return unicode(msg, "utf-8")
         if self.cognome:
-            return "{} {}".format(self.cognome, self.nome)
+            msg = "{} {}".format(self.cognome, self.nome)
+            return unicode(msg, "utf-8")
         if self.tipo == "bus":
-            return "P.I. {}".format(self.partiva_codfisc)
+            msg = "P.I. {}".format(self.partiva_codfisc)
+            return unicode(msg, "utf-8")
         else:
-            return "C.F. {}".format(self.partiva_codfisc)
-        
+            msg = "C.F. {}".format(self.partiva_codfisc)
+            return unicode(msg, "utf-8")
+
     class Meta:
         ordering = ["denominazione", "cognome"]
         verbose_name_plural = "Clienti"
@@ -224,9 +228,10 @@ class ClienteAppuntamento(models.Model):
             msg = "{}".format(self.denominazione)
             if self.cognome:
                 msg += "di {} {}".format(self.cognome, self.nome)
-            return msg
+            return unicode(msg, "utf-8")
         if self.cognome:
-            return "{} {}".format(self.cognome, self.nome)
+            msg = "{} {}".format(self.cognome, self.nome)
+            return unicode(msg, "utf-8")
         
     class Meta:
         ordering = ["denominazione", "cognome"]
@@ -236,8 +241,9 @@ class Gestore(models.Model):
     denominazione = models.CharField(max_length=45, primary_key=True,)
     
     def __unicode__(self):
-        return "{}".format(self.denominazione)
-    
+        msg = "{}".format(self.denominazione)
+        return unicode(msg, "utf-8")
+        
     class Meta:
         verbose_name_plural = "Gestori"
 
@@ -247,8 +253,9 @@ class TipologiaTariffa(models.Model):
                             help_text="tipologia della tariffa")
 
     def __unicode__(self):
-        return "{}".format(self.denominazione)
-    
+        msg = "{}".format(self.denominazione)
+        return unicode(msg, "utf-8")
+        
     class Meta:
         verbose_name_plural = "Tipologie delle tariffe"
         unique_together = ("gestore", "denominazione")
@@ -259,7 +266,8 @@ class FasciaTariffa(models.Model):
                               verbose_name="fascia di consumo della tariffa")
 
     def __unicode__(self):
-        return "{}".format(self.denominazione)  
+        msg = "{}".format(self.denominazione)  
+        return unicode(msg, "utf-8")
     
     class Meta:
         verbose_name_plural = "Fasce di consumo delle tariffe"
@@ -272,8 +280,9 @@ class ServizioTariffa(models.Model):
                                 verbose_name="servizio di portabilità")
 
     def __unicode__(self):
-        return "{}".format(self.denominazione)
-    
+        msg = "{}".format(self.denominazione)
+        return unicode(msg, "utf-8")
+        
     class Meta:
         verbose_name_plural = "Servizi di portabilità"
         unique_together = ("gestore", "denominazione")      
@@ -371,7 +380,7 @@ class Tariffa(models.Model):
             msg += "," + str(self.fascia)
         if self.servizio:
             msg += "," + str(self.servizio)                    
-        return msg           
+        return unicode(msg, "utf-8")          
             
     class Meta:
         verbose_name_plural = "Tariffe"
@@ -391,7 +400,7 @@ class Referente(models.Model):
         msg = "{} {}".format(self.cognome, self.nome)
         if self.qualifica:
             msg += "- {}".format(self.qualifica)
-        return msg
+        return unicode(msg, "utf-8")
     
     class Meta:
         verbose_name_plural = "Referenti"
@@ -445,7 +454,8 @@ class Appuntamento(models.Model):
     def __unicode__(self):
         data = self.data.strftime("%d/%m/%Y alle %H:%M")
         cliente = self.cliente
-        return "{} con {}".format(data, cliente)
+        msg = "{} con {}".format(data, cliente)
+        return unicode(msg, "utf-8")
     
     class Meta:
         verbose_name_plural = "Appuntamenti"
@@ -535,7 +545,8 @@ class Contratto(models.Model):
 #        models.Model.clean(self)   
     
     def __unicode__(self):
-        return "{} - {}".format(self.cliente, self.data_stipula.strftime("%d/%m/%Y"))
+        msg = "{} - {}".format(self.cliente, self.data_stipula.strftime("%d/%m/%Y"))
+        return unicode(msg, "utf-8")
        
     class Meta:
         verbose_name_plural = "Contratti"
@@ -549,7 +560,8 @@ class PianoTariffario(models.Model):
     opzione = models.BooleanField(blank=True, help_text="la tariffa è un opzione")
 
     def __unicode__(self):
-        return "{}: {}".format(self.contratto, self.tariffa)
+        msg = "{}: {}".format(self.contratto, self.tariffa)
+        return unicode(msg, "utf-8")
     
     class Meta:
         verbose_name_plural = "Piani Tariffari"
@@ -629,7 +641,8 @@ class DatoPianoTariffario(models.Model):
 
     
     def __unicode__(self):
-        return "{}: {}".format(self.piano_tariffario, self.telefono)
+        msg = "{}: {}".format(self.piano_tariffario, self.telefono)
+        return unicode(msg, "utf-8")
     
     class Meta:
         verbose_name_plural = "Dati Identificativi"    
@@ -686,7 +699,8 @@ class Obiettivo(models.Model):
                                               .format(self.denominazione))
     
     def __unicode__(self):
-        return "{}".format(self.denominazione)
-    
+        msg = "{}".format(self.denominazione)
+        return unicode(msg, "utf-8")
+        
     class Meta:
         verbose_name_plural = "Obiettivi"
