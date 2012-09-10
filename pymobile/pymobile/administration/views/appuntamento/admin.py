@@ -182,26 +182,26 @@ def get_mail_subject(appuntamento):
         msg.append("\n\tcliente: {}".format(cliente))
         if cliente.blindato:
             msg.append(" [blindato]")
-        msg.append("\n\ttipo: {}".format(cliente.tipo))
+        msg.append("\n\ttipo: {}".format(cliente.tipo.encode("utf-8")))
         msg.append("\n\ttelefono cliente: {}".format(cliente.telefono))
         msg.append("\n\tcellulare cliente: {}".format(cliente.cellulare))
-        msg.append("\n\temail cliente: {}".format(cliente.email))
+        msg.append("\n\temail cliente: {}".format(cliente.email.encode("utf-8")))
         msg.append("\n\tfax cliente: {}".format(cliente.fax))
-        msg.append("\n\tindirizzo: {}".format(cliente.indirizzo))
-        msg.append("\n\tcittà: {}".format(cliente.residenza))       
+        msg.append("\n\tindirizzo: {}".format(cliente.indirizzo.encode("utf-8")))
+        msg.append("\n\tcittà: {}".format(cliente.residenza.encode("utf-8")))       
     if appuntamento.referente:
         referente = appuntamento.referente
         msg.append("\n--- Referente ---")
         msg.append("\n\treferente: {}".format(referente))
-        msg.append("\n\tqualifica: {}".format(referente.qualifica))
+        msg.append("\n\tqualifica: {}".format(referente.qualifica.encode("utf-8")))
         msg.append("\n\ttelefono referente: {}".format(referente.telefono))
         msg.append("\n\tcellulare referente: {}".format(referente.cellulare))
-        msg.append("\n\temail referente: {}".format(referente.email))
+        msg.append("\n\temail referente: {}".format(referente.email.encode("utf-8")))
     msg.append("\n--- Informazioni---")
     msg.append("\n\tgestore fisso: {}".format(appuntamento.gestore_fisso))
     msg.append("\n\tgestore mobile: {}".format(appuntamento.gestore_mob))
     msg.append("\n\tnumero di sim: {}".format(appuntamento.num_sim))
-    msg.append("\n\tnota: {}".format(appuntamento.nota))    
+    msg.append("\n\tnota: {}".format(appuntamento.nota.encode("utf-8")))    
     return ''.join(msg)
 
 @login_required
